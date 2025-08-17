@@ -1,0 +1,24 @@
+{
+  "name": "makecode-arcade-sprite-generator",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "workspaces": [
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && source venv/bin/activate && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "build": "npm run build:client",
+    "build:client": "cd client && npm run build",
+    "lint": "npm run lint:client",
+    "lint:client": "cd client && npm run lint",
+    "setup": "npm install && cd client && npm install && cd ../server && npm run setup",
+    "setup:server": "cd server && npm run setup",
+    "clean": "rm -rf node_modules client/node_modules server/node_modules client/dist server/venv"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

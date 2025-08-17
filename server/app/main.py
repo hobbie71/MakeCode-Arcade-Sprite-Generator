@@ -1,0 +1,65 @@
+from fastapi import FastAPI, HTTPException, UploadFile, File, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
+import logging
+from typing import List
+
+from .routers import sprites, ai, convert, health
+from .database import engine, Base
+from .core.config import settings
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+    logger.info("Server startup complete")
+    yield
+    # Shutdown
+    logger.info("Server shutdown")
+
+app = FastAPI(
+    title="MakeCode Arcade Sprite Generator API",
+    description="API for generating, converting, and managing MakeCode Arcade sprites",
+    version="0.1.0",
+    lifespan=lifespan
+)
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(health.router, prefix="/api", tags=["health"])
+app.include_router(sprites.router, prefix="/api/sprites", tags=["sprites"])
+app.include_router(ai.router, prefix="/api/ai", tags=["ai"])
+app.include_router(convert.router, prefix="/api/convert", tags=["convert"])
+
+@app.get("/")
+async def root():
+    return {"message": "MakeCode Arcade Sprite Generator API", "version": "0.1.0"}
+
+@app.exception_handler(404)
+async def not_found_handler(request, exc):
+    return JSONResponse(
+        status_code=404,
+        content={"success": False, "error": "Endpoint not found"}
+    )
+
+@app.exception_handler(500)
+async def internal_error_handler(request, exc):
+    logger.error(f"Internal server error: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={"success": False, "error": "Internal server error"}
+    )
