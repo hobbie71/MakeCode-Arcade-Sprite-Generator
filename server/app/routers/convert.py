@@ -41,7 +41,7 @@ async def _convert_image_to_sprite_data(image: Image.Image, options: Dict[str, A
     height = options.get("targetHeight", 16)
     
     # Resize image
-    resized = image.resize((width, height), Image.NEAREST)
+    resized = image.resize((width, height), Image.Resampling.NEAREST)
     
     # Convert to MakeCode colors (simplified)
     sprite_data = []

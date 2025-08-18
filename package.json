@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "workspaces": [
-    "client"
+    "client",
+    "server"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
@@ -19,6 +20,17 @@
     "clean": "rm -rf node_modules client/node_modules server/node_modules client/dist server/venv"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.0",
+    "sass-embedded": "^1.90.0"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Javier Tamayo",
+    "email": "javierj.tamayo@gmail.com",
+    "url": "https://github.com/hobbie71"
+  },
+  "repository": {
+    "type": "github",
+    "url": "git@github.com:hobbie71/MakeCode-Arcade-Sprite-Generator.git"
   }
 }
