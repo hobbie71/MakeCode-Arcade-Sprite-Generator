@@ -3,12 +3,14 @@ import { MakeCodeColor, MakeCodePalette } from "@/types/color";
 
 import { getHexFromColor } from "@/utils/getHexFromColor";
 
+import { PIXEL_SIZE } from "../constants/pixelSize";
+
 export function drawPixelOnCanvas(
   canvas: HTMLCanvasElement,
   position: Coordinates,
   color: MakeCodeColor,
-  pixelSize: number,
-  palette?: MakeCodePalette
+  palette?: MakeCodePalette,
+  pixelSize: number = PIXEL_SIZE
 ): void {
   if (color === MakeCodeColor.TRANSPARENT) {
     drawCheckerboard(canvas, position, pixelSize);
@@ -56,4 +58,27 @@ function drawCheckerboard(
       );
     }
   }
+}
+
+export function drawPixelOnCanvasTransparent(
+  canvas: HTMLCanvasElement,
+  position: Coordinates,
+  color: MakeCodeColor,
+  palette?: MakeCodePalette,
+  pixelSize: number = PIXEL_SIZE
+): void {
+  if (color === MakeCodeColor.TRANSPARENT) return;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const hexColor = getHexFromColor(color, palette);
+
+  ctx.fillStyle = hexColor;
+  ctx.fillRect(
+    position.x * pixelSize,
+    position.y * pixelSize,
+    pixelSize,
+    pixelSize
+  );
 }

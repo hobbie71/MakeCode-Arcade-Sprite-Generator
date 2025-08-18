@@ -12,20 +12,18 @@ export function handleDraw(
   canvas: HTMLCanvasElement,
   coordinates: Coordinates,
   color: MakeCodeColor,
-  pixelSize: number,
   palette: MakeCodePalette,
   tool: EditorTools
 ) {
   switch (tool) {
     case EditorTools.Pencil:
-      drawPixelOnCanvas(canvas, coordinates, color, pixelSize, palette);
+      drawPixelOnCanvas(canvas, coordinates, color, palette);
       break;
     case EditorTools.Eraser:
       drawPixelOnCanvas(
         canvas,
         coordinates,
         MakeCodeColor.TRANSPARENT,
-        pixelSize,
         palette
       );
       break;

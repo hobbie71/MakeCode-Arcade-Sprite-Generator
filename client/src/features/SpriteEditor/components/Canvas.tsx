@@ -35,9 +35,9 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
   return (
     <div
       style={{
-        width: "100vw",
-        height: "100vh",
-        overflow: "scroll",
+        width: "100%",
+        minHeight: "100%",
+        overflow: "hidden",
         position: "relative",
         background: "#1e1e1e",
         cursor: tool === "pan" ? "grab" : "crosshair",
