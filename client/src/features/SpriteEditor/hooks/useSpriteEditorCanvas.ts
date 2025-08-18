@@ -53,14 +53,7 @@ export const useSpriteEditorCanvas = (
         pixelSize,
         zoom
       );
-      handleDraw(
-        canvasRef.current,
-        coordinates,
-        color,
-        pixelSize,
-        palette,
-        tool
-      );
+      handleDraw(canvasRef.current, coordinates, color, palette, tool);
 
       updateSpriteData(coordinates, color);
     },
@@ -85,14 +78,7 @@ export const useSpriteEditorCanvas = (
         pixelSize,
         zoom
       );
-      handleDraw(
-        canvasRef.current,
-        coordinates,
-        color,
-        pixelSize,
-        palette,
-        tool
-      );
+      handleDraw(canvasRef.current, coordinates, color, palette, tool);
 
       updateSpriteData(coordinates, color);
     },
@@ -127,14 +113,13 @@ export const useSpriteEditorCanvas = (
         drawPixelOnCanvas(
           canvasRef.current,
           { x, y },
-          MakeCodeColor.TRANSPARENT,
-          pixelSize
+          MakeCodeColor.TRANSPARENT
         );
       }
     }
 
     initSpriteData();
-  }, [canvasRef, height, pixelSize, width, initSpriteData]);
+  }, [canvasRef, height, width, initSpriteData]);
 
   return {
     handlePointerDown,

@@ -20,6 +20,7 @@
     "clean": "rm -rf node_modules client/node_modules server/node_modules client/dist server/venv"
   },
   "devDependencies": {
+    "@types/prismjs": "^1.26.5",
     "concurrently": "^9.1.0",
     "sass-embedded": "^1.90.0"
   },
@@ -32,5 +33,8 @@
   "repository": {
     "type": "github",
     "url": "git@github.com:hobbie71/MakeCode-Arcade-Sprite-Generator.git"
+  },
+  "dependencies": {
+    "prismjs": "^1.30.0"
   }
 }

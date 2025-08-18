@@ -8,7 +8,7 @@ import SideBar from "./Sidebar/Sidebar";
 const SpriteEditor = () => {
   return (
     <SpriteEditorProvider>
-      <div className="sprite-editor-container flex flex-row">
+      <div className="sprite-editor-container relative flex flex-row">
         <SideBar />
         <Canvas width={16} height={16} />
       </div>
