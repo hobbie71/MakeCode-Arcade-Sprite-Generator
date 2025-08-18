@@ -1,5 +1,5 @@
 {
-  "name": "makecode-sprite-generator-server",
+  "name": "@makecode-sprite-generator/server",
   "version": "0.0.0",
   "private": true,
   "scripts": {

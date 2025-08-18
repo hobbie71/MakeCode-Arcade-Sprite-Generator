@@ -1,0 +1,19 @@
+// Provder imports
+import SpriteEditorProvider from "./Provider/SpriteEditorProviders";
+
+// Component imports
+import Canvas from "./components/Canvas";
+import SideBar from "./Sidebar/Sidebar";
+
+const SpriteEditor = () => {
+  return (
+    <SpriteEditorProvider>
+      <div className="sprite-editor-container flex flex-row">
+        <SideBar />
+        <Canvas width={16} height={16} />
+      </div>
+    </SpriteEditorProvider>
+  );
+};
+
+export default SpriteEditor;

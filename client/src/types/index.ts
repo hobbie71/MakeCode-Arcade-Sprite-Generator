@@ -1,3 +1,6 @@
+import { MakeCodeColor } from "./color";
+import { EditorTools } from "./tools";
+
 // Sprite-related types
 export interface Sprite {
   id: string;
@@ -18,26 +21,6 @@ export interface SpriteFrame {
   duration?: number; // for animation (milliseconds)
 }
 
-// MakeCode Arcade color palette
-export enum MakeCodeColor {
-  TRANSPARENT = ".",
-  WHITE = "1",
-  RED = "2",
-  PINK = "3",
-  ORANGE = "4",
-  YELLOW = "5",
-  TEAL = "6",
-  GREEN = "7",
-  BLUE = "8",
-  LIGHT_BLUE = "9",
-  PURPLE = "a",
-  LIGHT_PURPLE = "b",
-  DARK_PURPLE = "c",
-  TAN = "d",
-  BROWN = "e",
-  BLACK = "f",
-}
-
 // Export formats
 export type ExportFormat = "javascript" | "python" | "makecode" | "png";
 
@@ -51,8 +34,9 @@ export interface ExportOptions {
 // AI Generation
 export interface AIPrompt {
   text: string;
-  style?: "pixel-art" | "8-bit" | "retro" | "minecraft";
-  size?: "16x16" | "32x32" | "64x64";
+  style: "pixel-art" | "8-bit" | "retro" | "minecraft";
+  width: number;
+  height: number;
   colors?: "makecode" | "full-color";
 }
 
@@ -85,22 +69,13 @@ export interface APIResponse<T> {
 // Editor state
 export interface EditorState {
   currentSprite: Sprite | null;
-  selectedTool: DrawingTool;
+  selectedTool: EditorTools;
   selectedColor: MakeCodeColor;
   zoom: number;
   showGrid: boolean;
   history: EditorAction[];
   historyIndex: number;
 }
-
-export type DrawingTool =
-  | "pencil"
-  | "eraser"
-  | "fill"
-  | "line"
-  | "rectangle"
-  | "circle"
-  | "select";
 
 export interface EditorAction {
   type: "draw" | "erase" | "fill" | "clear";
