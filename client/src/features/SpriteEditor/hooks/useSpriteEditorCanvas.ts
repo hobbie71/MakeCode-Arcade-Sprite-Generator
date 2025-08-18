@@ -6,6 +6,9 @@ import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelec
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
 import { useZoom } from "../contexts/ZoomContext/useZoom";
 
+// Hook imports
+import { useSpriteData } from "./useSpriteData";
+
 // Lib imports
 import { getCanvasCoordinates } from "../libs/getCanvasCoordinates";
 import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
@@ -28,6 +31,7 @@ export const useSpriteEditorCanvas = (
   const { color, palette } = useColorSelected();
   const { tool } = useToolSelected();
   const { zoom } = useZoom();
+  const { initSpriteData, updateSpriteData } = useSpriteData();
 
   // Refs
   const isPointerDown = useRef<boolean>(false);
@@ -57,8 +61,10 @@ export const useSpriteEditorCanvas = (
         palette,
         tool
       );
+
+      updateSpriteData(coordinates, color);
     },
-    [canvasRef, color, palette, pixelSize, tool, zoom]
+    [canvasRef, color, palette, pixelSize, tool, zoom, updateSpriteData]
   );
 
   const handlePointerMove = useCallback(
@@ -87,8 +93,20 @@ export const useSpriteEditorCanvas = (
         palette,
         tool
       );
+
+      updateSpriteData(coordinates, color);
     },
-    [canvasRef, color, palette, pixelSize, tool, offset, zoom, setOffset]
+    [
+      canvasRef,
+      color,
+      palette,
+      pixelSize,
+      tool,
+      offset,
+      zoom,
+      setOffset,
+      updateSpriteData,
+    ]
   );
 
   const handlePointerUp = useCallback(() => {
@@ -114,7 +132,9 @@ export const useSpriteEditorCanvas = (
         );
       }
     }
-  }, [canvasRef, height, pixelSize, width]);
+
+    initSpriteData();
+  }, [canvasRef, height, pixelSize, width, initSpriteData]);
 
   return {
     handlePointerDown,

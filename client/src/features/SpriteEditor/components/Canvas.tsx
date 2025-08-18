@@ -4,6 +4,7 @@ import { useEffect, memo, useState } from "react";
 import { useCanvas } from "../contexts/CanvasContext/useCanvas";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
 import { useZoom } from "../contexts/ZoomContext/useZoom";
+import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
 
 // Hook import
 import { useSpriteEditorCanvas } from "../hooks/useSpriteEditorCanvas";
@@ -14,10 +15,11 @@ interface Props {
   pixelSize?: number;
 }
 
-const Canvas = memo(({ width, height, pixelSize = 20 }: Props) => {
+const Canvas = memo(({ pixelSize = 20 }: Props) => {
   const { canvasRef } = useCanvas();
   const { tool } = useToolSelected();
   const { zoom } = useZoom();
+  const { width, height } = useCanvasSize();
 
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const {
