@@ -1,9 +1,10 @@
 # MakeCode Arcade Sprite Generator
 
 [![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.0.0-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](package.json)
 [![React](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4.3-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 A powerful, AI-enhanced sprite generation and editing tool specifically designed for MakeCode Arcade development. Transform images and text prompts into pixel-perfect sprites with multiple export options.
 
@@ -137,19 +138,19 @@ img`
 #### Version 0.1.0 - Basic Sprite Editor
 
 - [x] Project initialization and setup
-- [ ] **Canvas-based pixel editor** (multi-size grid support)
-- [ ] **Basic drawing tools** (pencil, eraser, fill bucket)
-- [ ] **MakeCode color palette** (16 colors) integration
-- [ ] **Real-time preview** of sprite changes
-- [ ] **PNG export** functionality
+- [x] **Canvas-based pixel editor** (multi-size grid support)
+- [x] **Basic drawing tools** (pencil, eraser)
+- [x] **MakeCode color palette** (16 colors) integration
+- [x] **Real-time preview** of sprite changes
+- [x] **PNG export** functionality
 
 #### Version 0.2.0 - MakeCode Integration
 
-- [ ] **MakeCode paste format export** (highest priority for users)
-- [ ] **JavaScript code export** with sprites.create()
-- [ ] **Copy to clipboard** functionality
+- [x] **MakeCode paste format export** (highest priority for users)
+- [x] **JavaScript code export** with sprites.create()
+- [x] **Copy to clipboard** functionality
 - [ ] **Grid size selection**
-- [ ] **Zoom controls** for precise editing
+- [x] **Zoom controls** for precise editing
 
 ### Phase 2: Image Processing (High Value Features)
 
@@ -199,7 +200,7 @@ img`
 
 - [ ] **Layer system** for complex sprites
 - [ ] **Undo/Redo system** (unlimited history)
-- [ ] **Selection tools** (rectangle, lasso, magic wand)
+- [ ] **Selection tools** (rectangle, line, fill bucket, etc)
 - [ ] **Copy/paste** between sprites
 - [ ] **Transformation tools** (rotate, flip, scale)
 
