@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 // Context imports
 import { useSprite } from "../../../context/SpriteContext/useSprite";
@@ -19,24 +19,66 @@ export const useSpriteData = () => {
   const { setSpriteData, spriteData } = useSprite();
   const { width, height } = useCanvasSize();
 
+  // Ref to store sprite data during drawing (doesn't trigger rerenders)
+  const spriteDataRef = useRef<MakeCodeColor[][]>([[]]);
+
+  // Initialize ref with proper data when spriteData changes
+  if (spriteData.length > 0 && spriteData[0].length > 0) {
+    spriteDataRef.current = spriteData;
+  }
+
   const updateSpriteData = useCallback(
     (coordinates: Coordinates, color: MakeCodeColor) => {
       if (coordinates.x >= width || coordinates.y >= height) return;
 
-      setSpriteData((prevData) => {
-        const newData = prevData.map((row) => [...row]);
-        newData[coordinates.y][coordinates.x] = color;
-        return newData;
-      });
+      // Ensure the ref has proper dimensions
+      if (!spriteDataRef.current[coordinates.y]) return;
+      spriteDataRef.current[coordinates.y][coordinates.x] = color;
     },
-    [height, width, setSpriteData]
+    [height, width]
+  );
+
+  const commitSpriteData = useCallback(() => {
+    setSpriteData(spriteDataRef.current.map((row) => [...row]));
+  }, [setSpriteData]);
+
+  const getCurrentSpriteData = useCallback(() => {
+    return spriteDataRef.current;
+  }, []);
+
+  const resizeSpriteData = useCallback(
+    (newData: MakeCodeColor[][]) => {
+      // Update both ref and state with the new resized data
+      spriteDataRef.current = newData;
+      setSpriteData(newData);
+    },
+    [setSpriteData]
   );
 
   const initSpriteData = useCallback(() => {
     const data = Array.from({ length: height }, () =>
       Array(width).fill(MakeCodeColor.TRANSPARENT)
     );
+
+    spriteDataRef.current = data;
     setSpriteData(data);
+    return data;
+  }, [height, width, setSpriteData]);
+
+  const initCanvasOnly = useCallback(() => {
+    // Only initialize sprite data if it's empty or wrong size
+    if (
+      !spriteDataRef.current ||
+      spriteDataRef.current.length !== height ||
+      (spriteDataRef.current[0] && spriteDataRef.current[0].length !== width)
+    ) {
+      const data = Array.from({ length: height }, () =>
+        Array(width).fill(MakeCodeColor.TRANSPARENT)
+      );
+      spriteDataRef.current = data;
+      setSpriteData(data);
+    }
+    return spriteDataRef.current;
   }, [height, width, setSpriteData]);
 
   const getImgCode = useCallback((): string => {
@@ -78,8 +120,13 @@ export const useSpriteData = () => {
   );
 
   return {
+    spriteData,
     initSpriteData,
+    initCanvasOnly, // New function that doesn't overwrite existing data
     updateSpriteData,
+    commitSpriteData,
+    getCurrentSpriteData, // Function to get current ref data
+    resizeSpriteData, // New function for resizing
     getImgCode,
     exportSpriteToImage,
   };

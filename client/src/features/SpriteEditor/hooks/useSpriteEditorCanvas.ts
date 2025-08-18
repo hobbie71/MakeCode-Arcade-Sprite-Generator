@@ -31,7 +31,9 @@ export const useSpriteEditorCanvas = (
   const { color, palette } = useColorSelected();
   const { tool } = useToolSelected();
   const { zoom } = useZoom();
-  const { initSpriteData, updateSpriteData } = useSpriteData();
+  const { initCanvasOnly, updateSpriteData, commitSpriteData } =
+    useSpriteData();
+  // const { spriteData } = useSprite();
 
   // Refs
   const isPointerDown = useRef<boolean>(false);
@@ -98,28 +100,35 @@ export const useSpriteEditorCanvas = (
   const handlePointerUp = useCallback(() => {
     isPointerDown.current = false;
     lastPanPosition.current = null;
-  }, []);
+
+    // Commit sprite data to React state when drawing is complete
+    commitSpriteData();
+  }, [commitSpriteData]);
 
   const handlePointerLeave = useCallback(() => {
     isPointerDown.current = false;
     lastPanPosition.current = null;
-  }, []);
+
+    // Commit sprite data to React state when drawing is complete
+    commitSpriteData();
+  }, [commitSpriteData]);
 
   const initCanvas = useCallback(() => {
     if (!canvasRef.current) return;
 
+    // Get the current sprite data (preserves existing data or initializes if needed)
+    const currentData = initCanvasOnly();
+
+    // Draw the current sprite data to the canvas
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
-        drawPixelOnCanvas(
-          canvasRef.current,
-          { x, y },
-          MakeCodeColor.TRANSPARENT
-        );
+        const color = currentData[y]
+          ? currentData[y][x]
+          : MakeCodeColor.TRANSPARENT;
+        drawPixelOnCanvas(canvasRef.current, { x, y }, color);
       }
     }
-
-    initSpriteData();
-  }, [canvasRef, height, width, initSpriteData]);
+  }, [canvasRef, height, width, initCanvasOnly]);
 
   return {
     handlePointerDown,
