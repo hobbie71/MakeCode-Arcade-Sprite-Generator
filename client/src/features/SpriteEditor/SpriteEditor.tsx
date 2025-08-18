@@ -1,5 +1,5 @@
 // Provder imports
-import SpriteEditorProvider from "./Provider/SpriteEditorProviders";
+import SpriteEditorProvider from "./provider/SpriteEditorProviders";
 
 // Component imports
 import Canvas from "./components/Canvas";
