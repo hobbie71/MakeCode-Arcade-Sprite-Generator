@@ -11,9 +11,10 @@ import { MAX_LENGTH, MIN_LENGTH } from "@/types/pixel";
 
 interface Props {
   type: "width" | "height";
+  fixedSize?: number; // Should be between MIN_LENGTH and MAX_LENGTH
 }
 
-const SizeInput = ({ type }: Props) => {
+const SizeInput = ({ type, fixedSize }: Props) => {
   // Hooks
   const { width, height } = useCanvasSize();
   const { updateCanvasSize } = useCanvasResize();
@@ -22,6 +23,9 @@ const SizeInput = ({ type }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+    // Don't allow input if fixedSize is set
+    if (fixedSize) return;
+
     const input = e.currentTarget;
     if (input.value.length > 3) {
       input.value = input.value.slice(0, 3);
@@ -33,6 +37,12 @@ const SizeInput = ({ type }: Props) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Don't allow keyboard interaction if fixedSize is set
+    if (fixedSize) {
+      e.preventDefault();
+      return;
+    }
+
     if (e.key === "Enter") {
       handleUserSubmit();
     } else if (e.key === "ArrowUp") {
@@ -52,6 +62,9 @@ const SizeInput = ({ type }: Props) => {
   };
 
   const handleUserSubmit = () => {
+    // Don't allow submission if fixedSize is set
+    if (fixedSize) return;
+
     const input = inputRef.current;
     if (!input) return;
 
@@ -63,6 +76,9 @@ const SizeInput = ({ type }: Props) => {
   };
 
   const incrementSize = (amount: number) => {
+    // Don't allow increment if fixedSize is set
+    if (fixedSize) return;
+
     const input = inputRef.current;
     if (!input) return;
 
@@ -82,25 +98,43 @@ const SizeInput = ({ type }: Props) => {
     const input = inputRef.current;
     if (!input) return;
 
+    // If fixedSize is provided, use that value and don't respond to context changes
+    if (fixedSize) {
+      input.value = String(fixedSize);
+      return;
+    }
+
     if (type === "width") {
       input.value = String(width);
     } else {
       input.value = String(height);
     }
-  }, [type, width, height]);
+  }, [type, width, height, fixedSize]);
 
   return (
     <input
       ref={inputRef}
-      className="input-no-arrows px-3 py-2 min-w-24 text-center border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+      className={`input-no-arrows px-3 py-2 min-w-24 text-center border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+        fixedSize
+          ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+          : "text-gray-700 bg-white"
+      }`}
       type="number"
       maxLength={3}
       onInput={handleInput}
-      onDoubleClick={() => inputRef.current?.select()}
+      onDoubleClick={() => !fixedSize && inputRef.current?.select()}
       onKeyDown={handleKeyDown}
       onBlur={() => handleUserSubmit()}
       max={MAX_LENGTH}
       min={MIN_LENGTH}
+      disabled={fixedSize !== undefined}
+      readOnly={fixedSize !== undefined}
+      title={
+        fixedSize ? "This value is fixed and cannot be changed" : undefined
+      }
+      style={{
+        userSelect: fixedSize ? "none" : "auto",
+      }}
     />
   );
 };

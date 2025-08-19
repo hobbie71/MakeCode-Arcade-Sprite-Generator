@@ -1,21 +1,75 @@
+import { useState } from "react";
+
 // Components
-import SizeInput from "./components/SizeInput";
-import { H2, P } from "@/components/Typography";
+import SizeInputs from "./components/SizeInputs";
+import TabButton from "./components/TabButton";
+import GenerationMethodSection from "./GenerationMethodSection/GenerationMethodSection";
+
+// Type imports
+import { AssetType, assetTypes } from "@/types/export";
 
 const InputSection = () => {
+  const [selectedAsset, setSelectedAsset] = useState<AssetType>(
+    AssetType.Sprite
+  );
+
+  const handleAssetSelect = (assetType: AssetType) => {
+    setSelectedAsset(assetType);
+  };
+
   return (
-    <div className="input-section-container p-2">
-      <H2>Sprite Size (px)</H2>
-      <div className="input-size-container flex flex-row">
-        <div className="mr-3">
-          <P>Width</P>
-          <SizeInput type="width" />
-        </div>
-        <div className="">
-          <P>Height</P>
-          <SizeInput type="height" />
-        </div>
+    <div
+      className="input-section-container p-2"
+      style={{ backgroundColor: "#1e1e1e" }}>
+      <h1 className="heading-3">ArcadeMake Code Sprite Generator</h1>
+      <div className="asset-type-container flex flex-row gap-1 border-b-2 border-b-neutral-700 border-x-0 border-t-0">
+        {assetTypes.map((type) => (
+          <TabButton
+            key={type}
+            isSelected={selectedAsset === type}
+            onClick={() => handleAssetSelect(type)}>
+            {type.charAt(0).toUpperCase() + type.slice(1)}
+          </TabButton>
+        ))}
       </div>
+
+      {/* Conditional sections based on selected asset */}
+      {selectedAsset === AssetType.Sprite && (
+        <>
+          <h3 className="heading-3">Sprite Size (px)</h3>
+          <SizeInputs />
+        </>
+      )}
+
+      {selectedAsset === AssetType.Background && (
+        <div className="background-options">
+          <h3 className="heading-3">Background Size (px)</h3>
+          <SizeInputs fixedSize={{ x: 160, y: 120 }} />
+        </div>
+      )}
+
+      {selectedAsset === AssetType.Tile && (
+        <div className="tile-options">
+          <h3 className="heading-3">Tile Size (px)</h3>
+          <SizeInputs fixedSize={{ x: 16, y: 16 }} />
+        </div>
+      )}
+
+      {selectedAsset === AssetType.Tilemap && (
+        <div className="tilemap-options">
+          <h3 className="heading-3">Tilemap Size</h3>
+          <p className="paragraph text-white/80">Coming soon...</p>
+        </div>
+      )}
+
+      {selectedAsset === AssetType.Animation && (
+        <div className="animation-options">
+          <h3 className="heading-3">Animation Sprite Size (px)</h3>
+          <p className="paragraph text-white/80">Coming soon...</p>
+        </div>
+      )}
+
+      <GenerationMethodSection />
     </div>
   );
 };
