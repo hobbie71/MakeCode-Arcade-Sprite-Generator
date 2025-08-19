@@ -15,7 +15,7 @@ export const useCanvasResize = () => {
 
   const updateCanvasSize = useCallback(
     (newWidth: number, newHeight: number) => {
-      // Get the current sprite data from ref (most up-to-date)
+      // Get the current sprite data from ref (this should have the most up-to-date data)
       const currentData = getCurrentSpriteData();
       const resizedData = getResizedSpriteData(
         currentData,

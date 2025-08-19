@@ -10,6 +10,7 @@ import ZoomIcons from "./components/ZoomIcons/ZoomIcons";
 
 // Type imports
 import { EditorTools } from "@/types/tools";
+import { STROKE_SIZES } from "@/types/pixel";
 
 const TOOL_ICONS: Array<{ tool: EditorTools; icon: string }> = [
   { tool: EditorTools.Pencil, icon: "PencilReply" },
@@ -21,8 +22,6 @@ const TOOL_ICONS: Array<{ tool: EditorTools; icon: string }> = [
   { tool: EditorTools.Select, icon: "SelectAll" },
   { tool: EditorTools.Pan, icon: "HandsFree" },
 ];
-
-const STROKE_SIZES = [1, 3, 5];
 
 const SideBar = () => {
   return (

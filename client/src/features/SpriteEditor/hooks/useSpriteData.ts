@@ -31,7 +31,6 @@ export const useSpriteData = () => {
     (coordinates: Coordinates, color: MakeCodeColor) => {
       if (coordinates.x >= width || coordinates.y >= height) return;
 
-      // Ensure the ref has proper dimensions
       if (!spriteDataRef.current[coordinates.y]) return;
       spriteDataRef.current[coordinates.y][coordinates.x] = color;
     },
@@ -39,7 +38,7 @@ export const useSpriteData = () => {
   );
 
   const commitSpriteData = useCallback(() => {
-    setSpriteData(spriteDataRef.current.map((row) => [...row]));
+    setSpriteData(spriteDataRef.current);
   }, [setSpriteData]);
 
   const getCurrentSpriteData = useCallback(() => {
@@ -122,11 +121,11 @@ export const useSpriteData = () => {
   return {
     spriteData,
     initSpriteData,
-    initCanvasOnly, // New function that doesn't overwrite existing data
+    initCanvasOnly,
     updateSpriteData,
     commitSpriteData,
-    getCurrentSpriteData, // Function to get current ref data
-    resizeSpriteData, // New function for resizing
+    getCurrentSpriteData,
+    resizeSpriteData,
     getImgCode,
     exportSpriteToImage,
   };
