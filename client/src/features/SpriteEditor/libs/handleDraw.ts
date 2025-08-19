@@ -14,11 +14,11 @@ export function handleDraw(
   color: MakeCodeColor,
   palette: MakeCodePalette,
   tool: EditorTools
-) {
+): MakeCodeColor {
   switch (tool) {
     case EditorTools.Pencil:
       drawPixelOnCanvas(canvas, coordinates, color, palette);
-      break;
+      return color;
     case EditorTools.Eraser:
       drawPixelOnCanvas(
         canvas,
@@ -26,14 +26,13 @@ export function handleDraw(
         MakeCodeColor.TRANSPARENT,
         palette
       );
-      break;
+      return MakeCodeColor.TRANSPARENT;
     case EditorTools.Circle:
-      break;
     case EditorTools.Fill:
-      break;
     case EditorTools.Line:
-      break;
     case EditorTools.Rectangle:
-      break;
+      return color;
+    default:
+      return color;
   }
 }

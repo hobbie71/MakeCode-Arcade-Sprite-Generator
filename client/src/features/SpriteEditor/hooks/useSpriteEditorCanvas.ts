@@ -55,9 +55,15 @@ export const useSpriteEditorCanvas = (
         pixelSize,
         zoom
       );
-      handleDraw(canvasRef.current, coordinates, color, palette, tool);
+      const actualColor = handleDraw(
+        canvasRef.current,
+        coordinates,
+        color,
+        palette,
+        tool
+      );
 
-      updateSpriteData(coordinates, color);
+      updateSpriteData(coordinates, actualColor);
     },
     [canvasRef, color, palette, pixelSize, tool, zoom, updateSpriteData]
   );
@@ -80,9 +86,15 @@ export const useSpriteEditorCanvas = (
         pixelSize,
         zoom
       );
-      handleDraw(canvasRef.current, coordinates, color, palette, tool);
+      const actualColor = handleDraw(
+        canvasRef.current,
+        coordinates,
+        color,
+        palette,
+        tool
+      );
 
-      updateSpriteData(coordinates, color);
+      updateSpriteData(coordinates, actualColor);
     },
     [
       canvasRef,
@@ -101,7 +113,6 @@ export const useSpriteEditorCanvas = (
     isPointerDown.current = false;
     lastPanPosition.current = null;
 
-    // Commit sprite data to React state when drawing is complete
     commitSpriteData();
   }, [commitSpriteData]);
 
@@ -109,17 +120,14 @@ export const useSpriteEditorCanvas = (
     isPointerDown.current = false;
     lastPanPosition.current = null;
 
-    // Commit sprite data to React state when drawing is complete
     commitSpriteData();
   }, [commitSpriteData]);
 
   const initCanvas = useCallback(() => {
     if (!canvasRef.current) return;
 
-    // Get the current sprite data (preserves existing data or initializes if needed)
     const currentData = initCanvasOnly();
 
-    // Draw the current sprite data to the canvas
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const color = currentData[y]
