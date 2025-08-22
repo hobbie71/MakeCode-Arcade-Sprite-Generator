@@ -162,8 +162,8 @@ export function rgbaToMakeCodeColor(
   a: number = 255,
   palette: MakeCodePalette = ArcadePalette
 ): MakeCodeColor {
-  // If alpha is 0 or very low, return transparent
-  if (a < 128) {
+  // If alpha is 0 or low, return transparent
+  if (a < 200) {
     return MakeCodeColor.TRANSPARENT;
   }
 
