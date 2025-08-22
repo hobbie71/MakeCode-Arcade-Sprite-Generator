@@ -1,4 +1,5 @@
 import { useColorSelected } from "@/features/SpriteEditor/contexts/ColorSelectedContext/useColorSelected";
+import { MakeCodeColor } from "@/types";
 import { getHexFromColor } from "@/utils/getHexFromColor";
 
 const ICON_SIZE = 32; // px
@@ -19,7 +20,7 @@ const SelectedColorIcons = () => {
       style={{ width: "100%", height: ICON_SIZE + 8 }} // +8 for overlap
       onClick={() => swapColors()}>
       <div
-        className="absolute border border-black rounded"
+        className={`absolute border border-black rounded ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
         style={{
           width: "80%",
           height: ICON_SIZE,
@@ -30,7 +31,7 @@ const SelectedColorIcons = () => {
         }}
       />
       <div
-        className="absolute border border-black rounded"
+        className={`absolute border border-black rounded ${alternateColor === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
         style={{
           width: "80%",
           height: ICON_SIZE,
