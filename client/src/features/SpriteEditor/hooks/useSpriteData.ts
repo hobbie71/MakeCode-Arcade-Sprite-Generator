@@ -27,7 +27,7 @@ export const useSpriteData = () => {
     spriteDataRef.current = spriteData;
   }
 
-  const updateSpriteData = useCallback(
+  const setSpriteDataCoordinates = useCallback(
     (coordinates: Coordinates, color: MakeCodeColor) => {
       if (coordinates.x >= width || coordinates.y >= height) return;
 
@@ -38,7 +38,8 @@ export const useSpriteData = () => {
   );
 
   const commitSpriteData = useCallback(() => {
-    setSpriteData(spriteDataRef.current);
+    const newSpriteData = spriteDataRef.current.map((row) => [...row]);
+    setSpriteData(newSpriteData);
   }, [setSpriteData]);
 
   const getCurrentSpriteData = useCallback(() => {
@@ -122,7 +123,7 @@ export const useSpriteData = () => {
     spriteData,
     initSpriteData,
     initCanvasOnly,
-    updateSpriteData,
+    setSpriteDataCoordinates,
     commitSpriteData,
     getCurrentSpriteData,
     resizeSpriteData,

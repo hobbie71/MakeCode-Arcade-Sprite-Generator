@@ -3,10 +3,10 @@ import { ColorOrder } from "@/types/color";
 
 // Component imports
 import ColorIcon from "./components/ColorIcon/ColorIcon";
-import StrokeIcon from "./components/StrokeIcon/StrokeIcon";
-import SelectedColorIcons from "./components/SelectedColorIcons/SelectedColorIcons";
-import ToolIcon from "./components/ToolIcon/ToolIcon";
-import ZoomIcons from "./components/ZoomIcons/ZoomIcons";
+import StrokeIcon from "./components/StrokeIcon";
+import SelectedColorIcons from "./components/SelectedColorIcons";
+import ToolIcon from "./components/ToolIcon";
+import ZoomIcons from "./components/ZoomIcons";
 
 // Type imports
 import { EditorTools } from "@/types/tools";

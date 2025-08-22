@@ -1,11 +1,5 @@
-// Style import
-import "./ToolIcon.css";
 import { memo } from "react";
-
-// Context imports
 import { useToolSelected } from "@/features/SpriteEditor/contexts/ToolSelectedContext/useToolSelected";
-
-// Type imports
 import { EditorTools } from "@/types/tools";
 
 interface Props {
@@ -14,17 +8,17 @@ interface Props {
 }
 
 const ToolIcon = memo(({ tool, icon }: Props) => {
-  // Hooks
   const { tool: selectedTool, setTool } = useToolSelected();
-
-  // Calculate selection state directly
   const isSelected = tool === selectedTool;
 
   return (
     <button
       className={`
-        tool-icon w-7 h-7 flex items-center justify-center
-        ${isSelected ? "selected" : ""}
+        w-7 h-7 flex items-center justify-center
+        bg-transparent outline-none shadow-none cursor-pointer
+        focus:outline-none focus:shadow-none
+        hover:text-neutral-200
+        ${isSelected ? "border border-white border-solid text-white" : "text-neutral-400"}
       `}
       onClick={() => setTool(tool)}
       aria-label={tool}

@@ -1,6 +1,10 @@
 import { MakeCodeColor } from "./color";
 import { EditorTools } from "./tools";
 
+// Re-export types from other modules
+export { MakeCodeColor } from "./color";
+export { EditorTools } from "./tools";
+
 // Sprite-related types
 export interface Sprite {
   id: string;

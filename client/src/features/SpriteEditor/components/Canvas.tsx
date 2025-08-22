@@ -6,8 +6,19 @@ import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected
 import { useZoom } from "../contexts/ZoomContext/useZoom";
 import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
 
+// Utility imports
+import {
+  isValidMakeCodeSprite,
+  parseMakeCodeSprite,
+} from "@/utils/makeCodeSprite";
+
 // Hook import
 import { useSpriteEditorCanvas } from "../hooks/useSpriteEditorCanvas";
+import { useMouseHandler } from "../hooks/useMouseHandler";
+import { usePan } from "../hooks/usePan";
+
+// Component imports
+import SelectionOverlay from "./SelectionOverlay";
 
 interface Props {
   width: number;
@@ -23,37 +34,69 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
 
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const {
-    handlePointerDown,
-    handlePointerLeave,
-    handlePointerMove,
-    handlePointerUp,
+    // handlePointerDown,
+    // handlePointerLeave,
+    // handlePointerMove,
+    // handlePointerUp,
+    pasteSpriteData,
     initCanvas,
-  } = useSpriteEditorCanvas(width, height, pixelSize, offset, setOffset);
+  } = useSpriteEditorCanvas(width, height, pixelSize);
+
+  const {
+    handleMouseEnter,
+    handleMouseMove,
+    handleMouseLeave,
+    handleMouseDown,
+    handleMouseUp,
+  } = useMouseHandler();
+
+  const {
+    handlePointerDown: handlePanDown,
+    handlePointerMove: handlePanMove,
+    handlePointerUp: handlePanUp,
+    handlePointerLeave: handlePanLeave,
+  } = usePan(offset, setOffset);
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const text = e.clipboardData.getData("text");
+    if (!text) return;
+
+    if (!isValidMakeCodeSprite(text)) return;
+
+    try {
+      const spriteData = parseMakeCodeSprite(text);
+      pasteSpriteData(spriteData);
+    } catch (error) {
+      console.error("Failed to parse sprite data:", error);
+    }
+  };
 
   useEffect(() => initCanvas(), [initCanvas]);
 
   return (
     <div
+      className="w-full min-h-full overflow-hidden relative bg-[#1e1e1e]"
       style={{
-        width: "100%",
-        minHeight: "100%",
-        overflow: "hidden",
-        position: "relative",
-        background: "#1e1e1e",
         cursor: tool === "pan" ? "grab" : "crosshair",
       }}
-      onMouseDown={handlePointerDown}
-      onMouseMove={handlePointerMove}
-      onMouseLeave={handlePointerLeave}
-      onMouseUp={handlePointerUp}>
+      onPaste={handlePaste}
+      onMouseDown={handlePanDown}
+      onMouseMove={handlePanMove}
+      onMouseUp={handlePanUp}
+      onMouseLeave={handlePanLeave}
+      tabIndex={0}>
       <canvas
         ref={canvasRef}
         width={width * pixelSize}
         height={height * pixelSize}
-        className="block bg-white border border-gray-300 outline-none "
-        tabIndex={0} // for keyboard accessibility
+        className="block absolute outline-none focus:outline-none active:outline-none hover:outline-none"
+        tabIndex={0}
+        onMouseEnter={handleMouseEnter}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
         style={{
-          position: "absolute",
           left: offset.x,
           top: offset.y,
           transform: `scale(${zoom})`,
@@ -62,6 +105,7 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
           outline: "none",
         }}
       />
+      <SelectionOverlay />
     </div>
   );
 });

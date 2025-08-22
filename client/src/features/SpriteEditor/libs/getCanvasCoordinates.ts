@@ -1,19 +1,14 @@
 import { Coordinates } from "@/types/pixel";
+import { PIXEL_SIZE } from "../constants/pixelSize";
 
 export function getCanvasCoordinates(
   canvas: HTMLCanvasElement,
   e: React.MouseEvent,
-  pixelSize: number,
-  zoom: number
+  zoom: number,
+  pixelSize: number = PIXEL_SIZE
 ): Coordinates {
   const rect = canvas.getBoundingClientRect();
-  const x = (e.clientX - rect.left) / zoom;
-  const y = (e.clientY - rect.top) / zoom;
-
-  const coordinates: Coordinates = {
-    x: Math.floor(x / pixelSize),
-    y: Math.floor(y / pixelSize),
-  };
-
-  return coordinates;
+  const x = Math.floor((e.clientX - rect.left) / (pixelSize * zoom));
+  const y = Math.floor((e.clientY - rect.top) / (pixelSize * zoom));
+  return { x, y };
 }
