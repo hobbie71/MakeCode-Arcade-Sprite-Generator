@@ -149,7 +149,7 @@ img`
 - [x] **MakeCode paste format export** (highest priority for users)
 - [x] **JavaScript code export** with sprites.create()
 - [x] **Copy to clipboard** functionality
-- [ ] **Grid size selection**
+- [x] **Grid size selection**
 - [x] **Zoom controls** for precise editing
 
 ### Phase 2: Image Processing (High Value Features)
@@ -158,16 +158,16 @@ img`
 
 #### Version 0.3.0 - Image Import & Conversion
 
-- [ ] **Image upload** (PNG, JPG, GIF support)
-- [ ] **Automatic resizing** to MakeCode dimensions
-- [ ] **Color quantization** to MakeCode palette
-- [ ] **Dithering options** for better image quality
-- [ ] **Multiple conversion algorithms** (nearest neighbor, bilinear)
+- [x] **Image upload** (PNG, JPG, GIF support)
+- [x] **Automatic resizing** to MakeCode dimensions
+- [x] **Color quantization** to MakeCode palette
+- [ ] ~~**Dithering options** for better image quality~~ <br> <sub><sup>_Canceled: Not applicable due to the fixed 15-color palette limitation of MakeCode Arcade._</sup></sub>
+- [ ] ~~**Multiple conversion algorithms** (nearest neighbor, bilinear)~~ <br> <sub><sup>_Canceled: Not applicable due to the fixed 15-color palette limitation of MakeCode Arcade._</sup></sub>
 
 #### Version 0.4.0 - Smart Processing
 
-- [ ] **Edge detection** for cleaner sprite conversion
-- [ ] **Background removal** tools
+- [x] **Edge detection** for cleaner sprite conversion
+- [x] **Background removal** tools
 - [ ] **Contrast/brightness** adjustment
 - [ ] **Preview comparison** (original vs converted)
 - [ ] **Batch size processing** (multiple dimensions at once)
