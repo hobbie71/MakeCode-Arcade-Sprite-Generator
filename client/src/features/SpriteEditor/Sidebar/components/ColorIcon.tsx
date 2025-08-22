@@ -1,9 +1,7 @@
-// Style import
-import "./ColorIcon.scss";
 import { memo } from "react";
 
 // Context imports
-import { useColorSelected } from "../../../contexts/ColorSelectedContext/useColorSelected";
+import { useColorSelected } from "../../contexts/ColorSelectedContext/useColorSelected";
 
 // Type imports
 import { MakeCodeColor } from "@/types/color";

@@ -2,7 +2,7 @@
 import { ColorOrder } from "@/types/color";
 
 // Component imports
-import ColorIcon from "./components/ColorIcon/ColorIcon";
+import ColorIcon from "./components/ColorIcon";
 import StrokeIcon from "./components/StrokeIcon";
 import SelectedColorIcons from "./components/SelectedColorIcons";
 import ToolIcon from "./components/ToolIcon";
