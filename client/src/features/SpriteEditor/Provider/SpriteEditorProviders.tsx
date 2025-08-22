@@ -1,4 +1,3 @@
-import { CanvasProvider } from "../contexts/CanvasContext/CanvasContext";
 import { ColorSelectedProvider } from "../contexts/ColorSelectedContext/ColorSelectedContext";
 import { ToolSelectedProvider } from "../contexts/ToolSelectedContext/ToolSelectedContext";
 import { ZoomProvider } from "../contexts/ZoomContext/ZoomContext";
@@ -7,17 +6,15 @@ import { MouseCoordinatesProvider } from "../contexts/MouseCoordinatesContext/Mo
 
 const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
   return (
-    <CanvasProvider>
-      <ColorSelectedProvider>
-        <ToolSelectedProvider>
-          <SelectionAreaProvider>
-            <MouseCoordinatesProvider>
-              <ZoomProvider>{children}</ZoomProvider>
-            </MouseCoordinatesProvider>
-          </SelectionAreaProvider>
-        </ToolSelectedProvider>
-      </ColorSelectedProvider>
-    </CanvasProvider>
+    <ColorSelectedProvider>
+      <ToolSelectedProvider>
+        <SelectionAreaProvider>
+          <MouseCoordinatesProvider>
+            <ZoomProvider>{children}</ZoomProvider>
+          </MouseCoordinatesProvider>
+        </SelectionAreaProvider>
+      </ToolSelectedProvider>
+    </ColorSelectedProvider>
   );
 };
 

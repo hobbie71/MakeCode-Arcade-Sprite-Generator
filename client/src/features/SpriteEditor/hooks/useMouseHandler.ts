@@ -5,7 +5,7 @@ import { Coordinates } from "@/types/pixel";
 
 // Context imports
 import { useMouseCoordinates } from "../contexts/MouseCoordinatesContext/useMouseCoordinates";
-import { useCanvas } from "../contexts/CanvasContext/useCanvas";
+import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useZoom } from "../contexts/ZoomContext/useZoom";
 import { getCanvasCoordinates } from "../libs/getCanvasCoordinates";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";

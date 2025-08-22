@@ -2,6 +2,7 @@ import { useState } from "react";
 
 // Component imports
 import TabButton from "../components/TabButton";
+import ImageToSpriteSection from "../ImageToSpriteSection/ImageToSpriteSection";
 
 // Type imports
 import { GenerationMethod, generationMethods } from "@/types/export";
@@ -31,7 +32,7 @@ const GenerationMethodSection = () => {
       {methodSelected === GenerationMethod.ImageToSprite && (
         <div className="generation-method-section">
           <h3 className="heading-3">Image to Sprite Generation</h3>
-          <p className="paragraph">Coming soon...</p>
+          <ImageToSpriteSection />
         </div>
       )}
     </div>

@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 
 // Context imports
-import { useCanvas } from "../contexts/CanvasContext/useCanvas";
-import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
+import { useCanvas } from "../../../context/CanvasContext/useCanvas";
+import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
 
 // Hook imports
 import { useSpriteData } from "./useSpriteData";
@@ -18,7 +18,7 @@ import { MakeCodeColor } from "@/types";
 export const useEraser = () => {
   const { canvasRef } = useCanvas();
   const { setSpriteDataCoordinates, commitSpriteData } = useSpriteData();
-  const { palette } = useColorSelected();
+  const { palette } = usePaletteSelected();
 
   const handlePointerDown = useCallback(
     (coordinates: Coordinates) => {
