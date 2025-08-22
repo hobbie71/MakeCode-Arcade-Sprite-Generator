@@ -3,6 +3,11 @@ export type Coordinates = {
   y: number;
 };
 
+export type SelectionArea = {
+  start: Coordinates;
+  end: Coordinates;
+};
+
 export const MAX_LENGTH = 512;
 export const MIN_LENGTH = 1;
 

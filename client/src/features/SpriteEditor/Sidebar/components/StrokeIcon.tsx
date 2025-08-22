@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
 
-// Style import
-import "./StrokeIcon.css";
-
 // Context import
 import { useToolSelected } from "@/features/SpriteEditor/contexts/ToolSelectedContext/useToolSelected";
 
@@ -30,14 +27,12 @@ const StrokeIcon = ({ strokeSize }: Props) => {
         padding: Math.max(8 - strokeSize, 0),
       }}>
       <div
-        className={`
-          stroke-icon rounded-sm
-          ${isSelected ? "selected" : ""}  
-        `}
+        className="rounded-sm bg-white"
         style={{
           backgroundColor: "#adadad",
           width: 8 + (strokeSize - 1) * 2,
           height: 8 + (strokeSize - 1) * 2,
+          opacity: `${isSelected ? 0.6 : 1}`,
         }}
       />
     </div>

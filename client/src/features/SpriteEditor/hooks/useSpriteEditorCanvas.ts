@@ -5,13 +5,18 @@ import { useCanvas } from "../contexts/CanvasContext/useCanvas";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
 import { useZoom } from "../contexts/ZoomContext/useZoom";
+import { useSelectionArea } from "../contexts/SelectionArea/useSelectionArea";
 
 // Hook imports
 import { useSpriteData } from "./useSpriteData";
+import { useSelectionOverlay } from "./useSelectionOverlay";
 
 // Lib imports
 import { getCanvasCoordinates } from "../libs/getCanvasCoordinates";
-import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
+import {
+  drawPixelOnCanvas,
+  drawSpriteDataOnCanvas,
+} from "../libs/drawPixelOnCanvas";
 import { handleDraw } from "../libs/handleDraw";
 
 // Type imports
@@ -22,18 +27,17 @@ import { Coordinates } from "@/types/pixel";
 export const useSpriteEditorCanvas = (
   width: number,
   height: number,
-  pixelSize: number,
-  offset: Coordinates,
-  setOffset: (offset: Coordinates) => void
+  pixelSize: number
 ) => {
   // Hooks
   const { canvasRef } = useCanvas();
   const { color, palette } = useColorSelected();
   const { tool } = useToolSelected();
   const { zoom } = useZoom();
-  const { initCanvasOnly, updateSpriteData, commitSpriteData } =
+  const { initCanvasOnly, setSpriteDataCoordinates, commitSpriteData } =
     useSpriteData();
-  // const { spriteData } = useSprite();
+  const { setStartOverlay, setEndOverlay } = useSelectionOverlay();
+  const { selectionArea, setSelectionArea } = useSelectionArea();
 
   // Refs
   const isPointerDown = useRef<boolean>(false);
@@ -55,37 +59,14 @@ export const useSpriteEditorCanvas = (
         pixelSize,
         zoom
       );
-      const actualColor = handleDraw(
-        canvasRef.current,
-        coordinates,
-        color,
-        palette,
-        tool
-      );
 
-      updateSpriteData(coordinates, actualColor);
-    },
-    [canvasRef, color, palette, pixelSize, tool, zoom, updateSpriteData]
-  );
+      if (tool === EditorTools.Select) {
+        if (selectionArea) setSelectionArea(null);
 
-  const handlePointerMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!isPointerDown.current || !canvasRef.current) return;
-
-      if (tool === EditorTools.Pan && lastPanPosition.current) {
-        const dx = e.clientX - lastPanPosition.current.x;
-        const dy = e.clientY - lastPanPosition.current.y;
-        setOffset({ x: offset.x + dx, y: offset.y + dy });
-        lastPanPosition.current = { x: e.clientX, y: e.clientY };
+        setStartOverlay(coordinates);
         return;
       }
 
-      const coordinates = getCanvasCoordinates(
-        canvasRef.current,
-        e,
-        pixelSize,
-        zoom
-      );
       const actualColor = handleDraw(
         canvasRef.current,
         coordinates,
@@ -94,7 +75,7 @@ export const useSpriteEditorCanvas = (
         tool
       );
 
-      updateSpriteData(coordinates, actualColor);
+      setSpriteDataCoordinates(coordinates, actualColor);
     },
     [
       canvasRef,
@@ -102,10 +83,49 @@ export const useSpriteEditorCanvas = (
       palette,
       pixelSize,
       tool,
-      offset,
       zoom,
-      setOffset,
-      updateSpriteData,
+      setSpriteDataCoordinates,
+      setStartOverlay,
+      selectionArea,
+      setSelectionArea,
+    ]
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isPointerDown.current || !canvasRef.current) return;
+
+      const coordinates = getCanvasCoordinates(
+        canvasRef.current,
+        e,
+        pixelSize,
+        zoom
+      );
+
+      if (tool === EditorTools.Select) {
+        setEndOverlay(coordinates);
+        return;
+      }
+
+      const actualColor = handleDraw(
+        canvasRef.current,
+        coordinates,
+        color,
+        palette,
+        tool
+      );
+
+      setSpriteDataCoordinates(coordinates, actualColor);
+    },
+    [
+      canvasRef,
+      color,
+      palette,
+      pixelSize,
+      tool,
+      zoom,
+      setSpriteDataCoordinates,
+      setEndOverlay,
     ]
   );
 
@@ -122,6 +142,18 @@ export const useSpriteEditorCanvas = (
 
     commitSpriteData();
   }, [commitSpriteData]);
+
+  const pasteSpriteData = useCallback(
+    (spriteData: MakeCodeColor[][]) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      drawSpriteDataOnCanvas(canvas, { x: 0, y: 0 }, spriteData);
+      setStartOverlay({ x: 0, y: 0 });
+      setEndOverlay({ x: spriteData[0].length, y: spriteData.length });
+    },
+    [canvasRef, setStartOverlay, setEndOverlay]
+  );
 
   const initCanvas = useCallback(() => {
     if (!canvasRef.current) return;
@@ -143,6 +175,7 @@ export const useSpriteEditorCanvas = (
     handlePointerMove,
     handlePointerUp,
     handlePointerLeave,
+    pasteSpriteData,
     initCanvas,
   };
 };
