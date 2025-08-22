@@ -1,7 +1,7 @@
 import { useEffect, memo, useState } from "react";
 
 // Context import
-import { useCanvas } from "../contexts/CanvasContext/useCanvas";
+import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
 import { useZoom } from "../contexts/ZoomContext/useZoom";
 import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
@@ -16,6 +16,7 @@ import {
 import { useSpriteEditorCanvas } from "../hooks/useSpriteEditorCanvas";
 import { useMouseHandler } from "../hooks/useMouseHandler";
 import { usePan } from "../hooks/usePan";
+import { usePasteData } from "../hooks/usePasteData";
 
 // Component imports
 import SelectionOverlay from "./SelectionOverlay";
@@ -33,14 +34,8 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
   const { width, height } = useCanvasSize();
 
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const {
-    // handlePointerDown,
-    // handlePointerLeave,
-    // handlePointerMove,
-    // handlePointerUp,
-    pasteSpriteData,
-    initCanvas,
-  } = useSpriteEditorCanvas(width, height, pixelSize);
+  const { initCanvas } = useSpriteEditorCanvas(width, height);
+  const { pasteSpriteData } = usePasteData();
 
   const {
     handleMouseEnter,

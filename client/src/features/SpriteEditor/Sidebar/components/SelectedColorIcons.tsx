@@ -1,6 +1,6 @@
 import { useColorSelected } from "@/features/SpriteEditor/contexts/ColorSelectedContext/useColorSelected";
 import { MakeCodeColor } from "@/types";
-import { getHexFromColor } from "@/utils/getHexFromColor";
+import { getHexFromMakeCodeColor } from "@/utils/colorUtils";
 
 const ICON_SIZE = 32; // px
 
@@ -26,7 +26,7 @@ const SelectedColorIcons = () => {
           height: ICON_SIZE,
           top: 0,
           left: 0,
-          backgroundColor: getHexFromColor(color),
+          backgroundColor: getHexFromMakeCodeColor(color),
           zIndex: 2,
         }}
       />
@@ -37,7 +37,7 @@ const SelectedColorIcons = () => {
           height: ICON_SIZE,
           bottom: 0,
           right: 0,
-          backgroundColor: getHexFromColor(alternateColor),
+          backgroundColor: getHexFromMakeCodeColor(alternateColor),
           zIndex: 1,
         }}
       />

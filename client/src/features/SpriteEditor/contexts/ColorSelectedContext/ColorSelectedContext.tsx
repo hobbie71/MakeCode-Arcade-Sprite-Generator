@@ -5,13 +5,11 @@ import {
   SetStateAction,
   useMemo,
 } from "react";
-import { MakeCodeColor, MakeCodePalette, ArcadePalette } from "@/types/color";
+import { MakeCodeColor } from "@/types/color";
 
 type ColorSelectedType = {
   color: MakeCodeColor;
   setColor: Dispatch<SetStateAction<MakeCodeColor>>;
-  palette: MakeCodePalette;
-  setPalette: Dispatch<SetStateAction<MakeCodePalette>>;
   alternateColor: MakeCodeColor;
   setAlternateColor: Dispatch<SetStateAction<MakeCodeColor>>;
 };
@@ -29,7 +27,6 @@ export const ColorSelectedProvider = ({
   const [alternateColor, setAlternateColor] = useState<MakeCodeColor>(
     MakeCodeColor.WHITE
   );
-  const [palette, setPalette] = useState<MakeCodePalette>(ArcadePalette);
 
   const contextValue = useMemo(
     () => ({
@@ -37,10 +34,8 @@ export const ColorSelectedProvider = ({
       setColor,
       alternateColor,
       setAlternateColor,
-      palette,
-      setPalette,
     }),
-    [color, alternateColor, palette]
+    [color, alternateColor]
   );
 
   return (

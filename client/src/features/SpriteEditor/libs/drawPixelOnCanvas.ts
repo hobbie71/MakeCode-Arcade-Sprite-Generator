@@ -1,7 +1,7 @@
 import { Coordinates } from "@/types/pixel";
 import { MakeCodeColor, MakeCodePalette } from "@/types/color";
 
-import { getHexFromColor } from "@/utils/getHexFromColor";
+import { getHexFromMakeCodeColor } from "@/utils/colorUtils";
 
 import { PIXEL_SIZE } from "../constants/pixelSize";
 
@@ -9,7 +9,7 @@ export function drawPixelOnCanvas(
   canvas: HTMLCanvasElement,
   position: Coordinates,
   color: MakeCodeColor,
-  palette?: MakeCodePalette,
+  palette: MakeCodePalette,
   pixelSize: number = PIXEL_SIZE
 ): void {
   if (color === MakeCodeColor.TRANSPARENT) {
@@ -20,7 +20,7 @@ export function drawPixelOnCanvas(
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  const hexColor = getHexFromColor(color, palette);
+  const hexColor = getHexFromMakeCodeColor(color, palette);
 
   ctx.fillStyle = hexColor;
   ctx.fillRect(
@@ -43,7 +43,7 @@ export function drawPixelOnCanvasTransparent(
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  const hexColor = getHexFromColor(color, palette);
+  const hexColor = getHexFromMakeCodeColor(color, palette);
 
   ctx.fillStyle = hexColor;
   ctx.fillRect(
@@ -58,7 +58,7 @@ export function drawSpriteDataOnCanvas(
   canvas: HTMLCanvasElement,
   startPosition: Coordinates,
   spriteData: MakeCodeColor[][],
-  palette?: MakeCodePalette,
+  palette: MakeCodePalette,
   pixelSize: number = PIXEL_SIZE
 ) {
   for (let y = 0; y < spriteData.length; y++) {

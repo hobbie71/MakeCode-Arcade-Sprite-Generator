@@ -1,8 +1,8 @@
 import { useCallback } from "react";
 
 // Context imports
-
-import { useCanvas } from "../contexts/CanvasContext/useCanvas";
+import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 
 // Hook imports
@@ -17,7 +17,8 @@ import { EditorTools } from "@/types";
 
 export const usePencil = () => {
   const { canvasRef } = useCanvas();
-  const { color, palette } = useColorSelected();
+  const { color } = useColorSelected();
+  const { palette } = usePaletteSelected();
   const { setSpriteDataCoordinates, commitSpriteData } = useSpriteData();
 
   const handlePointerDown = useCallback(
