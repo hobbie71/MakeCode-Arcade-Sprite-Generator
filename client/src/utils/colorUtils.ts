@@ -1,4 +1,5 @@
 import { MakeCodeColor, MakeCodePalette, ArcadePalette } from "@/types/color";
+import { hexToRgb, calculateColorDistance, rgbaToHex } from "./colorConversion";
 
 // Build a reverse lookup map for each palette
 const paletteHexToColorMap = new WeakMap<
@@ -19,42 +20,6 @@ function getPaletteHexToColorMap(
     paletteHexToColorMap.set(palette, map);
   }
   return map;
-}
-
-// Helper function to convert hex to RGB values
-function hexToRgb(hex: string): { r: number; g: number; b: number } {
-  let normalized = hex.trim();
-  if (normalized.startsWith("#")) {
-    normalized = normalized.slice(1);
-  }
-  // Expand 3-digit hex to 6-digit
-  if (normalized.length === 3) {
-    normalized = normalized
-      .split("")
-      .map((c) => c + c)
-      .join("");
-  }
-  // Remove alpha if present (8 digits)
-  if (normalized.length === 8) {
-    normalized = normalized.slice(0, 6);
-  }
-
-  const r = parseInt(normalized.slice(0, 2), 16);
-  const g = parseInt(normalized.slice(2, 4), 16);
-  const b = parseInt(normalized.slice(4, 6), 16);
-
-  return { r, g, b };
-}
-
-// Calculate color distance using Euclidean distance in RGB space
-function calculateColorDistance(
-  color1: { r: number; g: number; b: number },
-  color2: { r: number; g: number; b: number }
-): number {
-  const rDiff = color1.r - color2.r;
-  const gDiff = color1.g - color2.g;
-  const bDiff = color1.b - color2.b;
-  return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
 }
 
 // Find the closest color in the palette
@@ -94,20 +59,6 @@ export function getHexFromMakeCodeColor(
   return (
     palette[color] ?? palette[MakeCodeColor.TRANSPARENT] ?? "rgba(0,0,0,0)"
   );
-}
-
-export function rgbaToHex(
-  r: number,
-  g: number,
-  b: number,
-  a: number = 255
-): string {
-  const toHex = (n: number) => n.toString(16).padStart(2, "0");
-  // If alpha is 255, omit it for #RRGGBB, else use #RRGGBBAA
-  if (a === 255) {
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-  }
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}${toHex(a)}`;
 }
 
 export function hexToMakeCodeColor(
