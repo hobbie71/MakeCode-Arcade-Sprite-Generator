@@ -1,54 +1,48 @@
 import { MakeCodeColor, MakeCodePalette, ArcadePalette } from "@/types/color";
-import { hexToRgb, calculateColorDistance, rgbaToHex } from "./colorConversion";
+import {
+  hexToRgb,
+  calculateColorDistance,
+  rgbToHsl,
+  type RGB,
+  type HSL,
+} from "./colorConversion";
 
-// Build a reverse lookup map for each palette
-const paletteHexToColorMap = new WeakMap<
-  MakeCodePalette,
-  Map<string, MakeCodeColor>
->();
+// Build a reverse lookup map for each palette with RGB values
+const paletteRgbMap = new WeakMap<MakeCodePalette, Map<MakeCodeColor, RGB>>();
+const paletteHslMap = new WeakMap<MakeCodePalette, Map<MakeCodeColor, HSL>>();
 
-function getPaletteHexToColorMap(
-  palette: MakeCodePalette
-): Map<string, MakeCodeColor> {
-  let map = paletteHexToColorMap.get(palette);
+function getPaletteRgbMap(palette: MakeCodePalette): Map<MakeCodeColor, RGB> {
+  let map = paletteRgbMap.get(palette);
   if (!map) {
-    map = new Map<string, MakeCodeColor>();
+    map = new Map<MakeCodeColor, RGB>();
     for (const [makeCodeColor, colorHex] of Object.entries(palette)) {
       if (colorHex.toLowerCase().startsWith("rgba")) continue;
-      map.set(colorHex.toLowerCase(), makeCodeColor as MakeCodeColor);
+      try {
+        const rgb = hexToRgb(colorHex);
+        map.set(makeCodeColor as MakeCodeColor, rgb);
+      } catch {
+        // Skip invalid colors
+      }
     }
-    paletteHexToColorMap.set(palette, map);
+    paletteRgbMap.set(palette, map);
   }
   return map;
 }
 
-// Find the closest color in the palette
-function findClosestColor(
-  targetRgb: { r: number; g: number; b: number },
+export function getPaletteHslMap(
   palette: MakeCodePalette
-): MakeCodeColor {
-  let closestColor = MakeCodeColor.BLACK; // Default fallback
-  let minDistance = Infinity;
-
-  for (const [makeCodeColor, colorHex] of Object.entries(palette)) {
-    // Skip transparent/rgba colors for distance calculation
-    if (colorHex.toLowerCase().startsWith("rgba")) continue;
-
-    try {
-      const paletteRgb = hexToRgb(colorHex);
-      const distance = calculateColorDistance(targetRgb, paletteRgb);
-
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestColor = makeCodeColor as MakeCodeColor;
-      }
-    } catch {
-      // Skip invalid colors
-      continue;
+): Map<MakeCodeColor, HSL> {
+  let map = paletteHslMap.get(palette);
+  if (!map) {
+    map = new Map<MakeCodeColor, HSL>();
+    const rgbMap = getPaletteRgbMap(palette);
+    for (const [makeCodeColor, rgb] of rgbMap.entries()) {
+      const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+      map.set(makeCodeColor, hsl);
     }
+    paletteHslMap.set(palette, map);
   }
-
-  return closestColor;
+  return map;
 }
 
 export function getHexFromMakeCodeColor(
@@ -61,63 +55,50 @@ export function getHexFromMakeCodeColor(
   );
 }
 
-export function hexToMakeCodeColor(
-  hex: string,
-  palette: MakeCodePalette = ArcadePalette
-): MakeCodeColor {
-  // Normalize hex to #RRGGBB
-  let normalized = hex.trim().toLowerCase();
-  if (normalized.startsWith("#")) {
-    normalized = normalized.slice(1);
-  }
-  // Expand 3-digit hex to 6-digit
-  if (normalized.length === 3) {
-    normalized = normalized
-      .split("")
-      .map((c) => c + c)
-      .join("");
-  }
-  // Remove alpha if present (8 digits)
-  if (normalized.length === 8) {
-    normalized = normalized.slice(0, 6);
-  }
-  // Validate hex
-  if (!/^[0-9a-f]{6}$/i.test(normalized)) {
-    // For invalid hex, return black as fallback
-    return MakeCodeColor.BLACK;
-  }
-  normalized = "#" + normalized;
-
-  // Use reverse lookup map for performance - exact match first
-  const map = getPaletteHexToColorMap(palette);
-  const exactMatch = map.get(normalized);
-
-  if (exactMatch) {
-    return exactMatch;
-  }
-
-  // If no exact match, find the closest color
-  try {
-    const targetRgb = hexToRgb(normalized);
-    return findClosestColor(targetRgb, palette);
-  } catch {
-    // If hex parsing fails, return black as fallback
-    return MakeCodeColor.BLACK;
-  }
-}
-
-export function rgbaToMakeCodeColor(
+/**
+ * Legacy RGB to MakeCode color conversion with tolerance (kept for backward compatibility)
+ * @deprecated Use the new zone-based conversion system instead
+ */
+export function rgbToMakeCodeColor(
   r: number,
   g: number,
   b: number,
-  a: number = 255,
+  tolerance: number = 30,
   palette: MakeCodePalette = ArcadePalette
 ): MakeCodeColor {
-  // If alpha is 0 or low, return transparent
-  if (a < 200) {
-    return MakeCodeColor.TRANSPARENT;
+  const rgbMap = getPaletteRgbMap(palette);
+  const candidateColors: { color: MakeCodeColor; distance: number }[] = [];
+
+  // Find all colors within tolerance
+  for (const [makeCodeColor, paletteRgb] of rgbMap.entries()) {
+    const rDiff = Math.abs(r - paletteRgb.r);
+    const gDiff = Math.abs(g - paletteRgb.g);
+    const bDiff = Math.abs(b - paletteRgb.b);
+
+    // Check if all RGB channels are within tolerance
+    if (rDiff <= tolerance && gDiff <= tolerance && bDiff <= tolerance) {
+      const distance = calculateColorDistance({ r, g, b }, paletteRgb);
+      candidateColors.push({ color: makeCodeColor, distance });
+    }
   }
 
-  const hex = rgbaToHex(r, g, b, a);
-  return hexToMakeCodeColor(hex, palette);
+  // If we have candidates within tolerance, return the closest one
+  if (candidateColors.length > 0) {
+    candidateColors.sort((a, b) => a.distance - b.distance);
+    return candidateColors[0].color;
+  }
+
+  // If no colors within tolerance, find the closest color overall
+  let closestColor = MakeCodeColor.BLACK;
+  let minDistance = Infinity;
+
+  for (const [makeCodeColor, paletteRgb] of rgbMap.entries()) {
+    const distance = calculateColorDistance({ r, g, b }, paletteRgb);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestColor = makeCodeColor;
+    }
+  }
+
+  return closestColor;
 }

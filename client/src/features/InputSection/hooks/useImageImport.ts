@@ -4,15 +4,16 @@ import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteS
 
 // Hook imports
 import { usePasteData } from "@/features/SpriteEditor/hooks/usePasteData";
+import { useColorToMakeCodeConverter } from "@/features/InputSection/hooks/useColorToMakeCodeConverter";
 
 // Lib imports
-import { convertImageDataToSpriteData } from "../libs/convertImageDataToSpriteData";
 import { removeBackgroundAndCrop } from "../libs/backgroundDetection";
 
 export const useImageImports = () => {
   const { width, height } = useCanvasSize();
   const { palette } = usePaletteSelected();
   const { pasteSpriteData } = usePasteData();
+  const { convertImage } = useColorToMakeCodeConverter(palette);
 
   const handleFile = (file: File) => {
     const reader = new FileReader();
@@ -80,26 +81,6 @@ export const useImageImports = () => {
           drawHeight
         );
 
-        const previewCanvas = smallCanvas.cloneNode() as HTMLCanvasElement;
-        previewCanvas.width = smallCanvas.width * 8;
-        previewCanvas.height = smallCanvas.height * 8;
-        const previewCtx = previewCanvas.getContext("2d", { alpha: true });
-        if (previewCtx) {
-          previewCtx.globalCompositeOperation = "source-over";
-          previewCtx.imageSmoothingEnabled = false;
-          previewCtx.drawImage(
-            smallCanvas,
-            0,
-            0,
-            smallCanvas.width,
-            smallCanvas.height,
-            0,
-            0,
-            previewCanvas.width,
-            previewCanvas.height
-          );
-        }
-
         // Step 3: Extract pixel data from target size canvas
         const imageData = smallCtx.getImageData(
           0,
@@ -108,11 +89,7 @@ export const useImageImports = () => {
           targetHeight
         );
 
-        const spriteData = convertImageDataToSpriteData(
-          imageData,
-          width,
-          palette
-        );
+        const spriteData = convertImage(imageData, width, height);
 
         pasteSpriteData(spriteData);
       };
