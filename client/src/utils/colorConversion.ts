@@ -548,16 +548,6 @@ export function cmykToHsv(c: number, m: number, y: number, k: number): HSV {
 // ============================================
 
 /**
- * Calculate color distance using Euclidean distance in RGB space
- */
-export function calculateColorDistance(color1: RGB, color2: RGB): number {
-  const rDiff = color1.r - color2.r;
-  const gDiff = color1.g - color2.g;
-  const bDiff = color1.b - color2.b;
-  return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
-}
-
-/**
  * Validate if a string is a valid hex color
  */
 export function isValidHex(hex: string): boolean {

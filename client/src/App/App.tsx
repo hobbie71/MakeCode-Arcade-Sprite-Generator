@@ -8,7 +8,7 @@ import AppProviders from "@/providers/AppProviders";
 import SpriteEditor from "@/features/SpriteEditor/SpriteEditor";
 import ExportSection from "@/features/ExportSection/ExportSection";
 import InputSection from "@/features/InputSection/InputSection";
-import HueWheelDemo from "@/components/HueWheelDemo";
+import DevToolsButton from "@/features/DevTools/components/DevToolsButton";
 
 function App() {
   return (
@@ -18,9 +18,9 @@ function App() {
         <div className="w-full">
           <SpriteEditor />
           <ExportSection />
-          <HueWheelDemo />
         </div>
       </div>
+      <DevToolsButton />
     </AppProviders>
   );
 }
