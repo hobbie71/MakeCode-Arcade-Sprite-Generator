@@ -62,6 +62,8 @@ export const useImageImports = () => {
           alpha: true,
         });
         if (!smallCtx) return;
+        smallCtx.imageSmoothingEnabled = false;
+        smallCtx.imageSmoothingQuality = "low";
 
         // Center the image within the target canvas
         const offsetX = Math.floor((targetWidth - drawWidth) / 2);

@@ -13,3 +13,7 @@ body {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+canvas {
+  image-rendering: pixelated;
+}
