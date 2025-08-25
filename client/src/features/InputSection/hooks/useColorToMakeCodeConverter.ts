@@ -1,6 +1,9 @@
 // React imports
 import { useMemo, useCallback } from "react";
 
+// Context imports
+import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+
 // Lib imports
 import {
   hslToMakeCodeColor,
@@ -14,9 +17,10 @@ import { convertImageDataToRGBA } from "../libs/convertImageDataToRGBA";
 import { calculateHueZones } from "../utils/hueZoneUtils";
 
 // Type imports
-import { MakeCodeColor, MakeCodePalette } from "@/types/color";
+import { MakeCodeColor } from "@/types/color";
 
-export const useColorToMakeCodeConverter = (palette: MakeCodePalette) => {
+export const useColorToMakeCodeConverter = () => {
+  const { palette } = usePaletteSelected();
   const hueZones = useMemo(() => calculateHueZones(palette), [palette]);
 
   // Memoized conversion functions
