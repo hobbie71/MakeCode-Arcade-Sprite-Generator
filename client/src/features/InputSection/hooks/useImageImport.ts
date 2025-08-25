@@ -1,6 +1,5 @@
 // Context imports
 import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
 
 // Hook imports
 import { usePasteData } from "@/features/SpriteEditor/hooks/usePasteData";
@@ -11,9 +10,8 @@ import { removeBackgroundAndCrop } from "../libs/backgroundDetection";
 
 export const useImageImports = () => {
   const { width, height } = useCanvasSize();
-  const { palette } = usePaletteSelected();
   const { pasteSpriteData } = usePasteData();
-  const { convertImage } = useColorToMakeCodeConverter(palette);
+  const { convertImage } = useColorToMakeCodeConverter();
 
   const handleFile = (file: File) => {
     const reader = new FileReader();

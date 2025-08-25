@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import HueWheelDemo from "@/features/DevTools/components/HueWheelTable";
 import HueWheelVisualization from "@/features/DevTools/components/HueWheelVisualization";
 import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import ImageProcessingPipeline from "./components/ImageProcessingPipeline";
 
 type DevTab = "hue-wheel-table" | "hue-wheel-viz" | "image-processing";
 
@@ -23,24 +24,7 @@ const DevTools: React.FC<DevToolsProps> = ({ isOpen, onClose }) => {
       case "hue-wheel-viz":
         return <HueWheelVisualization palette={palette} />;
       case "image-processing":
-        return (
-          <div className="min-h-screen bg-gray-950 p-8">
-            <div className="max-w-6xl mx-auto">
-              <h1 className="text-3xl font-bold text-white mb-8 text-center">
-                Image Processing Pipeline
-              </h1>
-              <div className="bg-gray-900 p-6 rounded-lg text-white">
-                <p className="text-center text-gray-400">
-                  This section will show the image processing pipeline from
-                  input to final sprite.
-                </p>
-                <p className="text-center text-gray-400 mt-4">
-                  To be implemented...
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        return <ImageProcessingPipeline />;
       default:
         return null;
     }
@@ -119,7 +103,7 @@ const DevTools: React.FC<DevToolsProps> = ({ isOpen, onClose }) => {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-auto bg-gray-950 relative">
+      <div className="flex-1 bg-gray-950 relative">
         {/* Close overlay when clicking outside sidebar */}
         <div
           className="absolute inset-0 z-0"
