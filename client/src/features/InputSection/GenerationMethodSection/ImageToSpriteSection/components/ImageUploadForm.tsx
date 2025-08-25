@@ -1,11 +1,11 @@
 import React, { useRef, useState } from "react";
 
 // Hooks
-import { useImageImports } from "@/features/InputSection/hooks/useImageImport";
+import { useImageFileHandler } from "@/features/InputSection/hooks/useImageFileHandler";
 
 const ImageUploadForm = () => {
   // Hooks
-  const { handleFile } = useImageImports();
+  const { handleFile } = useImageFileHandler();
 
   // States
   const [isDragging, setIsDragging] = useState(false);

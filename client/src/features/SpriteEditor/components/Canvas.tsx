@@ -20,6 +20,7 @@ import { usePasteData } from "../hooks/usePasteData";
 
 // Component imports
 import SelectionOverlay from "./SelectionOverlay";
+import ImportPreview from "./ImportPreview";
 
 interface Props {
   width: number;
@@ -100,6 +101,7 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
           outline: "none",
         }}
       />
+      <ImportPreview />
       <SelectionOverlay />
     </div>
   );
