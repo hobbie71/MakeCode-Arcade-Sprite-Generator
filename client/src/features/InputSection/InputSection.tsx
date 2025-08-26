@@ -23,9 +23,7 @@ const InputSection = () => {
   };
 
   return (
-    <div
-      className="input-section-container p-2"
-      style={{ backgroundColor: "#1e1e1e" }}>
+    <div className="p-2 w-full h-full" style={{ backgroundColor: "#1e1e1e" }}>
       <h1 className="heading-3">ArcadeMake Code Sprite Generator</h1>
       <div className="asset-type-container flex flex-row gap-1 border-b-2 border-b-neutral-700 border-x-0 border-t-0">
         {assetTypes.map((type) => (

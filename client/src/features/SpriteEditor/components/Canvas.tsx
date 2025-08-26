@@ -71,7 +71,7 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
 
   return (
     <div
-      className="w-full min-h-full overflow-hidden relative bg-[#1e1e1e]"
+      className="w-full min-h-full relative bg-[#1e1e1e]"
       style={{
         cursor: tool === "pan" ? "grab" : "crosshair",
       }}

@@ -13,9 +13,11 @@ import DevToolsButton from "@/features/DevTools/components/DevToolsButton";
 function App() {
   return (
     <AppProviders>
-      <div className="app-container flex flex-row w-full h-full">
-        <InputSection />
-        <div className="w-full">
+      <div className="app-container grid grid-cols-10">
+        <div className="col-span-3">
+          <InputSection />
+        </div>
+        <div className="col-span-7">
           <SpriteEditor />
           <ExportSection />
         </div>
