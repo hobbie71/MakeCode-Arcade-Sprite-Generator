@@ -1,17 +1,22 @@
-import { useState } from "react";
-
 // Components
 import SizeInputs from "./components/SizeInputs";
 import TabButton from "./components/TabButton";
 import GenerationMethodSection from "./GenerationMethodSection/GenerationMethodSection";
+import Button from "../../components/Button";
+
+// Context imports
+import { useAssetType } from "@/context/AssetTypeContext/useAssetType";
+
+// Hook imports
+import { useImageFileHandler } from "./hooks/useImageFileHandler";
 
 // Type imports
 import { AssetType, assetTypes } from "@/types/export";
+import { BACKGROUND_SIZE, TILE_SIZE } from "@/types/pixel";
 
 const InputSection = () => {
-  const [selectedAsset, setSelectedAsset] = useState<AssetType>(
-    AssetType.Sprite
-  );
+  const { selectedAsset, setSelectedAsset } = useAssetType();
+  const { generateSpriteFromImportedImage } = useImageFileHandler();
 
   const handleAssetSelect = (assetType: AssetType) => {
     setSelectedAsset(assetType);
@@ -44,14 +49,14 @@ const InputSection = () => {
       {selectedAsset === AssetType.Background && (
         <div className="background-options">
           <h3 className="heading-3">Background Size (px)</h3>
-          <SizeInputs fixedSize={{ x: 160, y: 120 }} />
+          <SizeInputs fixedSize={BACKGROUND_SIZE} />
         </div>
       )}
 
       {selectedAsset === AssetType.Tile && (
         <div className="tile-options">
           <h3 className="heading-3">Tile Size (px)</h3>
-          <SizeInputs fixedSize={{ x: 16, y: 16 }} />
+          <SizeInputs fixedSize={TILE_SIZE} />
         </div>
       )}
 
@@ -70,6 +75,8 @@ const InputSection = () => {
       )}
 
       <GenerationMethodSection />
+
+      <Button onClick={generateSpriteFromImportedImage}>Generate Sprite</Button>
     </div>
   );
 };

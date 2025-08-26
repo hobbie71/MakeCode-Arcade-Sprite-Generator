@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 // Type imports
 import { Coordinates } from "@/types/pixel";
@@ -6,21 +6,33 @@ import { Coordinates } from "@/types/pixel";
 // Component imports
 import SizeInput from "./SizeInput";
 
-// Hook imports
-import { useCanvasResize } from "@/hooks/useCanvasResize";
+// Context imports
+import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
 
 interface Props {
   fixedSize?: Coordinates;
 }
 
 const SizeInputs = ({ fixedSize }: Props) => {
-  const { updateCanvasSize } = useCanvasResize();
+  const { setWidth, setHeight } = useCanvasSize();
+  const previousFixedSizeRef = useRef<Coordinates | undefined>(undefined);
 
   useEffect(() => {
-    if (fixedSize) {
-      updateCanvasSize(fixedSize.x, fixedSize.y);
+    // Only update if fixedSize has actually changed (deep comparison)
+    if (!fixedSize) return;
+
+    const hasChanged =
+      !previousFixedSizeRef.current ||
+      fixedSize.x !== previousFixedSizeRef.current.x ||
+      fixedSize.y !== previousFixedSizeRef.current.y;
+
+    if (hasChanged) {
+      previousFixedSizeRef.current = { ...fixedSize };
+      // Directly update canvas size without going through the sprite resize logic
+      setWidth(fixedSize.x);
+      setHeight(fixedSize.y);
     }
-  }, [fixedSize, updateCanvasSize]);
+  }, [fixedSize, setWidth, setHeight]);
 
   return (
     <div className="input-size-container flex flex-row">

@@ -3,26 +3,41 @@ import { useRef, useEffect } from "react";
 // Context imports
 import { useImageImports } from "@/context/ImageImportContext/useImageImports";
 
+// Lib imports
+import { createCanvasFromImage } from "@/features/InputSection/libs/imageProcesser";
+
 const ImportPreview = () => {
-  const { importCanvas, importVersion } = useImageImports();
+  const { importedImage } = useImageImports();
   const previewRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (!importCanvas) return;
+    if (!importedImage) return;
     const previewCanvas = previewRef.current;
     if (!previewCanvas) return;
 
     const ctx = previewCanvas.getContext("2d");
     if (!ctx) return;
 
-    // Resize preview canvas to match importCanvas
-    previewCanvas.width = importCanvas.width;
-    previewCanvas.height = importCanvas.height;
-    ctx.clearRect(0, 0, importCanvas.width, importCanvas.height);
-    ctx.drawImage(importCanvas, 0, 0);
-  }, [importCanvas, importVersion]);
+    // Create an image element from the file
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const importCanvas = createCanvasFromImage(img);
+        if (!importCanvas) return;
 
-  if (!importCanvas) {
+        // Resize preview canvas to match importCanvas
+        previewCanvas.width = importCanvas.width;
+        previewCanvas.height = importCanvas.height;
+        ctx.clearRect(0, 0, importCanvas.width, importCanvas.height);
+        ctx.drawImage(importCanvas, 0, 0);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(importedImage);
+  }, [importedImage]);
+
+  if (!importedImage) {
     return null;
   }
 

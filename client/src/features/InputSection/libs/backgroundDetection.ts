@@ -92,52 +92,52 @@ export const detectBackgroundAndBounds = (
 };
 
 /**
- * Removes background and crops to content bounds
+ * Removes background from canvas, making background pixels transparent
  */
-export const removeBackgroundAndCrop = (
+export const removeBackground = (
   sourceCanvas: HTMLCanvasElement,
   tolerance: number = 30
 ): HTMLCanvasElement => {
   const detection = detectBackgroundAndBounds(sourceCanvas, tolerance);
-  const { boundingBox, backgroundColor } = detection;
+  const { backgroundColor } = detection;
 
-  // Create new canvas with cropped dimensions
-  const croppedCanvas = document.createElement("canvas");
-  croppedCanvas.width = boundingBox.width;
-  croppedCanvas.height = boundingBox.height;
-  const croppedCtx = croppedCanvas.getContext("2d", {
+  // Create new canvas with same dimensions
+  const processedCanvas = document.createElement("canvas");
+  processedCanvas.width = sourceCanvas.width;
+  processedCanvas.height = sourceCanvas.height;
+  const processedCtx = processedCanvas.getContext("2d", {
     willReadFrequently: true,
     alpha: true,
   });
 
-  if (!croppedCtx) {
-    throw new Error("Could not get cropped canvas context");
+  if (!processedCtx) {
+    throw new Error("Could not get processed canvas context");
   }
 
   // Ensure proper alpha handling and clear canvas to transparent
-  croppedCtx.globalCompositeOperation = "source-over";
-  croppedCtx.clearRect(0, 0, boundingBox.width, boundingBox.height);
+  processedCtx.globalCompositeOperation = "source-over";
+  processedCtx.clearRect(0, 0, sourceCanvas.width, sourceCanvas.height);
 
-  // Get source image data for the cropped region
+  // Get source image data
   const sourceCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
   if (!sourceCtx) {
     throw new Error("Could not get source canvas context");
   }
 
   const sourceImageData = sourceCtx.getImageData(
-    boundingBox.x,
-    boundingBox.y,
-    boundingBox.width,
-    boundingBox.height
+    0,
+    0,
+    sourceCanvas.width,
+    sourceCanvas.height
   );
   const sourceData = sourceImageData.data;
 
-  // Create new image data for the cropped canvas
-  const croppedImageData = croppedCtx.createImageData(
-    boundingBox.width,
-    boundingBox.height
+  // Create new image data for the processed canvas
+  const processedImageData = processedCtx.createImageData(
+    sourceCanvas.width,
+    sourceCanvas.height
   );
-  const croppedData = croppedImageData.data;
+  const processedData = processedImageData.data;
 
   // Parse background color
   const bgMatch = backgroundColor.match(
@@ -163,36 +163,76 @@ export const removeBackgroundAndCrop = (
 
       if (isColorSimilar(pixel, bgColor, tolerance)) {
         // Make background pixels transparent
-        croppedData[i] = 0;
-        croppedData[i + 1] = 0;
-        croppedData[i + 2] = 0;
-        croppedData[i + 3] = 0;
+        processedData[i] = 0;
+        processedData[i + 1] = 0;
+        processedData[i + 2] = 0;
+        processedData[i + 3] = 0;
       } else {
         // Keep non-background pixels
-        croppedData[i] = sourceData[i];
-        croppedData[i + 1] = sourceData[i + 1];
-        croppedData[i + 2] = sourceData[i + 2];
-        croppedData[i + 3] = sourceData[i + 3];
+        processedData[i] = sourceData[i];
+        processedData[i + 1] = sourceData[i + 1];
+        processedData[i + 2] = sourceData[i + 2];
+        processedData[i + 3] = sourceData[i + 3];
       }
     }
 
-    croppedCtx.putImageData(croppedImageData, 0, 0);
+    processedCtx.putImageData(processedImageData, 0, 0);
   } else {
-    // Fallback: just crop without background removal
-    croppedCtx.drawImage(
-      sourceCanvas,
-      boundingBox.x,
-      boundingBox.y,
-      boundingBox.width,
-      boundingBox.height,
-      0,
-      0,
-      boundingBox.width,
-      boundingBox.height
-    );
+    // Fallback: copy original image
+    processedCtx.drawImage(sourceCanvas, 0, 0);
   }
 
+  return processedCanvas;
+};
+
+/**
+ * Crops canvas to content bounds based on background detection
+ */
+export const cropToContent = (
+  sourceCanvas: HTMLCanvasElement,
+  tolerance: number = 30
+): HTMLCanvasElement => {
+  const detection = detectBackgroundAndBounds(sourceCanvas, tolerance);
+  const { boundingBox } = detection;
+
+  // Create new canvas with cropped dimensions
+  const croppedCanvas = document.createElement("canvas");
+  croppedCanvas.width = boundingBox.width;
+  croppedCanvas.height = boundingBox.height;
+  const croppedCtx = croppedCanvas.getContext("2d", {
+    willReadFrequently: true,
+    alpha: true,
+  });
+
+  if (!croppedCtx) {
+    throw new Error("Could not get cropped canvas context");
+  }
+
+  // Copy the cropped region from source to new canvas
+  croppedCtx.drawImage(
+    sourceCanvas,
+    boundingBox.x,
+    boundingBox.y,
+    boundingBox.width,
+    boundingBox.height,
+    0,
+    0,
+    boundingBox.width,
+    boundingBox.height
+  );
+
   return croppedCanvas;
+};
+
+/**
+ * Removes background and crops to content bounds (convenience function)
+ */
+export const removeBackgroundAndCrop = (
+  sourceCanvas: HTMLCanvasElement,
+  tolerance: number = 30
+): HTMLCanvasElement => {
+  const backgroundRemoved = removeBackground(sourceCanvas, tolerance);
+  return cropToContent(backgroundRemoved, tolerance);
 };
 
 /**
