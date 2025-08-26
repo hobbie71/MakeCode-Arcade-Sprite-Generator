@@ -158,7 +158,7 @@ img`
 
 #### Version 0.3.0 - Image Import & Conversion
 
-- [x] **Image upload** (PNG, JPG, GIF support)
+- [x] **Image upload** (PNG, JPG)
 - [x] **Automatic resizing** to MakeCode dimensions
 - [x] **Color quantization** to MakeCode palette
 - [ ] ~~**Dithering options** for better image quality~~ <br> <sub><sup>_Canceled: Not applicable due to the fixed 15-color palette limitation of MakeCode Arcade._</sup></sub>
@@ -168,9 +168,9 @@ img`
 
 - [x] **Edge detection** for cleaner sprite conversion
 - [x] **Background removal** tools
-- [ ] **Contrast/brightness** adjustment
-- [ ] **Preview comparison** (original vs converted)
-- [ ] **Batch size processing** (multiple dimensions at once)
+- [x] **Contrast/brightness** adjustment
+- [x] **Preview comparison** (original vs converted)
+- [ ] **Batch size processing** (multiple dimensions at once) <br> <sub><sup>_Put on Hold: MVP first before quality of life features_</sup></sub>
 
 ### Phase 3: AI Integration (Differentiating Feature)
 
@@ -181,8 +181,8 @@ img`
 - [ ] **Text-to-sprite AI model** integration
 - [ ] **Style selection** (pixel art, 8-bit, retro)
 - [ ] **Prompt engineering** interface
-- [ ] **Multiple generation attempts** per prompt
-- [ ] **AI result refinement** tools
+- [ ] **Multiple generation attempts** per prompt <br> <sub><sup>_Put on Hold: MVP first before quality of life features_</sup></sub>
+- [ ] **AI result refinement** tools <br> <sub><sup>_Put on Hold: MVP first before quality of life features_</sup></sub>
 
 #### Version 0.6.0 - Advanced AI Features
 
