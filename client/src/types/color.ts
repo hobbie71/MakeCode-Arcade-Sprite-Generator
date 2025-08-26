@@ -228,25 +228,6 @@ export const SteamPunkPalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#2F213B",
 };
 
-export const GrayscalePalette: MakeCodePalette = {
-  [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
-  [MakeCodeColor.WHITE]: "#FFFFFF",
-  [MakeCodeColor.RED]: "#EDEDED",
-  [MakeCodeColor.PINK]: "#DBDBDB",
-  [MakeCodeColor.ORANGE]: "#C8C8C8",
-  [MakeCodeColor.YELLOW]: "#B6B6B6",
-  [MakeCodeColor.TEAL]: "#A4A4A4",
-  [MakeCodeColor.GREEN]: "#929292",
-  [MakeCodeColor.BLUE]: "#808080",
-  [MakeCodeColor.LIGHT_BLUE]: "#6D6D6D",
-  [MakeCodeColor.PURPLE]: "#5B5B5B",
-  [MakeCodeColor.LIGHT_PURPLE]: "#494949",
-  [MakeCodeColor.DARK_PURPLE]: "#373737",
-  [MakeCodeColor.TAN]: "#242424",
-  [MakeCodeColor.BROWN]: "#121212",
-  [MakeCodeColor.BLACK]: "#000000",
-};
-
 export const ALL_PALETTES = [
   { name: "Arcade Palette", palette: ArcadePalette },
   { name: "Matte Palette", palette: MattePalette },
@@ -258,5 +239,4 @@ export const ALL_PALETTES = [
   { name: "Adafruit Palette", palette: AdafruitPalette },
   { name: "StillLife Palette", palette: StillLifePalette },
   { name: "SteamPunk Palette", palette: SteamPunkPalette },
-  { name: "Grayscale Palette", palette: GrayscalePalette },
 ];

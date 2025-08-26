@@ -4,16 +4,17 @@ import { memo } from "react";
 import { useColorSelected } from "../../contexts/ColorSelectedContext/useColorSelected";
 
 // Type imports
-import { MakeCodeColor } from "@/types/color";
+import { MakeCodeColor, MakeCodePalette } from "@/types/color";
 
 // Util imports
 import { getHexFromMakeCodeColor } from "@/utils/colorUtils";
 
 interface Props {
   color: MakeCodeColor;
+  palette: MakeCodePalette;
 }
 
-const ColorIcon = memo(({ color }: Props) => {
+const ColorIcon = memo(({ color, palette }: Props) => {
   const { setColor } = useColorSelected();
 
   return (
@@ -24,7 +25,7 @@ const ColorIcon = memo(({ color }: Props) => {
         `}
       onClick={() => setColor(color)}
       style={{
-        backgroundColor: getHexFromMakeCodeColor(color),
+        backgroundColor: getHexFromMakeCodeColor(color, palette),
       }}
     />
   );

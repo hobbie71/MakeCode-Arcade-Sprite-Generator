@@ -1,8 +1,9 @@
 // Components
-import SizeInputs from "./components/SizeInputs";
 import TabButton from "./components/TabButton";
 import GenerationMethodSection from "./GenerationMethodSection/GenerationMethodSection";
 import Button from "../../components/Button";
+import AssetOptionsSelection from "./components/AssetOptionsSelection";
+import PaletteSelection from "./components/PaletteSelection";
 
 // Context imports
 import { useAssetType } from "@/context/AssetTypeContext/useAssetType";
@@ -12,7 +13,6 @@ import { useImageFileHandler } from "./hooks/useImageFileHandler";
 
 // Type imports
 import { AssetType, assetTypes } from "@/types/export";
-import { BACKGROUND_SIZE, TILE_SIZE } from "@/types/pixel";
 
 const InputSection = () => {
   const { selectedAsset, setSelectedAsset } = useAssetType();
@@ -36,42 +36,8 @@ const InputSection = () => {
         ))}
       </div>
 
-      {/* Conditional sections based on selected asset */}
-      {selectedAsset === AssetType.Sprite && (
-        <>
-          <h3 className="heading-3">Sprite Size (px)</h3>
-          <SizeInputs />
-        </>
-      )}
-
-      {selectedAsset === AssetType.Background && (
-        <div className="background-options">
-          <h3 className="heading-3">Background Size (px)</h3>
-          <SizeInputs fixedSize={BACKGROUND_SIZE} />
-        </div>
-      )}
-
-      {selectedAsset === AssetType.Tile && (
-        <div className="tile-options">
-          <h3 className="heading-3">Tile Size (px)</h3>
-          <SizeInputs fixedSize={TILE_SIZE} />
-        </div>
-      )}
-
-      {selectedAsset === AssetType.Tilemap && (
-        <div className="tilemap-options">
-          <h3 className="heading-3">Tilemap Size</h3>
-          <p className="paragraph text-white/80">Coming soon...</p>
-        </div>
-      )}
-
-      {selectedAsset === AssetType.Animation && (
-        <div className="animation-options">
-          <h3 className="heading-3">Animation Sprite Size (px)</h3>
-          <p className="paragraph text-white/80">Coming soon...</p>
-        </div>
-      )}
-
+      <AssetOptionsSelection selectedAsset={selectedAsset} />
+      <PaletteSelection />
       <GenerationMethodSection />
 
       <Button onClick={generateSpriteFromImportedImage}>Generate Sprite</Button>

@@ -1,8 +1,5 @@
-// Context imports
-import { ColorOrder } from "@/types/color";
-
 // Component imports
-import ColorIcon from "./components/ColorIcon";
+import ColorIcons from "./components/ColorIcons";
 import StrokeIcon from "./components/StrokeIcon";
 import SelectedColorIcons from "./components/SelectedColorIcons";
 import ToolIcon from "./components/ToolIcon";
@@ -39,11 +36,7 @@ const SideBar = () => {
       <div className="color-selected-container my-3 px-1">
         <SelectedColorIcons />
       </div>
-      <div className="color-icon-container flex flex-row flex-wrap justify-center">
-        {ColorOrder.map((color, i) => (
-          <ColorIcon key={i} color={color} />
-        ))}
-      </div>
+      <ColorIcons />
       <div className="zoom-icon-container flex flex-row flex-wrap justify-around my-3">
         <ZoomIcons />
       </div>
