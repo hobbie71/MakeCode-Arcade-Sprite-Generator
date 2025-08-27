@@ -5,6 +5,10 @@ import json
 import time
 from datetime import datetime
 
+from ..services.openai_services import OpenAIServices
+from ..services.pixellab_services import PixelLabServices
+from ..models.enums import OpenAIGenerationSettings, Size, MakeCodePalette
+
 router = APIRouter()
 
 class AIPromptRequest(BaseModel):
@@ -12,6 +16,13 @@ class AIPromptRequest(BaseModel):
     style: Optional[str] = "pixel-art"
     size: Optional[str] = "16x16"
     colors: Optional[str] = "makecode"
+
+class OpenAIGenerateRequest(BaseModel):
+    prompt: str
+    asset_type: str = "sprite"
+    style: str = "anime"
+    size: dict
+    palette: dict
 
 @router.post("/generate")
 async def generate_sprite_from_prompt(request: AIPromptRequest):
@@ -73,3 +84,69 @@ async def _generate_sprite_with_ai(request: AIPromptRequest) -> dict:
         "confidence": 85,
         "processing_time": 1500
     }
+
+@router.post("/generate/openai")
+async def generate_sprite_openAI(request: OpenAIGenerateRequest):
+    """Generate sprite using OpenAI"""
+    try:
+        # Create service instances
+        openai = OpenAIServices()
+        
+        # Convert request data to proper objects
+        settings = OpenAIGenerationSettings(
+            prompt=request.prompt,
+            asset_type=request.asset_type,
+            style=request.style
+        )
+        
+        size = Size(
+            width=request.size.get("width", 16),
+            height=request.size.get("height", 16)
+        )
+        
+        palette = MakeCodePalette(
+            colors=request.palette.get("colors", [
+                "#FFFFFF", "#FF2121", "#FF93C4", "#FF8135", "#FFF609",
+                "#249CA3", "#78DC52", "#003FAD", "#87F2FF", "#8E2EC4",
+                "#A4839F", "#5C406C", "#E5CDC4", "#91463D", "#000000"
+            ])
+        )
+        
+        # Generate sprite
+        return await openai.generate_sprite(settings, size, palette)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"OpenAI generation failed: {str(e)}")
+
+@router.post("/generate/pixellab")
+async def generate_sprite_pixellab(request: OpenAIGenerateRequest):
+    """Generate sprite using PixelLab"""
+    try:
+        # Create service instances
+        pixellab = PixelLabServices()
+        
+        # Convert request data to proper objects
+        settings = OpenAIGenerationSettings(
+            prompt=request.prompt,
+            asset_type=request.asset_type,
+            style=request.style
+        )
+        
+        size = Size(
+            width=request.size.get("width", 16),
+            height=request.size.get("height", 16)
+        )
+        
+        palette = MakeCodePalette(
+            colors=request.palette.get("colors", [
+                "#FFFFFF", "#FF2121", "#FF93C4", "#FF8135", "#FFF609",
+                "#249CA3", "#78DC52", "#003FAD", "#87F2FF", "#8E2EC4",
+                "#A4839F", "#5C406C", "#E5CDC4", "#91463D", "#000000"
+            ])
+        )
+        
+        # Generate sprite
+        return await pixellab.generate_sprite(settings, size, palette)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"PixelLab generation failed: {str(e)}")

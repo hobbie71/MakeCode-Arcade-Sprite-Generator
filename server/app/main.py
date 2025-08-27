@@ -33,7 +33,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,7 +42,7 @@ app.add_middleware(
 # Include routers
 app.include_router(health.router, prefix="/api", tags=["health"])
 app.include_router(sprites.router, prefix="/api/sprites", tags=["sprites"])
-app.include_router(ai.router, prefix="/api/ai", tags=["ai"])
+app.include_router(ai.router, prefix="", tags=["ai"])  # No prefix for direct /generate access
 app.include_router(convert.router, prefix="/api/convert", tags=["convert"])
 
 @app.get("/")
