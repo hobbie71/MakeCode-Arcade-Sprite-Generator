@@ -20,7 +20,7 @@ SPRITE_GENERATION_PROMPT = (
 )
 
 def get_sprite_generation_prompt(settings: PixelLabGenerationSettings, intended_size: Size, palette: MakeCodePalette):
-  aspect_ratio = f"{intended_size.width}:{intended_size.height}"
+  aspect_ratio = f"{intended_size.width/intended_size.height}"
   return SPRITE_GENERATION_PROMPT.format(
     asset_type=settings.assetType.value,
     style=settings.style.value,

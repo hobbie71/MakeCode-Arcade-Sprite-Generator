@@ -11,6 +11,7 @@ import { ImageExportFormats } from "@/types/export";
 
 // Lib imports
 import { drawPixelOnCanvasTransparent } from "../libs/drawPixelOnCanvas";
+import { getResizedSpriteData } from "@/libs/getResizedSpriteData";
 
 // Const imports
 import { PIXEL_SIZE } from "../constants/pixelSize";
@@ -66,17 +67,25 @@ export const useSpriteData = () => {
   }, [height, width, setSpriteData]);
 
   const initCanvasOnly = useCallback(() => {
-    // Only initialize sprite data if it's empty or wrong size
-    if (
-      !spriteDataRef.current ||
-      spriteDataRef.current.length !== height ||
-      (spriteDataRef.current[0] && spriteDataRef.current[0].length !== width)
-    ) {
+    // Only initialize sprite data if it's completely empty
+    if (!spriteDataRef.current || spriteDataRef.current.length === 0) {
       const data = Array.from({ length: height }, () =>
         Array(width).fill(MakeCodeColor.TRANSPARENT)
       );
       spriteDataRef.current = data;
       setSpriteData(data);
+    } else if (
+      spriteDataRef.current.length !== height ||
+      (spriteDataRef.current[0] && spriteDataRef.current[0].length !== width)
+    ) {
+      // If size is wrong, resize the existing data to preserve artwork
+      const resizedData = getResizedSpriteData(
+        spriteDataRef.current,
+        width,
+        height
+      );
+      spriteDataRef.current = resizedData;
+      setSpriteData(resizedData);
     }
     return spriteDataRef.current;
   }, [height, width, setSpriteData]);
