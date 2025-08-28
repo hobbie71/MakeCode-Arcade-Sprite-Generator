@@ -5,26 +5,40 @@ import { CanvasProvider } from "@/context/CanvasContext/CanvasContext";
 import { ImageImportProvider } from "@/context/ImageImportContext/ImageImportContext";
 import { AssetTypeProvider } from "@/context/AssetTypeContext/AssetTypeContext";
 import { GenerationMethodProvider } from "@/context/GenerationMethodContext/GenerationMethodContext";
-import { ImageSettingsProvider } from "@/context/ImageSettingsContext/ImageSettingsContext";
 import { TextSettingsProvider } from "@/context/TextSettingsContext/TextSettingsContext";
+import { AiModelProvider } from "@/context/AiModelContext/AiModelContext";
+import { LoadingProvider } from "@/context/LoadingContext/LoadingContext";
+import { PixelLabSettingsProvider } from "@/context/PixelLabSettingsContext/PixelLabSettingsContext";
+import { OpenAISettingsProvider } from "@/context/OpenAISettingsContext/OpenAISettingsContext";
+import { PostProcessingProvider } from "@/context/PostProcessingContext/PostProcessingContext";
 
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <AssetTypeProvider>
       <GenerationMethodProvider>
-        <ImageSettingsProvider>
-          <TextSettingsProvider>
-            <SpriteProvider>
-              <PaletteSelectedProvider>
-                <CanvasProvider>
-                  <CanvasSizeProvider>
-                    <ImageImportProvider>{children}</ImageImportProvider>
-                  </CanvasSizeProvider>
-                </CanvasProvider>
-              </PaletteSelectedProvider>
-            </SpriteProvider>
-          </TextSettingsProvider>
-        </ImageSettingsProvider>
+        <TextSettingsProvider>
+          <SpriteProvider>
+            <PaletteSelectedProvider>
+              <CanvasProvider>
+                <CanvasSizeProvider>
+                  <LoadingProvider>
+                    <AiModelProvider>
+                      <PixelLabSettingsProvider>
+                        <OpenAISettingsProvider>
+                          <ImageImportProvider>
+                            <PostProcessingProvider>
+                              {children}
+                            </PostProcessingProvider>
+                          </ImageImportProvider>
+                        </OpenAISettingsProvider>
+                      </PixelLabSettingsProvider>
+                    </AiModelProvider>
+                  </LoadingProvider>
+                </CanvasSizeProvider>
+              </CanvasProvider>
+            </PaletteSelectedProvider>
+          </SpriteProvider>
+        </TextSettingsProvider>
       </GenerationMethodProvider>
     </AssetTypeProvider>
   );

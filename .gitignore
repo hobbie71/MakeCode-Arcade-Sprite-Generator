@@ -21,6 +21,8 @@ server/*.pyd
 server/.env
 server/sprites.db
 server/uploads/
+.env
+.env.*
 
 # Editor directories and files
 .vscode/*

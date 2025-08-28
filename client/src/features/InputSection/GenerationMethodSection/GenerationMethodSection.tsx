@@ -1,6 +1,7 @@
 // Component imports
 import TabButton from "../components/TabButton";
 import ImageToSpriteSection from "./ImageToSpriteSection/ImageToSpriteSection";
+import TextToSpriteSection from "./TextToSpriteSection/TextToSpriteSection";
 
 // Context imports
 import { useGenerationMethod } from "@/context/GenerationMethodContext/useGenerationMethod";
@@ -25,7 +26,7 @@ const GenerationMethodSection = () => {
       {selectedMethod === GenerationMethod.TextToSprite && (
         <div className="generation-method-section">
           <h3 className="heading-3">AI Generated Sprite</h3>
-          <p className="paragraph">Coming soon...</p>
+          <TextToSpriteSection />
         </div>
       )}
       {selectedMethod === GenerationMethod.ImageToSprite && (

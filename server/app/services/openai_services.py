@@ -16,6 +16,10 @@ class OpenAIServices:
     self.client = OpenAI(api_key=self.api_token)
 
   def get_final_size(self, intended_size: Size) -> OpenAIFinalSize:
+    """
+    Determine the best OpenAI image size based on aspect ratio.
+    OpenAI supports: 1024x1024 (square), 1536x1024 (landscape), 1024x1536 (portrait)
+    """
     aspect_ratio = intended_size.width / intended_size.height
     
     # Define aspect ratio thresholds
@@ -43,11 +47,9 @@ class OpenAIServices:
         "size": final_size.value,
       }
       
-      # Only add quality if it's not the default
-      if settings.quality and settings.quality.value.strip():
+      # Only add quality if it's not the default auto value
+      if settings.quality.value and settings.quality.value.strip():
         params["quality"] = settings.quality.value
-
-      print(params)
       
       # Generate image using OpenAI
       response = self.client.images.generate(**params)

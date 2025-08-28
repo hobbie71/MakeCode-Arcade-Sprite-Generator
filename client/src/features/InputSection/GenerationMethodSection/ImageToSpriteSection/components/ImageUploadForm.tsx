@@ -5,7 +5,7 @@ import { useImageFileHandler } from "@/features/InputSection/hooks/useImageFileH
 
 const ImageUploadForm = () => {
   // Hooks
-  const { handleFile } = useImageFileHandler();
+  const { importImageManually } = useImageFileHandler();
 
   // States
   const [isDragging, setIsDragging] = useState(false);
@@ -32,7 +32,7 @@ const ImageUploadForm = () => {
 
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
-      handleFile(file);
+      importImageManually(file);
     } else {
       setError("Please upload a valid image file.");
     }
@@ -42,7 +42,7 @@ const ImageUploadForm = () => {
     setError(null);
     const file = e.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
-      handleFile(file);
+      importImageManually(file);
     } else {
       setError("Please upload a valid image file.");
     }

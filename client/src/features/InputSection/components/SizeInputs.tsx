@@ -11,9 +11,10 @@ import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
 
 interface Props {
   fixedSize?: Coordinates;
+  disabled?: boolean;
 }
 
-const SizeInputs = ({ fixedSize }: Props) => {
+const SizeInputs = ({ fixedSize, disabled = false }: Props) => {
   const { setWidth, setHeight } = useCanvasSize();
   const previousFixedSizeRef = useRef<Coordinates | undefined>(undefined);
 
@@ -41,7 +42,7 @@ const SizeInputs = ({ fixedSize }: Props) => {
         {fixedSize ? (
           <SizeInput type="width" fixedSize={fixedSize.x} />
         ) : (
-          <SizeInput type="width" />
+          <SizeInput type="width" disabled={disabled} />
         )}
       </div>
       <div className="">
@@ -49,7 +50,7 @@ const SizeInputs = ({ fixedSize }: Props) => {
         {fixedSize ? (
           <SizeInput type="height" fixedSize={fixedSize.y} />
         ) : (
-          <SizeInput type="height" />
+          <SizeInput type="height" disabled={disabled} />
         )}
       </div>
     </div>

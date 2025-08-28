@@ -1,14 +1,18 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 // Context imports
 import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
 import { useImageImports } from "@/context/ImageImportContext/useImageImports";
-import { useGenerationMethod } from "@/context/GenerationMethodContext/useGenerationMethod";
+import { useLoading } from "@/context/LoadingContext/useLoading";
+import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { useAiModel } from "@/context/AiModelContext/useAiModel";
+import { usePixelLabSettings } from "@/context/PixelLabSettingsContext/usePixelLabSettings";
+import { useOpenAISettings } from "@/context/OpenAISettingsContext/useOpenAISettings";
+import { usePostProcessing } from "@/context/PostProcessingContext/usePostProcessing";
 
 // Hook imports
 import { usePasteData } from "@/features/SpriteEditor/hooks/usePasteData";
 import { useColorToMakeCodeConverter } from "@/features/InputSection/hooks/useColorToMakeCodeConverter";
-import { useImageToSpriteExportSettings } from "../GenerationMethodSection/ImageToSpriteSection/hooks/useImageToSpriteExportSettings";
 
 // Lib imports
 import {
@@ -17,93 +21,199 @@ import {
   resizeCanvasToTarget,
 } from "../libs/imageProcesser";
 
-// Type imports
+// API imports
 import {
-  GenerationMethod,
-  DEFAULT_TEXT_TO_SPRITE_SETTINGS,
-} from "@/types/export";
+  generateOpenAiImage,
+  generatePixelLabImage,
+} from "@/api/generateImageApi";
+
+// Type imports
+import { AiModel } from "@/types/export";
 
 export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();
   const { setImportedImage, importedImage } = useImageImports();
-  const { selectedMethod } = useGenerationMethod();
+  const { startGeneration, stopGeneration } = useLoading();
   const { pasteSpriteData } = usePasteData();
   const { convertImage } = useColorToMakeCodeConverter();
-  const { settings: imageToSpriteSettings } = useImageToSpriteExportSettings();
+  const { selectedModel } = useAiModel();
+  const { settings: pixelLabSettings } = usePixelLabSettings();
+  const { settings: openAISettings } = useOpenAISettings();
+  const { settings: postProcessingSettings } = usePostProcessing();
+  const { palette } = usePaletteSelected();
 
-  // Store the uploaded image for processing
-  const [uploadedImageFile, setUploadedImageFile] = useState<File | null>(null);
+  /**
+   * Converts an image file to sprite data with post-processing settings applied
+   */
+  const convertImageToSprite = useCallback(
+    async (file?: File) => {
+      const imageFile = file ?? importedImage;
+      if (!imageFile) {
+        console.warn("No image file available for sprite generation");
+        return;
+      }
 
-  const handleFile = useCallback(
-    (file: File) => {
-      // Store the uploaded file for processing
-      setUploadedImageFile(file);
-      // Store the imported file for preview
-      setImportedImage(file);
+      return new Promise<void>((resolve, reject) => {
+        try {
+          startGeneration("Processing image to sprite...");
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new window.Image();
+            img.onload = () => {
+              try {
+                // Create canvas from the image
+                const originalCanvas = createCanvasFromImage(img);
+                if (!originalCanvas) {
+                  reject(new Error("Failed to create canvas from image"));
+                  return;
+                }
+
+                // Process the image with settings (includes post-processing)
+                const processedCanvas = processImageWithSettings(
+                  originalCanvas,
+                  postProcessingSettings
+                );
+
+                // Resize to target dimensions
+                const resizedCanvas = resizeCanvasToTarget(
+                  processedCanvas,
+                  width,
+                  height
+                );
+                if (!resizedCanvas) {
+                  reject(new Error("Failed to resize canvas"));
+                  return;
+                }
+
+                // Get image data and convert to sprite
+                const imageData = resizedCanvas
+                  .getContext("2d", { willReadFrequently: true })
+                  ?.getImageData(0, 0, width, height);
+
+                if (!imageData) {
+                  reject(new Error("Failed to get image data"));
+                  return;
+                }
+
+                const spriteData = convertImage(imageData, width, height);
+                pasteSpriteData(spriteData);
+                resolve();
+              } catch (error) {
+                console.error("Error processing image:", error);
+                reject(error);
+              } finally {
+                stopGeneration();
+              }
+            };
+            img.onerror = () => {
+              reject(new Error("Failed to load image"));
+              stopGeneration();
+            };
+            img.src = e.target?.result as string;
+          };
+          reader.onerror = () => {
+            reject(new Error("Failed to read image file"));
+            stopGeneration();
+          };
+          reader.readAsDataURL(imageFile);
+        } catch (error) {
+          console.error("Error reading image file:", error);
+          reject(error);
+          stopGeneration();
+        }
+      });
     },
-    [setImportedImage]
+    [
+      importedImage,
+      postProcessingSettings,
+      width,
+      height,
+      convertImage,
+      pasteSpriteData,
+      startGeneration,
+      stopGeneration,
+    ]
   );
 
-  const generateSpriteFromImportedImage = useCallback(() => {
-    // Use either the uploaded file or the imported image from context
-    const fileToProcess = uploadedImageFile || importedImage;
+  /**
+   * Generates an image using AI and converts it to sprite with post-processing
+   */
+  const generateAIImageAndConvertToSprite = useCallback(async () => {
+    try {
+      startGeneration("Generating AI sprite from prompt...");
 
-    if (!fileToProcess) {
-      console.warn("No image file available for sprite generation");
-      return;
+      // Generate image using selected AI model
+      let response;
+      if (selectedModel === AiModel.PixelLab) {
+        response = await generatePixelLabImage(
+          pixelLabSettings,
+          { width, height },
+          palette
+        );
+      } else if (selectedModel === AiModel.GPTImage1) {
+        response = await generateOpenAiImage(
+          openAISettings,
+          { width, height },
+          palette
+        );
+      } else {
+        throw new Error(`Unsupported AI model: ${selectedModel}`);
+      }
+
+      // Convert base64 data URL to File
+      const dataUrl = response.image_data;
+      const byteString = atob(dataUrl.split(",")[1]);
+      const mimeString = dataUrl.split(",")[0].split(":")[1].split(";")[0];
+
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+
+      const blob = new Blob([ab], { type: mimeString });
+      const file = new File([blob], "generated-sprite.png", {
+        type: mimeString,
+      });
+
+      // Store the generated image and convert to sprite with post-processing
+      setImportedImage(file);
+      await convertImageToSprite(file);
+    } catch (error) {
+      console.error("Error generating AI sprite:", error);
+      throw error;
+    } finally {
+      stopGeneration();
     }
-
-    // Create image element from file
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new window.Image();
-      img.onload = () => {
-        // Create canvas from the image
-        const originalCanvas = createCanvasFromImage(img);
-        if (!originalCanvas) return;
-
-        // Get appropriate settings based on current generation method
-        const settings =
-          selectedMethod === GenerationMethod.ImageToSprite
-            ? imageToSpriteSettings
-            : DEFAULT_TEXT_TO_SPRITE_SETTINGS;
-
-        // Process the image with settings
-        const processedCanvas = processImageWithSettings(
-          originalCanvas,
-          settings
-        );
-
-        // Resize to target dimensions
-        const resizedCanvas = resizeCanvasToTarget(
-          processedCanvas,
-          width,
-          height
-        );
-        if (!resizedCanvas) return;
-
-        // Get image data and convert to sprite
-        const imageData = resizedCanvas
-          .getContext("2d", { willReadFrequently: true })
-          ?.getImageData(0, 0, width, height);
-
-        if (!imageData) return;
-        const spriteData = convertImage(imageData, width, height);
-        pasteSpriteData(spriteData);
-      };
-      img.src = e.target?.result as string;
-    };
-    reader.readAsDataURL(fileToProcess);
   }, [
-    uploadedImageFile,
-    importedImage,
-    selectedMethod,
-    imageToSpriteSettings,
+    startGeneration,
+    stopGeneration,
+    setImportedImage,
+    selectedModel,
+    pixelLabSettings,
+    openAISettings,
+    convertImageToSprite,
     width,
     height,
-    convertImage,
-    pasteSpriteData,
+    palette,
   ]);
 
-  return { handleFile, generateSpriteFromImportedImage };
+  /**
+   * Handles file upload and immediately converts to sprite
+   */
+  const importImageManually = useCallback(
+    async (file: File) => {
+      setImportedImage(file);
+      await convertImageToSprite(file);
+    },
+    [setImportedImage, convertImageToSprite]
+  );
+
+  return {
+    importImageManually,
+    convertImageToSprite,
+    generateAIImageAndConvertToSprite,
+    importedImage,
+  };
 };

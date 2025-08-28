@@ -1,12 +1,11 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
 from typing import List
 
-from .routers import sprites, ai, convert, health
-from .database import engine, Base
+from .routers import sprites
 from .core.config import settings
 
 # Configure logging
@@ -16,8 +15,6 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    logger.info("Creating database tables...")
-    Base.metadata.create_all(bind=engine)
     logger.info("Server startup complete")
     yield
     # Shutdown
@@ -40,10 +37,7 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(health.router, prefix="/api", tags=["health"])
-app.include_router(sprites.router, prefix="/api/sprites", tags=["sprites"])
-app.include_router(ai.router, prefix="", tags=["ai"])  # No prefix for direct /generate access
-app.include_router(convert.router, prefix="/api/convert", tags=["convert"])
+app.include_router(sprites.router, prefix="/generate-image", tags=["generate-image"])
 
 @app.get("/")
 async def root():

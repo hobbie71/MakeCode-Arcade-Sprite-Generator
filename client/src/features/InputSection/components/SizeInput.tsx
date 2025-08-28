@@ -12,9 +12,10 @@ import { MAX_LENGTH, MIN_LENGTH } from "@/types/pixel";
 interface Props {
   type: "width" | "height";
   fixedSize?: number; // Should be between MIN_LENGTH and MAX_LENGTH
+  disabled?: boolean;
 }
 
-const SizeInput = ({ type, fixedSize }: Props) => {
+const SizeInput = ({ type, fixedSize, disabled = false }: Props) => {
   // Hooks
   const { width, height } = useCanvasSize();
   const { updateCanvasSize } = useCanvasResize();
@@ -23,8 +24,8 @@ const SizeInput = ({ type, fixedSize }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
-    // Don't allow input if fixedSize is set
-    if (fixedSize) return;
+    // Don't allow input if fixedSize is set or disabled
+    if (fixedSize || disabled) return;
 
     const input = e.currentTarget;
     if (input.value.length > 3) {
@@ -37,8 +38,8 @@ const SizeInput = ({ type, fixedSize }: Props) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Don't allow keyboard interaction if fixedSize is set
-    if (fixedSize) {
+    // Don't allow keyboard interaction if fixedSize is set or disabled
+    if (fixedSize || disabled) {
       e.preventDefault();
       return;
     }
@@ -62,8 +63,8 @@ const SizeInput = ({ type, fixedSize }: Props) => {
   };
 
   const handleUserSubmit = () => {
-    // Don't allow submission if fixedSize is set
-    if (fixedSize) return;
+    // Don't allow submission if fixedSize is set or disabled
+    if (fixedSize || disabled) return;
 
     const input = inputRef.current;
     if (!input) return;
@@ -76,8 +77,8 @@ const SizeInput = ({ type, fixedSize }: Props) => {
   };
 
   const incrementSize = (amount: number) => {
-    // Don't allow increment if fixedSize is set
-    if (fixedSize) return;
+    // Don't allow increment if fixedSize is set or disabled
+    if (fixedSize || disabled) return;
 
     const input = inputRef.current;
     if (!input) return;
@@ -115,25 +116,31 @@ const SizeInput = ({ type, fixedSize }: Props) => {
     <input
       ref={inputRef}
       className={`input-no-arrows px-3 py-2 min-w-24 text-center border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-        fixedSize
+        fixedSize || disabled
           ? "bg-gray-100 text-gray-500 cursor-not-allowed"
           : "text-gray-700 bg-white"
       }`}
       type="number"
       maxLength={3}
       onInput={handleInput}
-      onDoubleClick={() => !fixedSize && inputRef.current?.select()}
+      onDoubleClick={() =>
+        !fixedSize && !disabled && inputRef.current?.select()
+      }
       onKeyDown={handleKeyDown}
       onBlur={() => handleUserSubmit()}
       max={MAX_LENGTH}
       min={MIN_LENGTH}
-      disabled={fixedSize !== undefined}
-      readOnly={fixedSize !== undefined}
+      disabled={fixedSize !== undefined || disabled}
+      readOnly={fixedSize !== undefined || disabled}
       title={
-        fixedSize ? "This value is fixed and cannot be changed" : undefined
+        fixedSize
+          ? "This value is fixed and cannot be changed"
+          : disabled
+            ? "This input is disabled during generation"
+            : undefined
       }
       style={{
-        userSelect: fixedSize ? "none" : "auto",
+        userSelect: fixedSize || disabled ? "none" : "auto",
       }}
     />
   );
