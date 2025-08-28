@@ -178,9 +178,9 @@ img`
 
 #### Version 0.5.0 - AI Sprite Generation
 
-- [ ] **Text-to-sprite AI model** integration
-- [ ] **Style selection** (pixel art, 8-bit, retro)
-- [ ] **Prompt engineering** interface
+- [x] **Text-to-sprite AI model** integration
+- [x] **Style selection** (pixel art, 8-bit, retro)
+- [x] **Prompt engineering** interface
 - [ ] **Multiple generation attempts** per prompt <br> <sub><sup>_Put on Hold: MVP first before quality of life features_</sup></sub>
 - [ ] **AI result refinement** tools <br> <sub><sup>_Put on Hold: MVP first before quality of life features_</sup></sub>
 
