@@ -7,23 +7,23 @@ const LoadingOverlay: React.FC = () => {
   if (!isGenerating) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center backdrop-blur-sm">
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-8 max-w-md mx-4 text-center shadow-2xl">
+    <div className="loading-overlay">
+      <div className="loading-content">
         {/* Loading Spinner */}
-        <div className="mb-6">
+        <div className="mb-3">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto"></div>
         </div>
 
         {/* Loading Message */}
-        <h3 className="text-xl font-semibold text-white mb-4">
-          {generationMessage || "Generating sprite..."}
-        </h3>
+        <h4 className="heading-4">
+          {generationMessage || "Generating Sprite..."}
+        </h4>
 
         {/* Warning Message */}
         <div className="bg-yellow-900 border border-yellow-600 rounded-md p-4 mb-4">
           <div className="flex items-center">
             <svg
-              className="w-5 h-5 text-yellow-400 mr-2 flex-shrink-0"
+              className="w-5 h-5 text-yellow-300 mr-2 flex-shrink-0"
               fill="currentColor"
               viewBox="0 0 20 20">
               <path
@@ -32,11 +32,11 @@ const LoadingOverlay: React.FC = () => {
                 clipRule="evenodd"
               />
             </svg>
-            <div>
-              <p className="text-yellow-200 text-sm font-medium">
+            <div className="text-center">
+              <p className="text-yellow-200">
                 Please wait - this may take a few minutes
               </p>
-              <p className="text-yellow-300 text-xs mt-1">
+              <p className="text-neutral-200 text-sm mt-1">
                 Do not close this window or navigate away
               </p>
             </div>
@@ -44,7 +44,7 @@ const LoadingOverlay: React.FC = () => {
         </div>
 
         {/* Additional Info */}
-        <p className="text-gray-400 text-sm">
+        <p className="text-neutral-200 text-sm">
           AI image generation is processing your request...
         </p>
       </div>

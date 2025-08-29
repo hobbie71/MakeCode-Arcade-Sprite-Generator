@@ -113,39 +113,35 @@ const NumberInputBox = ({
   }, [value]);
 
   return (
-    <div className={`flex flex-row px-2 py-1 ${className}`}>
-      <label className="paragraph" htmlFor={label}>
-        <input
-          ref={inputRef}
-          className={`input-no-arrows mr-2 px-2 py-1 min-w-16 text-center border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            disabled
-              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-              : "text-gray-700 bg-white hover:border-gray-400"
-          }`}
-          type="number"
-          id={label}
-          name={label}
-          maxLength={maxDigits}
-          onInput={handleInput}
-          onDoubleClick={() => !disabled && inputRef.current?.select()}
-          onKeyDown={handleKeyDown}
-          onBlur={handleUserSubmit}
-          max={max}
-          min={min}
-          disabled={disabled}
-          readOnly={disabled}
-          placeholder={placeholder}
-          title={
-            disabled
-              ? "This value is disabled and cannot be changed"
-              : undefined
-          }
-          style={{
-            userSelect: disabled ? "none" : "auto",
-          }}
-        />
-        {label}
+    <div className={`input-group align-middle ${className}`}>
+      <label className="mr-3" htmlFor={label}>
+        {label}:
       </label>
+      <input
+        ref={inputRef}
+        className={`form-input input-no-arrows min-w-4 text-center ${
+          disabled ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""
+        }`}
+        type="number"
+        id={label}
+        name={label}
+        maxLength={maxDigits}
+        onInput={handleInput}
+        onDoubleClick={() => !disabled && inputRef.current?.select()}
+        onKeyDown={handleKeyDown}
+        onBlur={handleUserSubmit}
+        max={max}
+        min={min}
+        disabled={disabled}
+        readOnly={disabled}
+        placeholder={placeholder}
+        title={
+          disabled ? "This value is disabled and cannot be changed" : undefined
+        }
+        style={{
+          userSelect: disabled ? "none" : "auto",
+        }}
+      />
     </div>
   );
 };

@@ -19,10 +19,7 @@ const ColorIcon = memo(({ color, palette }: Props) => {
 
   return (
     <div
-      className={`
-        min-w-7 min-h-7 m-0.5 rounded hover:opacity-60 transition-opacity
-        ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}
-        `}
+      className={`color-swatch ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
       onClick={() => setColor(color)}
       style={{
         backgroundColor: getHexFromMakeCodeColor(color, palette),

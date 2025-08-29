@@ -13,13 +13,7 @@ const ToolIcon = memo(({ tool, icon }: Props) => {
 
   return (
     <button
-      className={`
-        w-7 h-7 flex items-center justify-center
-        bg-transparent outline-none shadow-none cursor-pointer
-        focus:outline-none focus:shadow-none
-        hover:text-neutral-200
-        ${isSelected ? "border border-white border-solid text-white" : "text-neutral-400"}
-      `}
+      className={`tool-button ${isSelected ? "active" : ""}`}
       onClick={() => setTool(tool)}
       aria-label={tool}
       type="button">

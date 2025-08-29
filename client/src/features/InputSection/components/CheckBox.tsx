@@ -15,13 +15,13 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
   };
 
   return (
-    <div className="flex flex-row px-2 py-1">
+    <div className="form-group justify-self-start my-2">
       <label
-        className={`paragraph ${disabled ? "text-gray-500 cursor-not-allowed" : "cursor-pointer"}`}
+        className={`form-label ${disabled ? "text-gray-500 cursor-not-allowed" : "cursor-pointer"}`}
         htmlFor={children}>
         <input
           type="checkbox"
-          className={`mr-2 ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+          className={`form-checkbox mr-2 ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
           id={children}
           name={children}
           checked={checked}

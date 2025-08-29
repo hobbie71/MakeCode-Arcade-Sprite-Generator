@@ -54,7 +54,7 @@ const ImageUploadForm = () => {
 
   return (
     <div
-      className={`border-2 border-dashed p-4 rounded transition-colors duration-200 cursor-pointer flex flex-col items-center justify-center ${
+      className={`card card-body border-2 border-dashed transition-colors duration-200 cursor-pointer flex flex-col items-center justify-center text-center ${
         isDragging
           ? "border-blue-400 bg-blue-800"
           : "border-white bg-transparent"
@@ -78,10 +78,11 @@ const ImageUploadForm = () => {
           d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M8 12l4-4m0 0l4 4m-4-4v12"
         />
       </svg>
-      <p className="paragraph text-center mb-2 text-white">
-        Drag and drop an image here, or{" "}
-        <span className="underline text-blue-500">browse</span>
-      </p>
+      <div className="paragraph text-center text-white">
+        <p className="">Drag and Drop an Image Here</p>
+        <p className="">or</p>
+        <p className="">Click to Browse Files</p>
+      </div>
       <input
         ref={inputRef}
         type="file"
@@ -90,7 +91,7 @@ const ImageUploadForm = () => {
         onChange={handleInputChange}
         tabIndex={-1}
       />
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {error && <p className="text-error mt-2">{error}</p>}
     </div>
   );
 };

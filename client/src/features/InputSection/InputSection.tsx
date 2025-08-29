@@ -7,13 +7,14 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 const InputSection = () => {
   return (
     <>
-      <div className="p-2 w-full h-full" style={{ backgroundColor: "#1e1e1e" }}>
-        <h1 className="heading-3">ArcadeMake Code Sprite Generator</h1>
-
+      <section className="sidebar-content w-full h-full text-center lg:text-left">
+        <h1 className="heading-3 text-center">
+          ArcadeMake Code Sprite Generator
+        </h1>
         <AssetOptionsSelection />
         <PaletteSelection />
         <GenerationMethodSection />
-      </div>
+      </section>
       <LoadingOverlay />
     </>
   );

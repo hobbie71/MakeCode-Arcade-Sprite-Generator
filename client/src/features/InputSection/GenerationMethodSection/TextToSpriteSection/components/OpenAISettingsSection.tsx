@@ -34,7 +34,7 @@ const OpenAISettingsSection = () => {
   );
 
   return (
-    <div className="">
+    <div className="form-group">
       {/* Style */}
       <DefaultDropDown
         onChange={(index: number) =>

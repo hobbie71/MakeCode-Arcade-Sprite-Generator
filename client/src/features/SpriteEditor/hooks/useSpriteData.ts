@@ -7,14 +7,9 @@ import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
 // Type imports
 import { MakeCodeColor } from "@/types/color";
 import { Coordinates } from "@/types/pixel";
-import { ImageExportFormats } from "@/types/export";
 
 // Lib imports
-import { drawPixelOnCanvasTransparent } from "../libs/drawPixelOnCanvas";
 import { getResizedSpriteData } from "@/libs/getResizedSpriteData";
-
-// Const imports
-import { PIXEL_SIZE } from "../constants/pixelSize";
 
 export const useSpriteData = () => {
   const { setSpriteData, spriteData } = useSprite();
@@ -90,44 +85,6 @@ export const useSpriteData = () => {
     return spriteDataRef.current;
   }, [height, width, setSpriteData]);
 
-  const getImgCode = useCallback((): string => {
-    const imgCode = "img";
-
-    const rows = spriteData.map((row) =>
-      row.map((color) => color.toString()).join(" ")
-    );
-    const body = rows.join("\n");
-    const result = `${imgCode}\`\n${body}\n\``;
-    return result;
-  }, [spriteData]);
-
-  const exportSpriteToImage = useCallback(
-    (format: ImageExportFormats) => {
-      const exportCanvas = document.createElement("canvas");
-      const ctx = exportCanvas.getContext("2d");
-      if (!ctx) return;
-
-      exportCanvas.width = width * PIXEL_SIZE;
-      exportCanvas.height = height * PIXEL_SIZE;
-
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const color = spriteData[y][x];
-          drawPixelOnCanvasTransparent(exportCanvas, { x, y }, color);
-        }
-      }
-
-      // Export in desired format
-      const url = exportCanvas.toDataURL(`image/${format}`);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "my-sprite"; // file name
-      link.click();
-      link.remove();
-    },
-    [height, width, spriteData]
-  );
-
   return {
     spriteData,
     initSpriteData,
@@ -136,7 +93,5 @@ export const useSpriteData = () => {
     commitSpriteData,
     getCurrentSpriteData,
     resizeSpriteData,
-    getImgCode,
-    exportSpriteToImage,
   };
 };

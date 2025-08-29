@@ -71,7 +71,7 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
 
   return (
     <div
-      className="w-full min-h-full relative bg-[#1e1e1e] overflow-hidden"
+      className="canvas-container"
       style={{
         cursor: tool === "pan" ? "grab" : "crosshair",
       }}
@@ -85,7 +85,7 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
         ref={canvasRef}
         width={width * pixelSize}
         height={height * pixelSize}
-        className="block absolute outline-none focus:outline-none active:outline-none hover:outline-none"
+        className="sprite-canvas"
         tabIndex={0}
         onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}

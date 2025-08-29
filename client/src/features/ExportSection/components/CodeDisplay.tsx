@@ -33,8 +33,7 @@ const CodeDisplay = ({ children, codingLanguage = "javascript" }: Props) => {
   return (
     <div className="relative">
       <pre
-        className="whitespace-pre-wrap break-all p-4 border border-gray-200 rounded max-h-60 overflow-auto cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-        style={{ backgroundColor: "#f6f6f6" }}
+        className="card-body rounded bg-neutral-100 max-h-60 overflow-auto cursor-pointer hover:bg-neutral-300 transition-colors duration-200"
         onClick={handleCopy}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
@@ -46,16 +45,14 @@ const CodeDisplay = ({ children, codingLanguage = "javascript" }: Props) => {
 
       {/* Tooltip */}
       {showTooltip && !copied && (
-        <div className="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none">
+        <div className="absolute-center bg-gray-800 text-white text-sm px-3 py-2 rounded shadow-lg pointer-events-none">
           Click to copy
         </div>
       )}
 
       {/* Copy confirmation animation */}
       {copied && (
-        <div
-          className="absolute top-2 right-2 text-white text-xs px-2 py-1 rounded shadow-lg animate-pulse"
-          style={{ backgroundColor: "#058b9b" }}>
+        <div className="absolute-center bg-green-500 text-white text-sm px-3 py-2 rounded shadow-lg animate-pulse">
           Copied!
         </div>
       )}

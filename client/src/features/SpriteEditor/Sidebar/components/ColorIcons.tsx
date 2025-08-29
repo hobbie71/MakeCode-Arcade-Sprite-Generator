@@ -11,7 +11,7 @@ const ColorIcons = () => {
   const { palette } = usePaletteSelected();
 
   return (
-    <div className="color-icon-container flex flex-row flex-wrap justify-center">
+    <div className="color-palette my-2">
       {ColorOrder.map((color, i) => (
         <ColorIcon key={i} color={color} palette={palette} />
       ))}

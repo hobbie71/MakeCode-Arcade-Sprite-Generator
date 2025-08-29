@@ -13,15 +13,15 @@ import DevToolsButton from "@/features/DevTools/components/DevToolsButton";
 function App() {
   return (
     <AppProviders>
-      <div className="app-container grid grid-cols-10">
-        <div className="col-span-3">
+      <main className="app-layout">
+        <section className="sidebar">
           <InputSection />
-        </div>
-        <div className="col-span-7">
+        </section>
+        <section className="main-content">
           <SpriteEditor />
           <ExportSection />
-        </div>
-      </div>
+        </section>
+      </main>
       <DevToolsButton />
     </AppProviders>
   );

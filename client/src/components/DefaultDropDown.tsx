@@ -9,7 +9,7 @@ interface DefaultDropDownProps<T> {
   options: DropdownOption<T>[];
   value: number;
   onChange: (index: number) => void;
-  children?: React.ReactNode;
+  children: string;
   className?: string;
   disabled?: boolean;
 }
@@ -28,12 +28,13 @@ const DefaultDropDown = <T,>({
   };
 
   return (
-    <div className="flex flex-row">
+    <div className="input-group">
+      <label htmlFor={children}>{children}</label>
       <select
-        className={`border rounded px-2 py-1 mb-4 text-center ${
+        className={`form-select ${
           disabled
             ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
-            : "text-black border-gray-400 hover:border-gray-500"
+            : ""
         } ${className}`}
         value={value}
         onChange={handleChange}
@@ -44,7 +45,6 @@ const DefaultDropDown = <T,>({
           </option>
         ))}
       </select>
-      {children && <p className="paragraph ml-3">{children}</p>}
     </div>
   );
 };

@@ -36,17 +36,17 @@ const SizeInputs = ({ fixedSize, disabled = false }: Props) => {
   }, [fixedSize, setWidth, setHeight]);
 
   return (
-    <div className="input-size-container flex flex-row">
-      <div className="mr-3">
-        <p className="paragraph">Width</p>
+    <div className="form-group responsive-flex mb-0">
+      <div className="form-group">
+        <label className="form-label">Width</label>
         {fixedSize ? (
           <SizeInput type="width" fixedSize={fixedSize.x} />
         ) : (
           <SizeInput type="width" disabled={disabled} />
         )}
       </div>
-      <div className="">
-        <p className="paragraph">Height</p>
+      <div className="form-group">
+        <label className="form-label">Height</label>
         {fixedSize ? (
           <SizeInput type="height" fixedSize={fixedSize.y} />
         ) : (

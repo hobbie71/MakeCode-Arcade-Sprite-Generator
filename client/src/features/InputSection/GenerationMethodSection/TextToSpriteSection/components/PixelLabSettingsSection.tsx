@@ -40,7 +40,7 @@ const PixelLabSettingsSection = () => {
   );
 
   return (
-    <div className="">
+    <div className="form-group">
       {/* Style */}
       <DefaultDropDown
         onChange={(index: number) =>
@@ -78,23 +78,25 @@ const PixelLabSettingsSection = () => {
             Quality
           </DefaultDropDown>
 
-          {/* Add Background */}
-          <CheckBox
-            onChange={(bool: boolean) => changeSetting("addBackground", bool)}
-            checked={settings.addBackground}
-            disabled={isGenerating}>
-            Add Background
-          </CheckBox>
+          <div className="">
+            {/* Add Background */}
+            <CheckBox
+              onChange={(bool: boolean) => changeSetting("addBackground", bool)}
+              checked={settings.addBackground}
+              disabled={isGenerating}>
+              Add Background
+            </CheckBox>
 
-          {/* Fit Full Canvas Size */}
-          <CheckBox
-            onChange={(bool: boolean) =>
-              changeSetting("fitFullCanvasSize", bool)
-            }
-            checked={settings.fitFullCanvasSize}
-            disabled={isGenerating}>
-            Fit Full Canvas Size
-          </CheckBox>
+            {/* Fit Full Canvas Size */}
+            <CheckBox
+              onChange={(bool: boolean) =>
+                changeSetting("fitFullCanvasSize", bool)
+              }
+              checked={settings.fitFullCanvasSize}
+              disabled={isGenerating}>
+              Fit Full Canvas Size
+            </CheckBox>
+          </div>
 
           {/* Point of View */}
           <DefaultDropDown

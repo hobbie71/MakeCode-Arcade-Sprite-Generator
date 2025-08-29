@@ -9,7 +9,7 @@ import SpriteDataResizer from "./components/SpriteDataResizer";
 const SpriteEditor = () => {
   return (
     <SpriteEditorProvider>
-      <div className="sprite-editor-container relative flex flex-row">
+      <div className="editor-section">
         <SideBar />
         <Canvas width={16} height={16} />
         <SpriteDataResizer />

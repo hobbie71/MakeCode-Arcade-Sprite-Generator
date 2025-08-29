@@ -22,22 +22,22 @@ const TOOL_ICONS: Array<{ tool: EditorTools; icon: string }> = [
 
 const SideBar = () => {
   return (
-    <div className="p-1 max-w-20" style={{ backgroundColor: "#333333" }}>
-      <div className="stroke-icon-container flex flex-row justify-around items-center px-1">
+    <div className="toolbox bg-[#333333]">
+      <div className="stroke-icon-container flex flex-row justify-around items-center my-2">
         {STROKE_SIZES.map((size, i) => (
           <StrokeIcon key={i} strokeSize={size} />
         ))}
       </div>
-      <div className="tool-icon-container flex flex-row flex-wrap justify-around my-3 gap-1 gap-y-3">
+      <div className="tool-grid my-2 ">
         {TOOL_ICONS.map(({ tool, icon }, i) => (
           <ToolIcon key={i} tool={tool} icon={icon} />
         ))}
       </div>
-      <div className="color-selected-container my-3 px-1">
+      <div className="my-2">
         <SelectedColorIcons />
       </div>
       <ColorIcons />
-      <div className="zoom-icon-container flex flex-row flex-wrap justify-around my-3">
+      <div className="zoom-icon-container flex flex-row flex-wrap justify-around my-1">
         <ZoomIcons />
       </div>
     </div>

@@ -13,25 +13,25 @@ const GenerationMethodSection = () => {
   const { selectedMethod, setSelectedMethod } = useGenerationMethod();
 
   return (
-    <div className="">
-      <h3 className="heading-3">Generation Method</h3>
-      {generationMethods.map((method) => (
-        <TabButton
-          key={method}
-          isSelected={selectedMethod === method}
-          onClick={() => setSelectedMethod(method)}>
-          {`${method.charAt(0).toUpperCase() + method.slice(1)} to Sprite`}
-        </TabButton>
-      ))}
+    <div className="form-group">
+      <h4 className="heading-4">Generation Method</h4>
+      <div className="tab-list">
+        {generationMethods.map((method) => (
+          <TabButton
+            key={method}
+            isSelected={selectedMethod === method}
+            onClick={() => setSelectedMethod(method)}>
+            {`${method.charAt(0).toUpperCase() + method.slice(1)} to Sprite`}
+          </TabButton>
+        ))}
+      </div>
       {selectedMethod === GenerationMethod.TextToSprite && (
-        <div className="generation-method-section">
-          <h3 className="heading-3">AI Generated Sprite</h3>
+        <div className="form-group">
           <TextToSpriteSection />
         </div>
       )}
       {selectedMethod === GenerationMethod.ImageToSprite && (
-        <div className="generation-method-section">
-          <h3 className="heading-3">Image to Sprite Generation</h3>
+        <div className="form-group">
           <ImageToSpriteSection />
         </div>
       )}

@@ -9,7 +9,7 @@ const DevToolsButton: React.FC = () => {
       {/* Fixed Button */}
       <button
         onClick={() => setIsDevToolsOpen(true)}
-        className="fixed bottom-4 right-4 z-40 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 transform hover:scale-105 hover:shadow-xl active:scale-95 group"
+        className="btn-primary fixed bottom-4 right-4 z-40 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 p-3 rounded-full transition-all duration-200 transform hover:scale-105 hover:shadow-xl active:scale-95 group"
         title="Open Dev Tools"
         aria-label="Open development tools">
         <svg

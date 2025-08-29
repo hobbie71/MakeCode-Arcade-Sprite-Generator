@@ -59,13 +59,15 @@ const TextToSpriteSection = () => {
           <Button
             onClick={() => convertImageToSprite()}
             isLoading={isGenerating}
-            variant="primary">
+            variant="primary"
+            className="w-full">
             Reprocess Image
           </Button>
           <Button
             onClick={() => generateAIImageAndConvertToSprite()}
             isLoading={isGenerating}
-            variant="secondary">
+            variant="secondary"
+            className="w-full">
             Generate New Sprite
           </Button>
         </>
@@ -73,7 +75,8 @@ const TextToSpriteSection = () => {
         <>
           <Button
             onClick={() => generateAIImageAndConvertToSprite()}
-            isLoading={isGenerating}>
+            isLoading={isGenerating}
+            className="w-full">
             Generate New Sprite
           </Button>
         </>

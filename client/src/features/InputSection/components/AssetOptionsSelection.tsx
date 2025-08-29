@@ -21,7 +21,7 @@ const AssetOptionsSelection = () => {
 
   return (
     <>
-      <div className="asset-type-container flex flex-row gap-1 border-b-2 border-b-neutral-700 border-x-0 border-t-0">
+      <div className="tab-list">
         {ALL_ASSETS_TYPE.map((type) => (
           <TabButton
             key={type}
@@ -34,22 +34,22 @@ const AssetOptionsSelection = () => {
       </div>
 
       {selectedAsset === AssetType.Sprite && (
-        <>
-          <h3 className="heading-3">Sprite Size (px)</h3>
+        <div className="form-group">
+          <h5 className="heading-5">Sprite Size (px)</h5>
           <SizeInputs disabled={isGenerating} />
-        </>
+        </div>
       )}
 
       {selectedAsset === AssetType.Background && (
-        <div className="background-options">
-          <h3 className="heading-3">Background Size (px)</h3>
+        <div className="form-group">
+          <h5 className="heading-5">Background Size (px)</h5>
           <SizeInputs fixedSize={BACKGROUND_SIZE} disabled={isGenerating} />
         </div>
       )}
 
       {selectedAsset === AssetType.Tile && (
-        <div className="tile-options">
-          <h3 className="heading-3">Tile Size (px)</h3>
+        <div className="form-group">
+          <h5 className="heading-5">Tile Size (px)</h5>
           <SizeInputs fixedSize={TILE_SIZE} disabled={isGenerating} />
         </div>
       )}

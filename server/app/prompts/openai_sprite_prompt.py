@@ -6,7 +6,7 @@ SPRITE_GENERATION_PROMPT = (
   "- No photorealism, no painterly shading. "
 
   "Follow these rules for sizing and positioning: "
-  "- Create the {asset_type} at an aspect ratio of {aspect_ratio} "
+  "- Create the {asset_type} at an aspect ratio of {aspect_ratio} minimum 128 x 128 pixels"
   "- Use cartoon proportions to get as close as you can to the aspect ratio of {aspect_ratio} "
   "- We are working with a very limited palette, so seperate items with different colors "
   "- Try to only use these colors : "

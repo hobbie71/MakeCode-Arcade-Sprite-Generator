@@ -3,20 +3,19 @@ import ExportButton from "./components/ExportButton";
 import CodeDisplay from "./components/CodeDisplay";
 
 // Hook imports
-import { useSpriteData } from "../SpriteEditor/hooks/useSpriteData";
+import { useExportSpriteData } from "../SpriteEditor/hooks/useExportSpriteData";
 
 // Type imports
 import { ImageExportFormats } from "@/types/export";
 
 const ExportSection = () => {
-  const { exportSpriteToImage, getImgCode } = useSpriteData();
+  const { exportSpriteToImage, getImgCode, getJavaScriptCode, getPythonCode } =
+    useExportSpriteData();
 
   return (
-    <div
-      className="export-section-container text-black p-4"
-      style={{ backgroundColor: "#fef3e0" }}>
-      <h2 className="heading-2">Export Sprite</h2>
-      <div className="export-button-containers">
+    <section className="export-section bg-neutral-900 ">
+      <h3 className="heading-3">Export Sprite Image</h3>
+      <div className="export-grid">
         {Object.values(ImageExportFormats).map((format) => (
           <ExportButton
             key={format}
@@ -26,23 +25,25 @@ const ExportSection = () => {
         ))}
       </div>
 
-      <h3 className="heading-3">Arcade MakeCode Sprite Editor</h3>
-      <p className="paragraph">
-        Copy the code below and paste it into the Sprite Editor in ArcadeMake
-        Code
-      </p>
-      <CodeDisplay>{getImgCode()}</CodeDisplay>
+      <h3 className="heading-3">Export Sprite Code</h3>
 
-      <h3 className="heading-3">Javascript Code</h3>
-      <CodeDisplay>
-        {`const mySprite = sprites.create(${getImgCode()}, SpriteKind.Player)`}
-      </CodeDisplay>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="export-card">
+          <h5 className="heading-5">Sprite Editor Code</h5>
+          <CodeDisplay>{getImgCode()}</CodeDisplay>
+        </div>
 
-      <h3 className="heading-3">Python Code</h3>
-      <CodeDisplay codingLanguage="python">
-        {`my_sprite = arcade_sprites.create_sprite(${getImgCode().replace("img", "").replace("`", '"""').replace("`", '"""')}, sprite_kind="Player")`}
-      </CodeDisplay>
-    </div>
+        <div className="export-card">
+          <h5 className="heading-5">Javascript Code</h5>
+          <CodeDisplay>{getJavaScriptCode()}</CodeDisplay>
+        </div>
+
+        <div className="export-card">
+          <h5 className="heading-5">Python Code</h5>
+          <CodeDisplay codingLanguage="python">{getPythonCode()}</CodeDisplay>
+        </div>
+      </div>
+    </section>
   );
 };
 
