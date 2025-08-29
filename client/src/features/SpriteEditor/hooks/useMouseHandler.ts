@@ -38,11 +38,7 @@ export const useMouseHandler = () => {
     handlePointerMove: handleEraserMove,
     handlePointerUp: handleEraserUp,
   } = useEraser();
-  const {
-    handlePointerDown: handleFillDown,
-    handlePointerMove: handleFillMove,
-    handlePointerUp: handleFillUp,
-  } = useFill();
+  const { handlePointerDown: handleFillDown } = useFill();
   const {
     handlePointerDown: handleLineDown,
     handlePointerMove: handleLineMove,
@@ -148,7 +144,6 @@ export const useMouseHandler = () => {
           handleEraserUp();
           break;
         case EditorTools.Fill:
-          handleFillUp(coordinates);
           break;
         case EditorTools.Line:
           handleLineUp(coordinates);
@@ -174,7 +169,6 @@ export const useMouseHandler = () => {
       tool,
       handlePencilUp,
       handleEraserUp,
-      handleFillUp,
       handleLineUp,
       handleRectangleUp,
       handleCircleUp,
@@ -200,7 +194,6 @@ export const useMouseHandler = () => {
           handleEraserMove(coordinates);
           break;
         case EditorTools.Fill:
-          handleFillMove(coordinates);
           break;
         case EditorTools.Line:
           handleLineMove(coordinates);
@@ -227,7 +220,6 @@ export const useMouseHandler = () => {
       updateMousePosition,
       handlePencilMove,
       handleEraserMove,
-      handleFillMove,
       handleLineMove,
       handleRectangleMove,
       handleCircleMove,

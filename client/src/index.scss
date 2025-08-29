@@ -258,11 +258,11 @@
   }
 
   .tool-button {
-    @apply flex w-8 h-8 items-center justify-center rounded border-2 
-    hover:outline-primary-500 transition-all;
+    @apply flex w-8 h-8 items-center justify-center rounded
+    focus:outline-none;
 
     &.active {
-      @apply outline-primary-500;
+      @apply border border-solid border-white;
     }
   }
 
