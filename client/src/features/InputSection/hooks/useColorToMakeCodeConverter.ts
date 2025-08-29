@@ -25,8 +25,8 @@ export const useColorToMakeCodeConverter = () => {
 
   // Memoized conversion functions
   const convertHsl = useCallback(
-    (h: number, s: number, l: number): MakeCodeColor => {
-      return hslToMakeCodeColor(h, s, l, hueZones);
+    (h: number, l: number): MakeCodeColor => {
+      return hslToMakeCodeColor(h, l, hueZones);
     },
     [hueZones]
   );

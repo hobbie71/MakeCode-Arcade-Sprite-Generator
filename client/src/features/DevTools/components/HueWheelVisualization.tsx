@@ -8,7 +8,7 @@ interface Props {
 }
 
 const HueWheelVisualization: React.FC<Props> = ({ palette }) => {
-  const { hueZones } = useColorToMakeCodeConverter(palette);
+  const { hueZones } = useColorToMakeCodeConverter();
 
   return (
     <div className="p-6 bg-gray-900 text-white rounded-lg">

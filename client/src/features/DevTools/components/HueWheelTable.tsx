@@ -4,7 +4,7 @@ import { MakeCodePalette } from "@/types/color";
 import { useColorToMakeCodeConverter } from "@/features/InputSection/hooks/useColorToMakeCodeConverter";
 
 const HueWheelTable = ({ palette }: { palette: MakeCodePalette }) => {
-  const { hueZones } = useColorToMakeCodeConverter(palette);
+  const { hueZones } = useColorToMakeCodeConverter();
 
   const getColorName = (color: MakeCodeColor): string => {
     return Object.keys(MakeCodeColor)[

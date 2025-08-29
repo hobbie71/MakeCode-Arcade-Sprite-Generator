@@ -8,7 +8,7 @@ import { useSprite } from "@/context/SpriteContext/useSprite";
 import { getSelectedSpriteData } from "../libs/getSelectedSpriteData";
 
 // Util import
-import { isPointerInSelection } from "../libs/isPointerInSelection";
+// import { isPointerInSelection } from "../libs/isPointerInSelection";
 
 // Type imports
 import { Coordinates, SelectionArea } from "@/types/pixel";
@@ -72,10 +72,10 @@ export const useSelectionOverlay = () => {
     if (!selectionArea) return;
 
     // if (!isPointerInSelection())
-  }, []);
+  }, [selectionArea]);
 
   // TODO: Implement moveOverlay functionality
   // const moveOverlay = useCallback(() => {}, []);
 
-  return { setStartOverlay, setEndOverlay };
+  return { setStartOverlay, setEndOverlay, resetSelectionAreaIfOutOfArea };
 };

@@ -7,7 +7,6 @@ import { HueZone, LuminanceZone } from "../../../types/hueZone";
  */
 export const hslToMakeCodeColor = (
   h: number,
-  s: number,
   l: number,
   hueZones: HueZone[]
 ): MakeCodeColor => {
@@ -30,7 +29,7 @@ export const rgbToMakeCodeColor = (
   hueZones: HueZone[]
 ): MakeCodeColor => {
   const hsl = rgbToHsl(r, g, b);
-  return hslToMakeCodeColor(hsl.h, hsl.s, hsl.l, hueZones);
+  return hslToMakeCodeColor(hsl.h, hsl.l, hueZones);
 };
 
 /**
@@ -41,7 +40,7 @@ export const hexToMakeCodeColor = (
   hueZones: HueZone[]
 ): MakeCodeColor => {
   const hsl = hexToHsl(hex);
-  return hslToMakeCodeColor(hsl.h, hsl.s, hsl.l, hueZones);
+  return hslToMakeCodeColor(hsl.h, hsl.l, hueZones);
 };
 
 /**

@@ -5,7 +5,6 @@ import { CanvasProvider } from "@/context/CanvasContext/CanvasContext";
 import { ImageImportProvider } from "@/context/ImageImportContext/ImageImportContext";
 import { AssetTypeProvider } from "@/context/AssetTypeContext/AssetTypeContext";
 import { GenerationMethodProvider } from "@/context/GenerationMethodContext/GenerationMethodContext";
-import { TextSettingsProvider } from "@/context/TextSettingsContext/TextSettingsContext";
 import { AiModelProvider } from "@/context/AiModelContext/AiModelContext";
 import { LoadingProvider } from "@/context/LoadingContext/LoadingContext";
 import { PixelLabSettingsProvider } from "@/context/PixelLabSettingsContext/PixelLabSettingsContext";
@@ -16,29 +15,27 @@ const AppProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <AssetTypeProvider>
       <GenerationMethodProvider>
-        <TextSettingsProvider>
-          <SpriteProvider>
-            <PaletteSelectedProvider>
-              <CanvasProvider>
-                <CanvasSizeProvider>
-                  <LoadingProvider>
-                    <AiModelProvider>
-                      <PixelLabSettingsProvider>
-                        <OpenAISettingsProvider>
-                          <ImageImportProvider>
-                            <PostProcessingProvider>
-                              {children}
-                            </PostProcessingProvider>
-                          </ImageImportProvider>
-                        </OpenAISettingsProvider>
-                      </PixelLabSettingsProvider>
-                    </AiModelProvider>
-                  </LoadingProvider>
-                </CanvasSizeProvider>
-              </CanvasProvider>
-            </PaletteSelectedProvider>
-          </SpriteProvider>
-        </TextSettingsProvider>
+        <SpriteProvider>
+          <PaletteSelectedProvider>
+            <CanvasProvider>
+              <CanvasSizeProvider>
+                <LoadingProvider>
+                  <AiModelProvider>
+                    <PixelLabSettingsProvider>
+                      <OpenAISettingsProvider>
+                        <ImageImportProvider>
+                          <PostProcessingProvider>
+                            {children}
+                          </PostProcessingProvider>
+                        </ImageImportProvider>
+                      </OpenAISettingsProvider>
+                    </PixelLabSettingsProvider>
+                  </AiModelProvider>
+                </LoadingProvider>
+              </CanvasSizeProvider>
+            </CanvasProvider>
+          </PaletteSelectedProvider>
+        </SpriteProvider>
       </GenerationMethodProvider>
     </AssetTypeProvider>
   );

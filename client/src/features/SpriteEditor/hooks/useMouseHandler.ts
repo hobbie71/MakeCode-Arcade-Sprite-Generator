@@ -14,10 +14,10 @@ import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected
 import { usePencil } from "./usePencil";
 import { useEraser } from "./useEraser";
 import { useFill } from "./useFill";
-import { useLine } from "./useLine";
-import { useRectangle } from "./useRectangle";
-import { useCircle } from "./useCircle";
-import { useSelect } from "./useSelect";
+// import { useLine } from "./useLine";
+// import { useRectangle } from "./useRectangle";
+// import { useCircle } from "./useCircle";
+// import { useSelect } from "./useSelect";
 import { EditorTools } from "@/types/tools";
 
 export const useMouseHandler = () => {
@@ -39,26 +39,26 @@ export const useMouseHandler = () => {
     handlePointerUp: handleEraserUp,
   } = useEraser();
   const { handlePointerDown: handleFillDown } = useFill();
-  const {
-    handlePointerDown: handleLineDown,
-    handlePointerMove: handleLineMove,
-    handlePointerUp: handleLineUp,
-  } = useLine();
-  const {
-    handlePointerDown: handleRectangleDown,
-    handlePointerMove: handleRectangleMove,
-    handlePointerUp: handleRectangleUp,
-  } = useRectangle();
-  const {
-    handlePointerDown: handleCircleDown,
-    handlePointerMove: handleCircleMove,
-    handlePointerUp: handleCircleUp,
-  } = useCircle();
-  const {
-    handlePointerDown: handleSelectDown,
-    handlePointerMove: handleSelectMove,
-    handlePointerUp: handleSelectUp,
-  } = useSelect();
+  // const {
+  //   handlePointerDown: handleLineDown,
+  //   handlePointerMove: handleLineMove,
+  //   handlePointerUp: handleLineUp,
+  // } = useLine();
+  // const {
+  //   handlePointerDown: handleRectangleDown,
+  //   handlePointerMove: handleRectangleMove,
+  //   handlePointerUp: handleRectangleUp,
+  // } = useRectangle();
+  // const {
+  //   handlePointerDown: handleCircleDown,
+  //   handlePointerMove: handleCircleMove,
+  //   handlePointerUp: handleCircleUp,
+  // } = useCircle();
+  // const {
+  //   handlePointerDown: handleSelectDown,
+  //   handlePointerMove: handleSelectMove,
+  //   handlePointerUp: handleSelectUp,
+  // } = useSelect();
 
   const updateMousePosition = useCallback(
     (newCoordinates: Coordinates) => {
@@ -95,18 +95,18 @@ export const useMouseHandler = () => {
         case EditorTools.Fill:
           handleFillDown(coordinates);
           break;
-        case EditorTools.Line:
-          handleLineDown(coordinates);
-          break;
-        case EditorTools.Rectangle:
-          handleRectangleDown(coordinates);
-          break;
-        case EditorTools.Circle:
-          handleCircleDown(coordinates);
-          break;
-        case EditorTools.Select:
-          handleSelectDown(coordinates);
-          break;
+        // case EditorTools.Line:
+        //   handleLineDown(coordinates);
+        //   break;
+        // case EditorTools.Rectangle:
+        //   handleRectangleDown(coordinates);
+        //   break;
+        // case EditorTools.Circle:
+        //   handleCircleDown(coordinates);
+        //   break;
+        // case EditorTools.Select:
+        //   handleSelectDown(coordinates);
+        //   break;
         case EditorTools.Pan:
           break;
         default:
@@ -120,21 +120,22 @@ export const useMouseHandler = () => {
       handlePencilDown,
       handleEraserDown,
       handleFillDown,
-      handleLineDown,
-      handleRectangleDown,
-      handleCircleDown,
-      handleSelectDown,
+      // handleLineDown,
+      // handleRectangleDown,
+      // handleCircleDown,
+      // handleSelectDown,
     ]
   );
 
-  const handleMouseUp = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleMouseUp = useCallback(() =>
+    // e: React.MouseEvent<HTMLCanvasElement>
+    {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
       isMouseDown.current = false;
 
-      const coordinates = getCanvasCoordinates(canvas, e, zoom);
+      // const coordinates = getCanvasCoordinates(canvas, e, zoom);
 
       switch (tool) {
         case EditorTools.Pencil:
@@ -145,36 +146,34 @@ export const useMouseHandler = () => {
           break;
         case EditorTools.Fill:
           break;
-        case EditorTools.Line:
-          handleLineUp(coordinates);
-          break;
-        case EditorTools.Rectangle:
-          handleRectangleUp(coordinates);
-          break;
-        case EditorTools.Circle:
-          handleCircleUp(coordinates);
-          break;
-        case EditorTools.Select:
-          handleSelectUp(coordinates);
-          break;
+        // case EditorTools.Line:
+        //   handleLineUp(coordinates);
+        //   break;
+        // case EditorTools.Rectangle:
+        //   handleRectangleUp(coordinates);
+        //   break;
+        // case EditorTools.Circle:
+        //   handleCircleUp(coordinates);
+        //   break;
+        // case EditorTools.Select:
+        //   handleSelectUp(coordinates);
+        //   break;
         case EditorTools.Pan:
           break;
         default:
           break;
       }
-    },
-    [
-      canvasRef,
-      zoom,
-      tool,
-      handlePencilUp,
-      handleEraserUp,
-      handleLineUp,
-      handleRectangleUp,
-      handleCircleUp,
-      handleSelectUp,
-    ]
-  );
+    }, [
+    canvasRef,
+    // zoom,
+    tool,
+    handlePencilUp,
+    handleEraserUp,
+    // handleLineUp,
+    // handleRectangleUp,
+    // handleCircleUp,
+    // handleSelectUp,
+  ]);
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -195,18 +194,18 @@ export const useMouseHandler = () => {
           break;
         case EditorTools.Fill:
           break;
-        case EditorTools.Line:
-          handleLineMove(coordinates);
-          break;
-        case EditorTools.Rectangle:
-          handleRectangleMove(coordinates);
-          break;
-        case EditorTools.Circle:
-          handleCircleMove(coordinates);
-          break;
-        case EditorTools.Select:
-          handleSelectMove(coordinates);
-          break;
+        // case EditorTools.Line:
+        //   handleLineMove(coordinates);
+        //   break;
+        // case EditorTools.Rectangle:
+        //   handleRectangleMove(coordinates);
+        //   break;
+        // case EditorTools.Circle:
+        //   handleCircleMove(coordinates);
+        //   break;
+        // case EditorTools.Select:
+        //   handleSelectMove(coordinates);
+        //   break;
         case EditorTools.Pan:
           break;
         default:
@@ -220,10 +219,10 @@ export const useMouseHandler = () => {
       updateMousePosition,
       handlePencilMove,
       handleEraserMove,
-      handleLineMove,
-      handleRectangleMove,
-      handleCircleMove,
-      handleSelectMove,
+      // handleLineMove,
+      // handleRectangleMove,
+      // handleCircleMove,
+      // handleSelectMove,
     ]
   );
 
