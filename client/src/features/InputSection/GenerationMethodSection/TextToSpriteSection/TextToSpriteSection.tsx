@@ -47,7 +47,6 @@ const TextToSpriteSection = () => {
         AI Model
       </DefaultDropDown>
 
-      {/* Post-processing settings */}
       <PostProcessingSection />
 
       {/* Render appropriate settings based on selected model */}

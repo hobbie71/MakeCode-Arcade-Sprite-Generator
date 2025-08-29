@@ -31,6 +31,7 @@ const DefaultDropDown = <T,>({
     <div className="input-group">
       <label htmlFor={children}>{children}</label>
       <select
+        id={children}
         className={`form-select ${
           disabled
             ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
@@ -38,7 +39,9 @@ const DefaultDropDown = <T,>({
         } ${className}`}
         value={value}
         onChange={handleChange}
-        disabled={disabled}>
+        disabled={disabled}
+        aria-label={children}
+        aria-describedby={`${children}-description`}>
         {options.map((option, index) => (
           <option key={option.name} value={index}>
             {option.name}

@@ -135,6 +135,10 @@ const NumberInputBox = ({
         disabled={disabled}
         readOnly={disabled}
         placeholder={placeholder}
+        aria-label={label}
+        aria-describedby={
+          disabled ? `${label}-disabled-hint` : `${label}-range-hint`
+        }
         title={
           disabled ? "This value is disabled and cannot be changed" : undefined
         }

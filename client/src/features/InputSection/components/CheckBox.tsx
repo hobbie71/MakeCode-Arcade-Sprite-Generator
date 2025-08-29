@@ -27,6 +27,8 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
           checked={checked}
           onChange={handleChange}
           disabled={disabled}
+          aria-label={children}
+          aria-describedby={disabled ? `${children}-disabled-hint` : undefined}
           title={
             disabled ? "This input is disabled during generation" : undefined
           }
