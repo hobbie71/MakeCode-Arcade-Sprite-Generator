@@ -1,15 +1,25 @@
 import React from "react";
 
-const IssueReportButton: React.FC = () => {
+interface IssueReportButtonProps {
+  highlight?: boolean;
+}
+
+const IssueReportButton: React.FC<IssueReportButtonProps> = ({
+  highlight = false,
+}) => {
   const handleReportIssue = () => {
     const googleFormUrl = "https://forms.gle/RMooZuywkBVUQwtw8";
     window.open(googleFormUrl, "_blank", "noopener,noreferrer");
   };
 
+  const highlightClasses = highlight
+    ? "ring-4 ring-yellow-400 ring-opacity-75 animate-bounce"
+    : "";
+
   return (
     <button
       onClick={handleReportIssue}
-      className="btn-primary fixed bottom-4 right-4 z-40 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 p-3 rounded-full transition-all duration-200 transform hover:scale-105 hover:shadow-xl active:scale-95 group"
+      className={`btn-primary fixed bottom-4 right-4 z-40 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 p-3 rounded-full transition-all duration-200 transform hover:scale-105 hover:shadow-xl active:scale-95 group ${highlightClasses}`}
       title="Report an Issue"
       aria-label="Report an issue or request a feature">
       <svg
