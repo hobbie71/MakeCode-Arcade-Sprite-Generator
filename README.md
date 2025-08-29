@@ -1,7 +1,7 @@
 # MakeCode Arcade Sprite Generator
 
 [![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](package.json)
 [![React](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4.3-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
@@ -28,6 +28,67 @@ A powerful, AI-enhanced sprite generation and editing tool specifically designed
 ## 🚀 Getting Started
 
 This project is currently in early development. Check back soon for usage instructions and demos!
+
+### Development Setup
+
+1. Clone the repository
+2. Copy `.env.example` to `.env` and configure your API keys
+3. Run `npm run setup` to install dependencies
+4. Run `npm run dev` to start the development server
+
+### Production Deployment
+
+This project is configured for deployment on platforms like Railway, Render, or Heroku.
+
+#### Environment Variables
+
+Make sure to set these environment variables in your deployment platform:
+
+```bash
+PIXELLAB_API_TOKEN=your_pixellab_api_token
+OPENAI_API_TOKEN=your_openai_api_token
+CORS_ORIGINS=["https://yourdomain.com"]
+HOST=0.0.0.0
+PORT=8000
+ENVIRONMENT=production
+```
+
+#### Deployment Commands
+
+The project includes these npm scripts for deployment:
+
+1. Clone the repository
+2. Copy `.env.example` to `.env` and configure your API keys
+3. Run `npm run setup` to install dependencies
+4. Run `npm run dev` to start the development server, or use the included `dev.sh` script:
+
+```bash
+./dev.sh
+```
+
+- `npm start`: Production start command (builds client and starts server)
+- `npm run build`: Build the client application
+- `npm run setup`: Install all dependencies (client and server)
+
+#### Platform-Specific Instructions
+
+**Railway/Railpack:**
+
+- The project includes a `Procfile` and `start.sh` script
+- Ensure you have a `start` script in your package.json (✅ included)
+- Set environment variables in your Railway dashboard
+
+**Heroku:**
+
+- Use the Node.js buildpack
+- Set environment variables in the Heroku dashboard
+- The app will automatically use the PORT environment variable
+
+**Render:**
+
+- Use Node.js environment
+- Build command: `npm run build`
+- Start command: `npm start`
 
 ## 🎨 Usage
 
@@ -82,10 +143,13 @@ const mySprite = sprites.create(
 
 ### Python Export
 
-```python
-import arcade_sprites
+- The project includes a `Procfile` and `start.sh` script
+- Ensure you have a `start` script in your package.json (✅ included)
+- Set environment variables in your Railway dashboard
+- **Set the Start Command to `./start.sh` in your Railway project settings.**
 
 # Create sprite with default character model
+
 my_sprite = arcade_sprites.create_sprite("""
 . . . . . . f f f f . . . . . .
 . . . . f f f 2 2 f f f . . . .
@@ -104,13 +168,14 @@ my_sprite = arcade_sprites.create_sprite("""
 . . . . . f f f f f f . . . . .
 . . . . . f f . . f f . . . . .
 """, sprite_kind="Player")
+
 ```
 
 ### MakeCode Paste Format
 
 ```
-img`
-. . . . . . f f f f . . . . . .
+
+img`. . . . . . f f f f . . . . . .
 . . . . f f f 2 2 f f f . . . .
 . . . f f f 2 2 2 2 f f f . . .
 . . f f f e e e e e e f f f . .
@@ -125,8 +190,8 @@ img`
 . . 4 d f 2 2 2 2 2 2 f d 4 . .
 . . 4 4 f 4 4 5 5 4 4 f 4 4 . .
 . . . . . f f f f f f . . . . .
-. . . . . f f . . f f . . . . .
-`
+. . . . . f f . . f f . . . . .`
+
 ```
 
 ## Development Roadmap
@@ -285,3 +350,4 @@ This project is not affiliated with Microsoft Corporation or the official MakeCo
 ---
 
 _Built with ❤️ for the MakeCode Arcade community_
+```

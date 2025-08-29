@@ -36,9 +36,12 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
 
   return (
     <div className="mt-4">
-      <label className="text-neutral-200">Ai Prompt</label>
+      <label htmlFor="ai-prompt-input" className="text-neutral-200">
+        Ai Prompt
+      </label>
       <textarea
         ref={textareaRef}
+        id="ai-prompt-input"
         className={`min-w-full min-h-24 mt-2 p-2 rounded text-black bg-white ${
           disabled
             ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
@@ -51,7 +54,9 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
         onKeyDown={handleKeyDown}
         onBlur={handleUserSubmit}
         disabled={disabled}
-        readOnly={disabled}></textarea>
+        readOnly={disabled}
+        aria-describedby="ai-prompt-description"
+        aria-label="AI Prompt for sprite generation"></textarea>
     </div>
   );
 };

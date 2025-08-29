@@ -79,8 +79,6 @@ class PixelLabServices:
       if settings.direction.value and settings.direction.value.strip():
         params["direction"] = settings.direction.value
 
-      print(params)
-
       response = self.client.generate_image_pixflux(**params)
       image = response.image.pil_image()
       
