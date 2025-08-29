@@ -12,7 +12,6 @@
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && source .venv/bin/activate && PYTHONPATH=. python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
-    "start": "./start.sh",
     "build": "npm run build:client",
     "build:client": "cd client && npm run build",
     "lint": "npm run lint:client",

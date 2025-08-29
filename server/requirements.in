@@ -4,3 +4,7 @@ pixel
 httpx
 openai
 pillow
+pydantic
+pydantic-settings
+pixellab
+python-dotenv

@@ -32,33 +32,7 @@ This project is currently in early development. Check back soon for usage instru
 ### Development Setup
 
 1. Clone the repository
-2. Copy `.env.example` to `.env` and configure your API keys
-3. Run `npm run setup` to install dependencies
-4. Run `npm run dev` to start the development server
-
-### Production Deployment
-
-This project is configured for deployment on platforms like Railway, Render, or Heroku.
-
-#### Environment Variables
-
-Make sure to set these environment variables in your deployment platform:
-
-```bash
-PIXELLAB_API_TOKEN=your_pixellab_api_token
-OPENAI_API_TOKEN=your_openai_api_token
-CORS_ORIGINS=["https://yourdomain.com"]
-HOST=0.0.0.0
-PORT=8000
-ENVIRONMENT=production
-```
-
-#### Deployment Commands
-
-The project includes these npm scripts for deployment:
-
-1. Clone the repository
-2. Copy `.env.example` to `.env` and configure your API keys
+2. Copy `.env.example` to `.env` and configure your API keys and CORS settings
 3. Run `npm run setup` to install dependencies
 4. Run `npm run dev` to start the development server, or use the included `dev.sh` script:
 
@@ -66,27 +40,63 @@ The project includes these npm scripts for deployment:
 ./dev.sh
 ```
 
+**Note:** The `.env` file is used for local development only. Do not commit it to git. For production, set environment variables in your deployment platform (see below).
+
+### Production Deployment
+
+This project is configured for deployment on platforms like Railway, Render, or Heroku.
+
+#### Environment Variables
+
+**For local development:**
+
+Set your secrets and config in a `.env` file at the project root. Example:
+
+```env
+PIXELLAB_API_TOKEN=your_pixellab_api_token
+OPENAI_API_TOKEN=your_openai_api_token
+CORS_ORIGINS=["http://localhost:3000", "http://localhost:5173"]
+HOST=0.0.0.0
+PORT=8000
+ENVIRONMENT=development
+```
+
+**For production (Railway, Render, etc):**
+
+Set all required environment variables in your deployment platform's dashboard. Do not use a `.env` file in production. Example variables:
+
+- `PIXELLAB_API_TOKEN`
+- `OPENAI_API_TOKEN`
+- `CORS_ORIGINS` (e.g. `["https://your-frontend-url.up.railway.app"]`)
+- `HOST` (usually `0.0.0.0`)
+- `PORT` (usually `8000` or set by platform)
+- `ENVIRONMENT` (set to `production`)
+
+#### Deployment Commands
+
+The project includes these npm scripts for deployment:
+
 - `npm start`: Production start command (builds client and starts server)
 - `npm run build`: Build the client application
 - `npm run setup`: Install all dependencies (client and server)
 
 #### Platform-Specific Instructions
 
-**Railway/Railpack:**
+**Railway (Docker):**
 
-- The project includes a `Procfile` and `start.sh` script
-- Ensure you have a `start` script in your package.json (✅ included)
-- Set environment variables in your Railway dashboard
+- The project includes a `Dockerfile` for full-stack deployment (Node + Python)
+- Set all required environment variables in the Railway dashboard (do not use `.env`)
+- Railway will use the Dockerfile automatically; you do not need to set a start command
 
 **Heroku:**
 
-- Use the Node.js buildpack
+- Use the Node.js buildpack (or a custom Dockerfile if using Python)
 - Set environment variables in the Heroku dashboard
 - The app will automatically use the PORT environment variable
 
 **Render:**
 
-- Use Node.js environment
+- Use Node.js environment (or Docker for full stack)
 - Build command: `npm run build`
 - Start command: `npm start`
 
