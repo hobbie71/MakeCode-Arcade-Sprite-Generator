@@ -1,6 +1,3 @@
-// Style import
-import "./App.scss";
-
 // React imports
 import { useState, useEffect } from "react";
 

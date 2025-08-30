@@ -190,7 +190,7 @@
   }
 
   .form-label {
-    @apply block text-sm font-medium text-neutral-100 mb-1;
+    @apply block font-medium text-neutral-100 mb-1;
   }
 
   .form-input {
@@ -258,7 +258,7 @@
   }
 
   .tool-button {
-    @apply flex w-8 h-8 items-center justify-center rounded
+    @apply flex w-8 h-8 text-white items-center justify-center rounded
     focus:outline-none;
 
     &.active {
@@ -272,10 +272,10 @@
 
   .color-swatch {
     @apply w-8 h-8 rounded border border-black cursor-pointer hover:scale-110 transition-transform;
-  }
 
-  .color-swatch.active {
-    @apply border-neutral-800 scale-110;
+    &.active {
+      @apply border-neutral-800 scale-110;
+    }
   }
 
   /* Canvas Components */
@@ -449,4 +449,24 @@ $transparent-secondary-color: #dedede;
   background-position:
     0 0,
     5.5px 5.5px;
+}
+
+canvas {
+  image-rendering: pixelated;
+}
+
+html,
+body {
+  background-color: #121418;
+  color: white;
+}
+
+.input-no-arrows::-webkit-inner-spin-button,
+.input-no-arrows::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.input-no-arrows {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
