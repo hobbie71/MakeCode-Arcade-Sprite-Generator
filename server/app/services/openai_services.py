@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 class OpenAIServices:
   def __init__(self):
-    self.api_token = settings.OPENAI_API_TOKEN
-    self.client = OpenAI(api_key=self.api_token)
+    self.api_key = settings.OPENAI_API_KEY
+    self.client = OpenAI(api_key=self.api_key)
 
   def get_final_size(self, intended_size: Size) -> OpenAIFinalSize:
     """

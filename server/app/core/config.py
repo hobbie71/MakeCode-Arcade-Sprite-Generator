@@ -4,21 +4,15 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Get the project root directory (parent of server directory)
-PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+print("PROJECT_ROOT: ", PROJECT_ROOT)
 load_dotenv(str(PROJECT_ROOT / ".env"))
 
 class Settings(BaseSettings):
   # API Keys
-  PIXELLAB_API_TOKEN: str = ""
-  OPENAI_API_TOKEN: str = ""
-
-  # CORS - can be overridden by environment variable
-  CORS_ORIGINS: list[str] = [
-    "http://localhost:3000", 
-    "http://127.0.0.1:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173"
-  ]
+  PIXELLAB_API_KEY: str = ""
+  OPENAI_API_KEY: str = ""
+  CORS_ORIGINS: list[str] = []
 
   # App Settings
   DEBUG: bool = False

@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 class PixelLabServices:
   def __init__(self):
-    self.api_token = settings.PIXELLAB_API_TOKEN
-    self.client = pixellab.Client(secret=self.api_token)
+    self.api_key = settings.PIXELLAB_API_KEY
+    self.client = pixellab.Client(secret=self.api_key)
 
   def get_final_size(self, size: Size, fitFullCanvasSize: bool) -> Size:
     if fitFullCanvasSize:

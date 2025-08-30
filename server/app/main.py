@@ -39,6 +39,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+print("settings.CORS_ORIGINS", settings.CORS_ORIGINS)
+print("settings.PIXELLAB_API_KEY", settings.PIXELLAB_API_KEY)
+print("settings.OPENAI_API_KEY", settings.OPENAI_API_KEY)
+
+
 # Include routers
 app.include_router(sprites.router, prefix="/generate-image", tags=["generate-image"])
 
