@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
 import Prism from "prismjs";
-import "prismjs/themes/prism.css";
 import "prismjs/components/prism-python";
+import "prismjs/themes/prism.css";
 
 interface Props {
   children: string;
