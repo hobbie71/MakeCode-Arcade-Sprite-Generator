@@ -1,5 +1,5 @@
-import { MakeCodeColor } from "@/types/color";
-import { SelectionArea } from "@/types/pixel";
+import { MakeCodeColor } from "../../../types";
+import type { SelectionArea } from "../../../types/pixel";
 
 export function getSelectedSpriteData(
   spriteData: MakeCodeColor[][],

@@ -1,7 +1,8 @@
-import React, { createContext, useState, ReactNode } from "react";
+import React, { createContext, useState } from "react";
+import type { ReactNode } from "react";
 
 // Type imports
-import { GenerationMethod } from "@/types/export";
+import { GenerationMethod } from "../../types/export";
 
 type GenerationMethodContextType = {
   selectedMethod: GenerationMethod;

@@ -2,9 +2,10 @@
 import { drawPixelOnCanvas } from "./drawPixelOnCanvas";
 
 // Type imports
-import { Coordinates } from "@/types/pixel";
-import { MakeCodeColor, MakeCodePalette } from "@/types/color";
-import { EditorTools } from "@/types/tools";
+import type { Coordinates } from "../../../types/pixel";
+import { MakeCodeColor } from "../../../types/color";
+import type { MakeCodePalette } from "../../../types/color";
+import { EditorTools } from "../../../types/tools";
 
 // TODO: add advance tools, circle, rectangle, fill, and line
 

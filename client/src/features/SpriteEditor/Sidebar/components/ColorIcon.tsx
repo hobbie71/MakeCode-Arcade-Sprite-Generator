@@ -4,10 +4,11 @@ import { memo } from "react";
 import { useColorSelected } from "../../contexts/ColorSelectedContext/useColorSelected";
 
 // Type imports
-import { MakeCodeColor, MakeCodePalette } from "@/types/color";
+import { MakeCodeColor } from "../../../../types/color";
+import type { MakeCodePalette } from "../../../../types/color";
 
 // Util imports
-import { getHexFromMakeCodeColor } from "@/utils/colorUtils";
+import { getHexFromMakeCodeColor } from "../../../../utils/colorUtils";
 
 interface Props {
   color: MakeCodeColor;

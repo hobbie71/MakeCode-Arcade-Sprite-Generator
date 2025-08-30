@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 // Type imports
-import { MAX_LENGTH, MIN_LENGTH } from "@/types/pixel";
+import { MAX_LENGTH, MIN_LENGTH } from "../../../types/pixel";
 
 interface Props {
   label: string;
@@ -114,7 +114,7 @@ const NumberInputBox = ({
 
   return (
     <div className={`input-group align-middle ${className}`}>
-      <label className="mr-3" htmlFor={label}>
+      <label className="form-label mr-3" htmlFor={label}>
         {label}:
       </label>
       <input

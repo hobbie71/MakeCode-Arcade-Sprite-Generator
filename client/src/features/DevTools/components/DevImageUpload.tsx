@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
-import { removeBackgroundAndCrop } from "@/features/InputSection/libs/backgroundDetection";
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
-import { useColorToMakeCodeConverter } from "@/features/InputSection/hooks/useColorToMakeCodeConverter";
-import { drawPixelOnCanvas } from "@/features/SpriteEditor/libs/drawPixelOnCanvas";
-import { PIXEL_SIZE } from "@/features/SpriteEditor/constants/pixelSize";
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { removeBackgroundAndCrop } from "../../../features/InputSection/libs/backgroundDetection";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
+import { useColorToMakeCodeConverter } from "../../../features/InputSection/hooks/useColorToMakeCodeConverter";
+import { drawPixelOnCanvas } from "../../../features/SpriteEditor/libs/drawPixelOnCanvas";
+import { PIXEL_SIZE } from "../../../features/SpriteEditor/constants/pixelSize";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 
 interface Props {
   setCanvasArray: (canvasArray: HTMLCanvasElement[]) => void;

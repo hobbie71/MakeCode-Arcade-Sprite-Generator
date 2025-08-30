@@ -1,4 +1,4 @@
-import { MakeCodeColor } from "@/types/color";
+import { MakeCodeColor } from "../../types/color";
 import { createContext, useState, useMemo } from "react";
 
 type SpriteContextType = {

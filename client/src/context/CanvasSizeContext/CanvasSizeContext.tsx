@@ -1,10 +1,6 @@
-import {
-  createContext,
-  useState,
-  Dispatch,
-  SetStateAction,
-  useMemo,
-} from "react";
+import { createContext, useState, useMemo } from "react";
+
+import type { Dispatch, SetStateAction } from "react";
 
 type CanvasSizeContextType = {
   width: number;

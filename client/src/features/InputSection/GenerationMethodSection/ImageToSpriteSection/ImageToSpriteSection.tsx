@@ -7,7 +7,7 @@ import PostProcessingSection from "../TextToSpriteSection/components/PostProcess
 import { useImageFileHandler } from "../../hooks/useImageFileHandler";
 
 // Context imports
-import { useLoading } from "@/context/LoadingContext/useLoading";
+import { useLoading } from "../../../../context/LoadingContext/useLoading";
 
 const ImageToSpriteSection = () => {
   const { importedImage, convertImageToSprite } = useImageFileHandler();

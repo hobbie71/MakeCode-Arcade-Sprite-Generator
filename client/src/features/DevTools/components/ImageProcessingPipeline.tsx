@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DevImageUpload from "./DevImageUpload";
-import SizeInputs from "@/features/InputSection/components/SizeInputs";
+import SizeInputs from "../../../features/InputSection/components/SizeInputs";
 
 const ImageProcessingPipeline = () => {
   const [canvasArray, setCanvasArray] = useState<HTMLCanvasElement[]>([]);

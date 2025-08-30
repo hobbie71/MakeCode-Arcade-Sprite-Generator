@@ -12,11 +12,11 @@ import { useLoading } from "../../../../context/LoadingContext/useLoading";
 import { useImageFileHandler } from "../../hooks/useImageFileHandler";
 
 // Context imports
-import { useAiModel } from "@/context/AiModelContext/useAiModel";
-import { useAssetType } from "@/context/AssetTypeContext/useAssetType";
+import { useAiModel } from "../../../../context/AiModelContext/useAiModel";
+import { useAssetType } from "../../../../context/AssetTypeContext/useAssetType";
 
 // Type imports
-import { ALL_AI_MODELS, AiModel } from "@/types/export";
+import { ALL_AI_MODELS, AiModel } from "../../../../types/export";
 
 const TextToSpriteSection = () => {
   const { selectedModel, setSelectedModel, setDefaultModel } = useAiModel();

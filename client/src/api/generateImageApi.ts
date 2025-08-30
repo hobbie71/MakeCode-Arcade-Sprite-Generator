@@ -1,15 +1,17 @@
 import {
   GENERATE_OPENAI_IMAGE_API_URL,
   GENERATE_PIXELLAB_IMAGE_API_URL,
-} from "@/constants/api";
-import {
-  PixelLabSpriteRequest,
+} from "../constants/api";
+
+import type {
   OpenAISpriteRequest,
+  PixelLabSpriteRequest,
   PixelLabGenerationSettings,
   OpenAIGenerationSettings,
   Size,
-  MakeCodePalette,
-} from "@/types/export";
+} from "../types/export";
+
+import type { MakeCodePalette } from "../types/color";
 
 export async function generatePixelLabImage(
   settings: PixelLabGenerationSettings,

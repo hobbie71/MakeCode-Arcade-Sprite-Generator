@@ -1,11 +1,8 @@
-import {
-  createContext,
-  useState,
-  Dispatch,
-  SetStateAction,
-  useMemo,
-} from "react";
-import { ArcadePalette, MakeCodePalette } from "@/types/color";
+import { createContext, useState, useMemo } from "react";
+import type { SetStateAction, Dispatch } from "react";
+
+import { ArcadePalette } from "../../types/color";
+import type { MakeCodePalette } from "../../types/color";
 
 type paletteSelectedType = {
   palette: MakeCodePalette;

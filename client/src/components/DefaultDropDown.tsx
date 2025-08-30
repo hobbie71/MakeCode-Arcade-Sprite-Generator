@@ -29,7 +29,9 @@ const DefaultDropDown = <T,>({
 
   return (
     <div className="input-group">
-      <label htmlFor={children}>{children}</label>
+      <label className="form-label" htmlFor={children}>
+        {children}
+      </label>
       <select
         id={children}
         className={`form-select ${

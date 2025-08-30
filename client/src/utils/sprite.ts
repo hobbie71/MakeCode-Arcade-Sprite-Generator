@@ -1,5 +1,5 @@
-import { MakeCodeColor } from "@/types/color";
-import { type Sprite, type ExportOptions } from "@/types";
+import { MakeCodeColor } from "../types";
+import { type Sprite, type ExportOptions } from "../types";
 
 /**
  * MakeCode Arcade color palette hex values

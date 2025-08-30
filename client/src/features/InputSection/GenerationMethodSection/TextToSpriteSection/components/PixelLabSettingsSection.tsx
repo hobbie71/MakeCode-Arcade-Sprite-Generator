@@ -1,15 +1,15 @@
 import { useState } from "react";
 
 // Component imports
-import CheckBox from "@/features/InputSection/components/CheckBox";
+import CheckBox from "../../../../../features/InputSection/components/CheckBox";
 import AiPromptInput from "../components/AiPromptInput";
 import DefaultDropDown from "../../../../../components/DefaultDropDown";
 import AdvanceDropDownButton from "./AdvanceDropDownButton";
 
 // Hooks imports
-import { usePixelLabSettings } from "@/context/PixelLabSettingsContext/usePixelLabSettings";
-import { useAssetType } from "@/context/AssetTypeContext/useAssetType";
-import { useLoading } from "@/context/LoadingContext/useLoading";
+import { usePixelLabSettings } from "../../../../../context/PixelLabSettingsContext/usePixelLabSettings";
+import { useAssetType } from "../../../../../context/AssetTypeContext/useAssetType";
+import { useLoading } from "../../../../../context/LoadingContext/useLoading";
 
 // Type imports
 import {
@@ -18,7 +18,7 @@ import {
   ALL_GENERATION_DIRECTIONS,
   ALL_GENERATION_OUTLINES,
   ALL_PIXELLAB_QUALITYS,
-} from "@/types/export";
+} from "../../../../../types/export";
 import { useCallback, useEffect } from "react";
 
 const PixelLabSettingsSection = () => {

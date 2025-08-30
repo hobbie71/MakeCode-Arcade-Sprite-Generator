@@ -1,8 +1,9 @@
-import { getPaletteHslMap } from "@/utils/colorUtils";
-import { hexToHsl } from "@/utils/colorConversion";
-import { MakeCodeColor, MakeCodePalette } from "@/types/color";
-import { HSL } from "@/utils/colorConversion";
-import { HueZone, LuminanceZone } from "@/types/hueZone";
+import { getPaletteHslMap } from "../../../utils/colorUtils";
+import { hexToHsl } from "../../../utils/colorConversion";
+import { MakeCodeColor } from "../../../types/color";
+import type { MakeCodePalette } from "../../../types/color";
+import type { HSL } from "../../../utils/colorConversion";
+import type { HueZone, LuminanceZone } from "../../../types/hueZone";
 
 /**
  * Calculate hue zones for color conversion based on palette

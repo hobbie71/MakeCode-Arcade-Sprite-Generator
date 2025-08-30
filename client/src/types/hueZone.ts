@@ -1,4 +1,4 @@
-import { MakeCodeColor } from "@/types/color";
+import { MakeCodeColor } from "../types/color";
 
 export interface HueZone {
   luminanceZone: LuminanceZone[];

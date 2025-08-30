@@ -1,5 +1,5 @@
 // import { useCallback } from "react";
-// import { Coordinates } from "@/types/pixel";
+// import type { Coordinates } from "../../../types/pixel";
 
 export const useRectangle = () => {
   // TODO: add rectangle tool logic here

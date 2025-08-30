@@ -1,7 +1,8 @@
-import { Coordinates } from "@/types/pixel";
-import { MakeCodeColor, MakeCodePalette } from "@/types/color";
+import type { Coordinates } from "../../../types/pixel";
+import { MakeCodeColor } from "../../../types/color";
+import type { MakeCodePalette } from "../../../types/color";
 
-import { getHexFromMakeCodeColor } from "@/utils/colorUtils";
+import { getHexFromMakeCodeColor } from "../../../utils/colorUtils";
 
 import { PIXEL_SIZE } from "../constants/pixelSize";
 

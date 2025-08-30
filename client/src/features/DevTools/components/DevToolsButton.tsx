@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import DevTools from "@/features/DevTools/DevTools";
+import DevTools from "../../../features/DevTools/DevTools";
 
 const DevToolsButton: React.FC = () => {
   const [isDevToolsOpen, setIsDevToolsOpen] = useState(false);

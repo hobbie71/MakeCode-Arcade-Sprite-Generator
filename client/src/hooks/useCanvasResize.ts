@@ -1,13 +1,13 @@
 import { useCallback } from "react";
 
 // Context imports
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
+import { useCanvasSize } from "../context/CanvasSizeContext/useCanvasSize";
 
 // Hook imports
-import { useSpriteData } from "@/features/SpriteEditor/hooks/useSpriteData";
+import { useSpriteData } from "../features/SpriteEditor/hooks/useSpriteData";
 
 // Lib imports
-import { getResizedSpriteData } from "@/libs/getResizedSpriteData";
+import { getResizedSpriteData } from "../libs/getResizedSpriteData";
 
 export const useCanvasResize = () => {
   const { resizeSpriteData, getCurrentSpriteData } = useSpriteData();

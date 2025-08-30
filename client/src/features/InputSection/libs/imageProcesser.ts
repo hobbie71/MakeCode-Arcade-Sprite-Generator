@@ -6,7 +6,7 @@ import {
 } from "../libs/backgroundDetection";
 
 // Type imports
-import { ImageExportSettings } from "@/types/export";
+import type { ImageExportSettings } from "../../../types/export";
 
 export const createCanvasFromImage = (
   img: HTMLImageElement

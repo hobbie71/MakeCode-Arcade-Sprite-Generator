@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 
 // Hooks
-import { useImageFileHandler } from "@/features/InputSection/hooks/useImageFileHandler";
+import { useImageFileHandler } from "../../../hooks/useImageFileHandler";
 
 const ImageUploadForm = () => {
   // Hooks

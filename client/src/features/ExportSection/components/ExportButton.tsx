@@ -1,4 +1,4 @@
-import { ImageExportFormats } from "@/types/export";
+import { ImageExportFormats } from "../../../types/export";
 
 interface Props {
   format: ImageExportFormats;

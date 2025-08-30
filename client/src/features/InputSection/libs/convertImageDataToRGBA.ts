@@ -1,4 +1,4 @@
-import { RGBA } from "@/utils/colorConversion";
+import type { RGBA } from "../../../utils/colorConversion";
 
 export function convertImageDataToRGBA(
   imageData: ImageData,

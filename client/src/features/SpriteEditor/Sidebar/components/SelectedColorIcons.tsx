@@ -1,6 +1,6 @@
-import { useColorSelected } from "@/features/SpriteEditor/contexts/ColorSelectedContext/useColorSelected";
-import { MakeCodeColor } from "@/types";
-import { getHexFromMakeCodeColor } from "@/utils/colorUtils";
+import { useColorSelected } from "../../../../features/SpriteEditor/contexts/ColorSelectedContext/useColorSelected";
+import { MakeCodeColor } from "../../../../types";
+import { getHexFromMakeCodeColor } from "../../../../utils/colorUtils";
 
 const ICON_SIZE = 32; // px
 

@@ -2,14 +2,14 @@ import { useCallback, useRef } from "react";
 
 // Context imports
 import { useSprite } from "../../../context/SpriteContext/useSprite";
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 
 // Type imports
-import { MakeCodeColor } from "@/types/color";
-import { Coordinates } from "@/types/pixel";
+import { MakeCodeColor } from "../../../types/color";
+import type { Coordinates } from "../../../types/pixel";
 
 // Lib imports
-import { getResizedSpriteData } from "@/libs/getResizedSpriteData";
+import { getResizedSpriteData } from "../../../libs/getResizedSpriteData";
 
 export const useSpriteData = () => {
   const { setSpriteData, spriteData } = useSprite();

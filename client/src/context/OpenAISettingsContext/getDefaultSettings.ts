@@ -1,9 +1,5 @@
-import {
-  AssetType,
-  OpenAIGenerationSettings,
-  OpenAIQuality,
-  Style,
-} from "@/types/export";
+import { AssetType, OpenAIQuality, Style } from "../../types/export";
+import type { OpenAIGenerationSettings } from "../../types/export";
 
 // Default OpenAI settings based on asset type
 export const getDefaultOpenAISettings = (

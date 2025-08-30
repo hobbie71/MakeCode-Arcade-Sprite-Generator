@@ -1,6 +1,6 @@
 import { memo } from "react";
-import { useToolSelected } from "@/features/SpriteEditor/contexts/ToolSelectedContext/useToolSelected";
-import { EditorTools } from "@/types/tools";
+import { useToolSelected } from "../../../../features/SpriteEditor/contexts/ToolSelectedContext/useToolSelected";
+import { EditorTools } from "../../../../types/tools";
 
 interface Props {
   tool: EditorTools;

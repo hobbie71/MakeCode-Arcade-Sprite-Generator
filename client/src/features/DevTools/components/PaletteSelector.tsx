@@ -1,5 +1,5 @@
-import { ALL_PALETTES } from "@/types/color";
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { ALL_PALETTES } from "../../../types/color";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 
 const PaletteSelector = () => {
   const { palette, setPalette } = usePaletteSelected();

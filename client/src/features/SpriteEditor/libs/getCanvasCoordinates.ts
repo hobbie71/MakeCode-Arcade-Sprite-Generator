@@ -1,4 +1,4 @@
-import { Coordinates } from "@/types/pixel";
+import type { Coordinates } from "../../../types/pixel";
 import { PIXEL_SIZE } from "../constants/pixelSize";
 
 export function getCanvasCoordinates(

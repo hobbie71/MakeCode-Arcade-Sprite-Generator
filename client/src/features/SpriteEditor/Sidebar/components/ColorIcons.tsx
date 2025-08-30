@@ -1,11 +1,11 @@
 // Context imports
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { usePaletteSelected } from "../../../../context/PaletteSelectedContext/usePaletteSelected";
 
 // Component imports
 import ColorIcon from "./ColorIcon";
 
 // Type imports
-import { ColorOrder } from "@/types/color";
+import { ColorOrder } from "../../../../types/color";
 
 const ColorIcons = () => {
   const { palette } = usePaletteSelected();

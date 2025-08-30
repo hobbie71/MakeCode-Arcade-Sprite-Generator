@@ -1,6 +1,6 @@
-import { hexToHsl, rgbToHsl } from "@/utils/colorConversion";
-import { MakeCodeColor } from "@/types/color";
-import { HueZone, LuminanceZone } from "../../../types/hueZone";
+import { hexToHsl, rgbToHsl } from "../../../utils/colorConversion";
+import { MakeCodeColor } from "../../../types/color";
+import type { HueZone, LuminanceZone } from "../../../types/hueZone";
 
 /**
  * Convert HSL values to MakeCode color using zone-based system

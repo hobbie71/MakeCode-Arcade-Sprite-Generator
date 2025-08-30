@@ -1,7 +1,7 @@
 import PaletteSelector from "./PaletteSelector";
-import { MakeCodeColor } from "@/types";
-import { MakeCodePalette } from "@/types/color";
-import { useColorToMakeCodeConverter } from "@/features/InputSection/hooks/useColorToMakeCodeConverter";
+import { MakeCodeColor } from "../../../types";
+import type { MakeCodePalette } from "../../../types/color";
+import { useColorToMakeCodeConverter } from "../../../features/InputSection/hooks/useColorToMakeCodeConverter";
 
 const HueWheelTable = ({ palette }: { palette: MakeCodePalette }) => {
   const { hueZones } = useColorToMakeCodeConverter();
@@ -71,7 +71,10 @@ const HueWheelTable = ({ palette }: { palette: MakeCodePalette }) => {
                       <div className="flex-shrink-0">
                         <div
                           className="w-8 h-8 rounded border border-gray-500"
-                          style={{ backgroundColor: palette[lumZone.color] }}
+                          style={{
+                            backgroundColor:
+                              palette[lumZone.color as keyof MakeCodePalette],
+                          }}
                         />
                       </div>
 
@@ -109,7 +112,7 @@ const HueWheelTable = ({ palette }: { palette: MakeCodePalette }) => {
                       </div>
 
                       <div className="flex-shrink-0 text-xs text-gray-400">
-                        Hex: {palette[lumZone.color]}
+                        Hex: {palette[lumZone.color as keyof MakeCodePalette]}
                       </div>
                     </div>
                   ))}

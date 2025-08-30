@@ -3,12 +3,12 @@ import SizeInputs from "./SizeInputs";
 import TabButton from "./TabButton";
 
 // Context imports
-import { useAssetType } from "@/context/AssetTypeContext/useAssetType";
-import { useLoading } from "@/context/LoadingContext/useLoading";
+import { useAssetType } from "../../../context/AssetTypeContext/useAssetType";
+import { useLoading } from "../../../context/LoadingContext/useLoading";
 
 // Type imports
-import { AssetType, ALL_ASSETS_TYPE } from "@/types/export";
-import { BACKGROUND_SIZE, TILE_SIZE } from "@/types/pixel";
+import { AssetType, ALL_ASSETS_TYPE } from "../../../types/export";
+import { BACKGROUND_SIZE, TILE_SIZE } from "../../../types/pixel";
 
 const AssetOptionsSelection = () => {
   const { selectedAsset, setSelectedAsset } = useAssetType();

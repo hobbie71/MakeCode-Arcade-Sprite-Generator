@@ -1,11 +1,6 @@
-import {
-  createContext,
-  useState,
-  Dispatch,
-  SetStateAction,
-  useMemo,
-} from "react";
-import { AssetType } from "@/types/export";
+import { createContext, useState, useMemo } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import { AssetType } from "../../types/export";
 
 type AssetTypeContextType = {
   selectedAsset: AssetType;

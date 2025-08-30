@@ -1,6 +1,6 @@
 import React from "react";
-import { useColorToMakeCodeConverter } from "@/features/InputSection/hooks/useColorToMakeCodeConverter";
-import { MakeCodePalette } from "@/types/color";
+import { useColorToMakeCodeConverter } from "../../../features/InputSection/hooks/useColorToMakeCodeConverter";
+import type { MakeCodePalette } from "../../../types/color";
 import PaletteSelector from "./PaletteSelector";
 
 interface Props {
@@ -161,7 +161,7 @@ const HueWheelVisualization: React.FC<Props> = ({ palette }) => {
                       <g key={`lum-${zoneIdx}-${lumZone.color}-${lumIdx}`}>
                         <path
                           d={`M ${x1} ${y1} L ${x2} ${y2} A ${radius + ringWidth} ${radius + ringWidth} 0 ${largeArcFlag} 1 ${x3} ${y3} L ${x4} ${y4} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${x1} ${y1} Z`}
-                          fill={palette[lumZone.color]}
+                          fill={palette[lumZone.color as keyof MakeCodePalette]}
                           stroke="#374151"
                           strokeWidth="1"
                           opacity="0.9"

@@ -4,8 +4,8 @@ import { useCallback, useRef } from "react";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
 
 // Type imports
-import { Coordinates } from "@/types/pixel";
-import { EditorTools } from "@/types";
+import type { Coordinates } from "../../../types/pixel";
+import { EditorTools } from "../../../types";
 
 export const usePan = (
   offset: Coordinates,

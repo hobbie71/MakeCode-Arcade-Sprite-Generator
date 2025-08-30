@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 
 // Type imports
-import { Coordinates } from "@/types/pixel";
+import type { Coordinates } from "../../../types/pixel";
 
 // Component imports
 import SizeInput from "./SizeInput";
 
 // Context imports
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 
 interface Props {
   fixedSize?: Coordinates;

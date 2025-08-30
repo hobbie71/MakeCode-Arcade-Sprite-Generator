@@ -2,7 +2,7 @@ import { useCallback, useRef, useEffect } from "react";
 
 // Context imports
 import { useSelectionArea } from "../contexts/SelectionArea/useSelectionArea";
-import { useSprite } from "@/context/SpriteContext/useSprite";
+import { useSprite } from "../../../context/SpriteContext/useSprite";
 
 // Lib imports
 import { getSelectedSpriteData } from "../libs/getSelectedSpriteData";
@@ -11,8 +11,8 @@ import { getSelectedSpriteData } from "../libs/getSelectedSpriteData";
 // import { isPointerInSelection } from "../libs/isPointerInSelection";
 
 // Type imports
-import { Coordinates, SelectionArea } from "@/types/pixel";
-import { MakeCodeColor } from "@/types/color";
+import type { Coordinates, SelectionArea } from "../../../types/pixel";
+import { MakeCodeColor } from "../../../types/color";
 
 export const useSelectionOverlay = () => {
   // Hooks

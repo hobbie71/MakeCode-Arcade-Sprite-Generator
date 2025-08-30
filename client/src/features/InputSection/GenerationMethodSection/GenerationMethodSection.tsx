@@ -4,10 +4,10 @@ import ImageToSpriteSection from "./ImageToSpriteSection/ImageToSpriteSection";
 import TextToSpriteSection from "./TextToSpriteSection/TextToSpriteSection";
 
 // Context imports
-import { useGenerationMethod } from "@/context/GenerationMethodContext/useGenerationMethod";
+import { useGenerationMethod } from "../../../context/GenerationMethodContext/useGenerationMethod";
 
 // Type imports
-import { GenerationMethod, generationMethods } from "@/types/export";
+import { GenerationMethod, generationMethods } from "../../../types/export";
 
 const GenerationMethodSection = () => {
   const { selectedMethod, setSelectedMethod } = useGenerationMethod();

@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 
 // Type imports
-import { Coordinates } from "@/types/pixel";
+import type { Coordinates } from "../../../types/pixel";
 
 // Context imports
 import { useMouseCoordinates } from "../contexts/MouseCoordinatesContext/useMouseCoordinates";
@@ -18,7 +18,7 @@ import { useFill } from "./useFill";
 // import { useRectangle } from "./useRectangle";
 // import { useCircle } from "./useCircle";
 // import { useSelect } from "./useSelect";
-import { EditorTools } from "@/types/tools";
+import { EditorTools } from "../../../types";
 
 export const useMouseHandler = () => {
   const { mouseCoordinates, setMouseCoordinates } = useMouseCoordinates();

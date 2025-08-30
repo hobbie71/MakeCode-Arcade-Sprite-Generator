@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 
 // Context imports
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 
 // Hook imports
-import { useCanvasResize } from "@/hooks/useCanvasResize";
+import { useCanvasResize } from "../../../hooks/useCanvasResize";
 
 // Type imports
-import { MAX_LENGTH, MIN_LENGTH } from "@/types/pixel";
+import { MAX_LENGTH, MIN_LENGTH } from "../../../types/pixel";
 
 interface Props {
   type: "width" | "height";

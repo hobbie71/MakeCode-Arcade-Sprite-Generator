@@ -1,12 +1,12 @@
 import {
   AssetType,
-  PixelLabGenerationSettings,
   PixelLabQuality,
   Style,
   GenerationView,
   GenerationDirection,
   GenerationOutline,
-} from "@/types/export";
+} from "../../types/export";
+import type { PixelLabGenerationSettings } from "../../types/export";
 
 // Default PixelLab settings based on asset type
 export const getDefaultPixelLabSettings = (

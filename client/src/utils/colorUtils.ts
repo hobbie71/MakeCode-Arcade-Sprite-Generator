@@ -1,4 +1,5 @@
-import { MakeCodeColor, MakeCodePalette, ArcadePalette } from "@/types/color";
+import { MakeCodeColor, ArcadePalette } from "../types/color";
+import type { MakeCodePalette } from "../types/color";
 import { hexToRgb, rgbToHsl, type RGB, type HSL } from "./colorConversion";
 
 // Build a reverse lookup map for each palette with RGB values

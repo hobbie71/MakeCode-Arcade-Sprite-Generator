@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 // Context import
-import { useToolSelected } from "@/features/SpriteEditor/contexts/ToolSelectedContext/useToolSelected";
+import { useToolSelected } from "../../contexts/ToolSelectedContext/useToolSelected";
 
 interface Props {
   strokeSize: number;

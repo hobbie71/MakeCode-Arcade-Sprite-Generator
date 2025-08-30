@@ -1,5 +1,6 @@
-import React, { createContext, useState, ReactNode, useCallback } from "react";
-import { AiModel, AssetType } from "@/types/export";
+import React, { createContext, useState, useCallback } from "react";
+import type { ReactNode } from "react";
+import { AiModel, AssetType } from "../../types/export";
 import { getDefaultAiModelSettings } from "./getDefaultSettings";
 
 type AiModelContextType = {

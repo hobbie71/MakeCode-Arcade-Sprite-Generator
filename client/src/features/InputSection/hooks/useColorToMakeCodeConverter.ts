@@ -2,7 +2,7 @@
 import { useMemo, useCallback } from "react";
 
 // Context imports
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 
 // Lib imports
 import {
@@ -17,7 +17,7 @@ import { convertImageDataToRGBA } from "../libs/convertImageDataToRGBA";
 import { calculateHueZones } from "../utils/hueZoneUtils";
 
 // Type imports
-import { MakeCodeColor } from "@/types/color";
+import { MakeCodeColor } from "../../../types/color";
 
 export const useColorToMakeCodeConverter = () => {
   const { palette } = usePaletteSelected();

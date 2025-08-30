@@ -4,13 +4,13 @@ import { useEffect, memo, useState } from "react";
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
 import { useZoom } from "../contexts/ZoomContext/useZoom";
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 
 // Utility imports
 import {
   isValidMakeCodeSprite,
   parseMakeCodeSprite,
-} from "@/utils/makeCodeSprite";
+} from "../../../utils/makeCodeSprite";
 
 // Hook import
 import { useSpriteEditorCanvas } from "../hooks/useSpriteEditorCanvas";

@@ -1,14 +1,14 @@
 import { useCallback } from "react";
 
 // Context imports
-import { useSprite } from "@/context/SpriteContext/useSprite";
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
+import { useSprite } from "../../../context/SpriteContext/useSprite";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 
 // Lib imports
 import { drawPixelOnCanvasTransparent } from "../libs/drawPixelOnCanvas";
 
 // Type imports
-import { ImageExportFormats } from "@/types/export";
+import { ImageExportFormats } from "../../../types/export";
 import { PIXEL_SIZE } from "../constants/pixelSize";
 
 export const useExportSpriteData = () => {

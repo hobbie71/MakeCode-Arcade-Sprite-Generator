@@ -1,11 +1,7 @@
-import React, {
-  createContext,
-  ReactNode,
-  useReducer,
-  useCallback,
-  useMemo,
-} from "react";
-import { AssetType, OpenAIGenerationSettings } from "@/types/export";
+import React, { createContext, useReducer, useCallback, useMemo } from "react";
+import type { ReactNode } from "react";
+import { AssetType } from "../../types/export";
+import type { OpenAIGenerationSettings } from "../../types/export";
 import { getDefaultOpenAISettings } from "./getDefaultSettings";
 
 // Action types

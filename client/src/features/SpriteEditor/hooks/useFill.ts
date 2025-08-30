@@ -2,9 +2,9 @@ import { useCallback } from "react";
 
 // Context imports
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 
 // Hook imports
 import { useSpriteData } from "./useSpriteData";
@@ -13,8 +13,8 @@ import { useSpriteData } from "./useSpriteData";
 import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
 // Type imports
-import { Coordinates } from "@/types/pixel";
-import { MakeCodeColor } from "@/types/color";
+import type { Coordinates } from "../../../types/pixel";
+import { MakeCodeColor } from "../../../types/color";
 
 export const useFill = () => {
   const { canvasRef } = useCanvas();

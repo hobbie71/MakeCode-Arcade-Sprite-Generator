@@ -2,15 +2,15 @@ import { useCallback } from "react";
 
 // Context imports
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
-import { useSprite } from "@/context/SpriteContext/useSprite";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+import { useSprite } from "../../../context/SpriteContext/useSprite";
 
 // Lib imports
 import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
 // Type imports
-import { MakeCodeColor } from "@/types";
+import { MakeCodeColor } from "../../../types";
 
 export const usePasteData = () => {
   const { canvasRef } = useCanvas();

@@ -1,8 +1,9 @@
 // Context imports
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 
 // Type import
-import { ALL_PALETTES, MakeCodePalette } from "@/types/color";
+import { ALL_PALETTES } from "../../../types/color";
+import type { MakeCodePalette } from "../../../types/color";
 
 const PaletteSelection = () => {
   const { palette, setPalette } = usePaletteSelected();

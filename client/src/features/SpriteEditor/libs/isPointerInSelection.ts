@@ -1,4 +1,4 @@
-import { Coordinates, SelectionArea } from "@/types/pixel";
+import type { Coordinates, SelectionArea } from "../../../types/pixel";
 
 export const isPointerInSelection = (
   pointer: Coordinates,

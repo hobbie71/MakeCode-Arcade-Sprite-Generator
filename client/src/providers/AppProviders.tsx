@@ -1,15 +1,15 @@
-import { SpriteProvider } from "@/context/SpriteContext/SpriteContext";
-import { CanvasSizeProvider } from "@/context/CanvasSizeContext/CanvasSizeContext";
-import { PaletteSelectedProvider } from "@/context/PaletteSelectedContext/PaletteSelectedContext";
-import { CanvasProvider } from "@/context/CanvasContext/CanvasContext";
-import { ImageImportProvider } from "@/context/ImageImportContext/ImageImportContext";
-import { AssetTypeProvider } from "@/context/AssetTypeContext/AssetTypeContext";
-import { GenerationMethodProvider } from "@/context/GenerationMethodContext/GenerationMethodContext";
-import { AiModelProvider } from "@/context/AiModelContext/AiModelContext";
-import { LoadingProvider } from "@/context/LoadingContext/LoadingContext";
-import { PixelLabSettingsProvider } from "@/context/PixelLabSettingsContext/PixelLabSettingsContext";
-import { OpenAISettingsProvider } from "@/context/OpenAISettingsContext/OpenAISettingsContext";
-import { PostProcessingProvider } from "@/context/PostProcessingContext/PostProcessingContext";
+import { SpriteProvider } from "../context/SpriteContext/SpriteContext";
+import { CanvasSizeProvider } from "../context/CanvasSizeContext/CanvasSizeContext";
+import { PaletteSelectedProvider } from "../context/PaletteSelectedContext/PaletteSelectedContext";
+import { CanvasProvider } from "../context/CanvasContext/CanvasContext";
+import { ImageImportProvider } from "../context/ImageImportContext/ImageImportContext";
+import { AssetTypeProvider } from "../context/AssetTypeContext/AssetTypeContext";
+import { GenerationMethodProvider } from "../context/GenerationMethodContext/GenerationMethodContext";
+import { AiModelProvider } from "../context/AiModelContext/AiModelContext";
+import { LoadingProvider } from "../context/LoadingContext/LoadingContext";
+import { PixelLabSettingsProvider } from "../context/PixelLabSettingsContext/PixelLabSettingsContext";
+import { OpenAISettingsProvider } from "../context/OpenAISettingsContext/OpenAISettingsContext";
+import { PostProcessingProvider } from "../context/PostProcessingContext/PostProcessingContext";
 
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
   return (

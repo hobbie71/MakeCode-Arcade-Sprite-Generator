@@ -1,11 +1,6 @@
-import {
-  createContext,
-  SetStateAction,
-  useMemo,
-  useState,
-  Dispatch,
-} from "react";
-import { SelectionArea } from "@/types/pixel";
+import { createContext, useMemo, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import type { SelectionArea } from "../../../../types/pixel";
 
 type SelectionAreaContextType = {
   selectionArea: SelectionArea | null;

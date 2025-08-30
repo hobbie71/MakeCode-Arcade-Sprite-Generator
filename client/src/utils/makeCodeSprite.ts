@@ -1,4 +1,4 @@
-import { MakeCodeColor } from "@/types/color";
+import { MakeCodeColor } from "../types";
 
 /**
  * Valid MakeCode color characters

@@ -1,11 +1,6 @@
-import {
-  useState,
-  createContext,
-  Dispatch,
-  SetStateAction,
-  useMemo,
-} from "react";
-import { Coordinates } from "@/types/pixel";
+import { useState, createContext, useMemo } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import type { Coordinates } from "../../../../types/pixel";
 
 interface MouseCoordinatesContextType {
   mouseCoordinates: Coordinates | null;

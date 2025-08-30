@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import HueWheelDemo from "@/features/DevTools/components/HueWheelTable";
-import HueWheelVisualization from "@/features/DevTools/components/HueWheelVisualization";
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import HueWheelDemo from "../../features/DevTools/components/HueWheelTable";
+import HueWheelVisualization from "../../features/DevTools/components/HueWheelVisualization";
+import { usePaletteSelected } from "../../context/PaletteSelectedContext/usePaletteSelected";
 import ImageProcessingPipeline from "./components/ImageProcessingPipeline";
 
 type DevTab = "hue-wheel-table" | "hue-wheel-viz" | "image-processing";

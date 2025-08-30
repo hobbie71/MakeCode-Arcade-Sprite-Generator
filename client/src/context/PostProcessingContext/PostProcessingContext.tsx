@@ -1,11 +1,7 @@
-import React, {
-  createContext,
-  ReactNode,
-  useReducer,
-  useCallback,
-  useMemo,
-} from "react";
-import { AssetType, PostProcessingSettings } from "@/types/export";
+import React, { createContext, useReducer, useCallback, useMemo } from "react";
+import type { ReactNode } from "react";
+import { AssetType } from "../../types/export";
+import type { PostProcessingSettings } from "../../types/export";
 import { getDefaultPostProcessingSettings } from "./getDefaultSettings";
 
 // Action types

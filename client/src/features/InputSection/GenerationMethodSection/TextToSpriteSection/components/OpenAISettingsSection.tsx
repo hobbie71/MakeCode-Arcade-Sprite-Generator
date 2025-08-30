@@ -6,12 +6,12 @@ import DefaultDropDown from "../../../../../components/DefaultDropDown";
 import AdvanceDropDownButton from "./AdvanceDropDownButton";
 
 // Hooks imports
-import { useOpenAISettings } from "@/context/OpenAISettingsContext/useOpenAISettings";
-import { useAssetType } from "@/context/AssetTypeContext/useAssetType";
-import { useLoading } from "@/context/LoadingContext/useLoading";
+import { useOpenAISettings } from "../../../../../context/OpenAISettingsContext/useOpenAISettings";
+import { useAssetType } from "../../../../../context/AssetTypeContext/useAssetType";
+import { useLoading } from "../../../../../context/LoadingContext/useLoading";
 
 // Type imports
-import { ALL_STYLES, ALL_OPENAI_QUALITYS } from "@/types/export";
+import { ALL_STYLES, ALL_OPENAI_QUALITYS } from "../../../../../types/export";
 import { useCallback, useEffect } from "react";
 
 const OpenAISettingsSection = () => {

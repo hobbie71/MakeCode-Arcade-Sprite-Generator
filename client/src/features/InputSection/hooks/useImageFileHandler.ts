@@ -1,18 +1,18 @@
 import { useCallback } from "react";
 
 // Context imports
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
-import { useImageImports } from "@/context/ImageImportContext/useImageImports";
-import { useLoading } from "@/context/LoadingContext/useLoading";
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
-import { useAiModel } from "@/context/AiModelContext/useAiModel";
-import { usePixelLabSettings } from "@/context/PixelLabSettingsContext/usePixelLabSettings";
-import { useOpenAISettings } from "@/context/OpenAISettingsContext/useOpenAISettings";
-import { usePostProcessing } from "@/context/PostProcessingContext/usePostProcessing";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
+import { useImageImports } from "../../../context/ImageImportContext/useImageImports";
+import { useLoading } from "../../../context/LoadingContext/useLoading";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+import { useAiModel } from "../../../context/AiModelContext/useAiModel";
+import { usePixelLabSettings } from "../../../context/PixelLabSettingsContext/usePixelLabSettings";
+import { useOpenAISettings } from "../../../context/OpenAISettingsContext/useOpenAISettings";
+import { usePostProcessing } from "../../../context/PostProcessingContext/usePostProcessing";
 
 // Hook imports
-import { usePasteData } from "@/features/SpriteEditor/hooks/usePasteData";
-import { useColorToMakeCodeConverter } from "@/features/InputSection/hooks/useColorToMakeCodeConverter";
+import { usePasteData } from "../../../features/SpriteEditor/hooks/usePasteData";
+import { useColorToMakeCodeConverter } from "../../../features/InputSection/hooks/useColorToMakeCodeConverter";
 
 // Lib imports
 import {
@@ -25,10 +25,10 @@ import {
 import {
   generateOpenAiImage,
   generatePixelLabImage,
-} from "@/api/generateImageApi";
+} from "../../../api/generateImageApi";
 
 // Type imports
-import { AiModel } from "@/types/export";
+import { AiModel } from "../../../types/export";
 
 export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();

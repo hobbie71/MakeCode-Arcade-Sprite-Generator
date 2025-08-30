@@ -1,5 +1,5 @@
 // import { useCallback } from "react";
-// import { Coordinates } from "@/types/pixel";
+// import type { Coordinates } from "../../../types/pixel";
 
 export const useCircle = () => {
   // TODO: Add circle drawing logic

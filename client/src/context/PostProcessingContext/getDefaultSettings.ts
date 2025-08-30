@@ -1,4 +1,5 @@
-import { AssetType, PostProcessingSettings } from "@/types/export";
+import { AssetType } from "../../types/export";
+import type { PostProcessingSettings } from "../../types/export";
 
 // Default PostProcessing settings based on asset type
 export const getDefaultPostProcessingSettings = (

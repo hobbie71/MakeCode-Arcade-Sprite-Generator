@@ -1,4 +1,5 @@
-import React, { createContext, useState, useMemo, ReactNode } from "react";
+import React, { createContext, useState, useMemo } from "react";
+import type { ReactNode } from "react";
 
 type LoadingContextType = {
   isGenerating: boolean;

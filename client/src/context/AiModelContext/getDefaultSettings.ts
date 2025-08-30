@@ -1,4 +1,4 @@
-import { AiModel, AssetType } from "@/types/export";
+import { AiModel, AssetType } from "../../types/export";
 
 // Default OpenAI settings based on asset type
 export const getDefaultAiModelSettings = (assetType: AssetType): AiModel => {

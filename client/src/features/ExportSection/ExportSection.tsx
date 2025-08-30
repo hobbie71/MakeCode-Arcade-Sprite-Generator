@@ -6,7 +6,7 @@ import CodeDisplay from "./components/CodeDisplay";
 import { useExportSpriteData } from "../SpriteEditor/hooks/useExportSpriteData";
 
 // Type imports
-import { ImageExportFormats } from "@/types/export";
+import { ImageExportFormats } from "../../types/export";
 
 const ExportSection = () => {
   const { exportSpriteToImage, getImgCode, getJavaScriptCode, getPythonCode } =

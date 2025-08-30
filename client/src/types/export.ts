@@ -1,3 +1,5 @@
+import type { MakeCodePalette } from "./color";
+
 export enum ImageExportFormats {
   PNG = "png",
   JPEG = "jpeg",
@@ -181,9 +183,6 @@ export type Size = {
   width: number;
   height: number;
 };
-
-// MakeCodePalette type to match backend
-export type MakeCodePalette = Record<string, string>;
 
 // Request types to match backend
 export type PixelLabSpriteRequest = {

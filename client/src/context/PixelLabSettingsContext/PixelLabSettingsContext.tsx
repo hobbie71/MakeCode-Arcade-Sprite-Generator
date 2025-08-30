@@ -1,11 +1,7 @@
-import React, {
-  createContext,
-  ReactNode,
-  useReducer,
-  useCallback,
-  useMemo,
-} from "react";
-import { AssetType, PixelLabGenerationSettings } from "@/types/export";
+import React, { createContext, useReducer, useCallback, useMemo } from "react";
+import type { ReactNode } from "react";
+import { AssetType } from "../../types/export";
+import type { PixelLabGenerationSettings } from "../../types/export";
 import { getDefaultPixelLabSettings } from "./getDefaultSettings";
 
 // Action types

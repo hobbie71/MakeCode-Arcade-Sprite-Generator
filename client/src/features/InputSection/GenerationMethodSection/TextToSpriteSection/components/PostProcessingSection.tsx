@@ -1,11 +1,11 @@
 // Component imports
-import CheckBox from "@/features/InputSection/components/CheckBox";
+import CheckBox from "../../../../../features/InputSection/components/CheckBox";
 import NumberInputBox from "../../../components/NumberInputBox";
 
 // Hooks imports
-import { usePostProcessing } from "@/context/PostProcessingContext/usePostProcessing";
-import { useLoading } from "@/context/LoadingContext/useLoading";
-import { useAssetType } from "@/context/AssetTypeContext/useAssetType";
+import { usePostProcessing } from "../../../../../context/PostProcessingContext/usePostProcessing";
+import { useLoading } from "../../../../../context/LoadingContext/useLoading";
+import { useAssetType } from "../../../../../context/AssetTypeContext/useAssetType";
 import { useEffect } from "react";
 
 const PostProcessingSection = () => {

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 // Context imports
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 
 // Hook imports
 import { useSpriteData } from "./useSpriteData";
@@ -11,7 +11,7 @@ import { useSpriteData } from "./useSpriteData";
 import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
 // Type imports
-import { MakeCodeColor } from "@/types/color";
+import { MakeCodeColor } from "../../../types/color";
 
 export const useSpriteEditorCanvas = (width: number, height: number) => {
   // Hooks

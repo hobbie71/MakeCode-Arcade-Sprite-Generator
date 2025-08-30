@@ -1,11 +1,7 @@
-import {
-  createContext,
-  useState,
-  Dispatch,
-  SetStateAction,
-  useMemo,
-} from "react";
-import { MakeCodeColor } from "@/types/color";
+import { createContext, useState, useMemo } from "react";
+
+import type { Dispatch, SetStateAction } from "react";
+import { MakeCodeColor } from "../../../../types/color";
 
 type ColorSelectedType = {
   color: MakeCodeColor;

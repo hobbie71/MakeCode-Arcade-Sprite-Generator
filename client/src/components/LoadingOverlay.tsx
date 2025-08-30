@@ -1,5 +1,5 @@
 import React from "react";
-import { useLoading } from "@/context/LoadingContext/useLoading";
+import { useLoading } from "../context/LoadingContext/useLoading";
 
 const LoadingOverlay: React.FC = () => {
   const { isGenerating, generationMessage } = useLoading();

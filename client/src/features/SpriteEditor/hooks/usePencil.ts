@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 
 // Context imports
-import { usePaletteSelected } from "@/context/PaletteSelectedContext/usePaletteSelected";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 
@@ -12,8 +12,8 @@ import { useSpriteData } from "./useSpriteData";
 import { handleDraw } from "../libs/handleDraw";
 
 // Type imports
-import { Coordinates } from "@/types/pixel";
-import { EditorTools } from "@/types";
+import type { Coordinates } from "../../../types/pixel";
+import { EditorTools } from "../../../types";
 
 export const usePencil = () => {
   const { canvasRef } = useCanvas();

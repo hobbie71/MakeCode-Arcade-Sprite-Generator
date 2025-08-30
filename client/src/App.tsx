@@ -1,19 +1,19 @@
 // Style import
-import "./App.css";
+import "./App.scss";
 
 // React imports
 import { useState, useEffect } from "react";
 
 // Provider imports
-import AppProviders from "@/providers/AppProviders";
+import AppProviders from "./providers/AppProviders";
 
 // Component imports
-import SpriteEditor from "@/features/SpriteEditor/SpriteEditor";
-import ExportSection from "@/features/ExportSection/ExportSection";
-import InputSection from "@/features/InputSection/InputSection";
-// import DevToolsButton from "@/features/DevTools/components/DevToolsButton";
-import IssueReportButton from "@/features/IssueReport/IssueReportButton";
-import WelcomeModal from "../components/WelcomeModal";
+import SpriteEditor from "./features/SpriteEditor/SpriteEditor";
+import ExportSection from "./features/ExportSection/ExportSection";
+import InputSection from "./features/InputSection/InputSection";
+// import DevToolsButton from "./features/DevTools/components/DevToolsButton";
+import IssueReportButton from "./features/IssueReport/IssueReportButton";
+import WelcomeModal from "./components/WelcomeModal";
 
 function App() {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);

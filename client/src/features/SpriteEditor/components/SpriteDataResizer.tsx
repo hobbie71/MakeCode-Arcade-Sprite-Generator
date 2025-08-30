@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 
 // Context imports
-import { useCanvasSize } from "@/context/CanvasSizeContext/useCanvasSize";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 
 // Hook imports
 import { useSpriteData } from "../hooks/useSpriteData";
 
 // Lib imports
-import { getResizedSpriteData } from "@/libs/getResizedSpriteData";
+import { getResizedSpriteData } from "../../../libs/getResizedSpriteData";
 
 /**
  * Component that handles sprite data resizing when canvas dimensions change.
