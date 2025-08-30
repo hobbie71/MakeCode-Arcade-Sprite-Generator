@@ -48,6 +48,7 @@ export async function generateOpenAiImage(
     palette,
   };
 
+  console.log(GENERATE_OPENAI_IMAGE_API_URL);
   const response = await fetch(GENERATE_OPENAI_IMAGE_API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
