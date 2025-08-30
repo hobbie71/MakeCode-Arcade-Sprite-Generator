@@ -7,6 +7,7 @@ import logging
 import os
 from pathlib import Path
 from typing import List
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from .routers import sprites
 from .core.config import settings
@@ -39,10 +40,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-print("settings.CORS_ORIGINS", settings.CORS_ORIGINS)
-print("settings.PIXELLAB_API_KEY", settings.PIXELLAB_API_KEY)
-print("settings.OPENAI_API_KEY", settings.OPENAI_API_KEY)
+class LogRequestMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        print(f"Request: {request.method} {request.url} Origin: {request.headers.get('origin')}")
+        return await call_next(request)
 
+app.add_middleware(LogRequestMiddleware)
 
 # Include routers
 app.include_router(sprites.router, prefix="/generate-image", tags=["generate-image"])
