@@ -10,6 +10,7 @@ import { LoadingProvider } from "../context/LoadingContext/LoadingContext";
 import { PixelLabSettingsProvider } from "../context/PixelLabSettingsContext/PixelLabSettingsContext";
 import { OpenAISettingsProvider } from "../context/OpenAISettingsContext/OpenAISettingsContext";
 import { PostProcessingProvider } from "../context/PostProcessingContext/PostProcessingContext";
+import { ErrorProvider } from "../context/ErrorContext/ErrorContext";
 
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -25,7 +26,7 @@ const AppProviders = ({ children }: { children: React.ReactNode }) => {
                       <OpenAISettingsProvider>
                         <ImageImportProvider>
                           <PostProcessingProvider>
-                            {children}
+                            <ErrorProvider>{children}</ErrorProvider>
                           </PostProcessingProvider>
                         </ImageImportProvider>
                       </OpenAISettingsProvider>

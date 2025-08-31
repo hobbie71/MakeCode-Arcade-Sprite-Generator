@@ -8,13 +8,19 @@ interface Props {
 const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleUserSubmit = () => {
+  const handleUserSubmit = (prompt: string | null = null) => {
     if (disabled) return;
+
+    if (prompt) {
+      onSubmit(prompt);
+      return;
+    }
 
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    const prompt = textarea.value.trim();
+    prompt = textarea.value.trim();
+
     if (prompt) {
       onSubmit(prompt);
     }
@@ -32,6 +38,12 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
     } else if (e.key === "Tab") {
       handleUserSubmit();
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const prompt = e.target.value;
+
+    if (prompt === "") handleUserSubmit(prompt);
   };
 
   return (
@@ -52,7 +64,8 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
           disabled ? "Loading..." : "Create a scary dragon that spits fire!"
         }
         onKeyDown={handleKeyDown}
-        onBlur={handleUserSubmit}
+        onBlur={() => handleUserSubmit()}
+        onChange={handleChange}
         disabled={disabled}
         readOnly={disabled}
         aria-describedby="ai-prompt-description"

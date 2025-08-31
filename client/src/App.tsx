@@ -11,6 +11,7 @@ import InputSection from "./features/InputSection/InputSection";
 // import DevToolsButton from "./features/DevTools/components/DevToolsButton";
 import IssueReportButton from "./features/IssueReport/IssueReportButton";
 import WelcomeModal from "./components/WelcomeModal";
+import Error from "./components/Error";
 
 function App() {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
@@ -58,6 +59,7 @@ function App() {
         isVisible={showWelcomeModal}
         onClose={handleCloseWelcomeModal}
       />
+      <Error />
     </AppProviders>
   );
 }

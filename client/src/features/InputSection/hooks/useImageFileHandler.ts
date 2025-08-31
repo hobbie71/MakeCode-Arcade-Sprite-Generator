@@ -9,6 +9,7 @@ import { useAiModel } from "../../../context/AiModelContext/useAiModel";
 import { usePixelLabSettings } from "../../../context/PixelLabSettingsContext/usePixelLabSettings";
 import { useOpenAISettings } from "../../../context/OpenAISettingsContext/useOpenAISettings";
 import { usePostProcessing } from "../../../context/PostProcessingContext/usePostProcessing";
+import { useError } from "../../../context/ErrorContext/useError";
 
 // Hook imports
 import { usePasteData } from "../../../features/SpriteEditor/hooks/usePasteData";
@@ -20,6 +21,9 @@ import {
   processImageWithSettings,
   resizeCanvasToTarget,
 } from "../libs/imageProcesser";
+
+// Utils imports
+import { hasBadWord } from "../../../utils/hasBadWord";
 
 // API imports
 import {
@@ -41,6 +45,7 @@ export const useImageFileHandler = () => {
   const { settings: openAISettings } = useOpenAISettings();
   const { settings: postProcessingSettings } = usePostProcessing();
   const { palette } = usePaletteSelected();
+  const { setError } = useError();
 
   /**
    * Converts an image file to sprite data with post-processing settings applied
@@ -49,7 +54,7 @@ export const useImageFileHandler = () => {
     async (file?: File) => {
       const imageFile = file ?? importedImage;
       if (!imageFile) {
-        console.warn("No image file available for sprite generation");
+        setError("No Image File Available for Sprite Generation");
         return;
       }
 
@@ -100,7 +105,7 @@ export const useImageFileHandler = () => {
                 pasteSpriteData(spriteData);
                 resolve();
               } catch (error) {
-                console.error("Error processing image:", error);
+                setError("Error processing image: " + error);
                 reject(error);
               } finally {
                 stopGeneration();
@@ -118,7 +123,7 @@ export const useImageFileHandler = () => {
           };
           reader.readAsDataURL(imageFile);
         } catch (error) {
-          console.error("Error reading image file:", error);
+          setError("Error reading image file: " + error);
           reject(error);
           stopGeneration();
         }
@@ -133,6 +138,7 @@ export const useImageFileHandler = () => {
       pasteSpriteData,
       startGeneration,
       stopGeneration,
+      setError,
     ]
   );
 
@@ -146,12 +152,32 @@ export const useImageFileHandler = () => {
       // Generate image using selected AI model
       let response;
       if (selectedModel === AiModel.PixelLab) {
+        if (pixelLabSettings.prompt === "") {
+          setError("No Prompt Detected. Added a Prompt");
+          return;
+        }
+
+        if (hasBadWord(pixelLabSettings.prompt)) {
+          setError("Bad Word Detected");
+          return;
+        }
+
         response = await generatePixelLabImage(
           pixelLabSettings,
           { width, height },
           palette
         );
       } else if (selectedModel === AiModel.GPTImage1) {
+        if (openAISettings.prompt === "") {
+          setError("No Prompt Detected. Added a Prompt");
+          return;
+        }
+
+        if (hasBadWord(openAISettings.prompt)) {
+          setError("Bad Word Detected");
+          return;
+        }
+
         response = await generateOpenAiImage(
           openAISettings,
           { width, height },
@@ -181,7 +207,7 @@ export const useImageFileHandler = () => {
       setImportedImage(file);
       await convertImageToSprite(file);
     } catch (error) {
-      console.error("Error generating AI sprite:", error);
+      setError("Error generating AI sprite: " + error);
       throw error;
     } finally {
       stopGeneration();
@@ -197,6 +223,7 @@ export const useImageFileHandler = () => {
     width,
     height,
     palette,
+    setError,
   ]);
 
   /**
