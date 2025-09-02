@@ -1,4 +1,4 @@
-import { MakeCodeColor } from "../../../types";
+import { MakeCodeColor } from "../../../types/color";
 import type { SelectionArea } from "../../../types/pixel";
 
 export function getSelectedSpriteData(

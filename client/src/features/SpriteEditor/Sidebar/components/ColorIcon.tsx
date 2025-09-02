@@ -8,7 +8,7 @@ import { MakeCodeColor } from "../../../../types/color";
 import type { MakeCodePalette } from "../../../../types/color";
 
 // Util imports
-import { getHexFromMakeCodeColor } from "../../../../utils/colorUtils";
+import { getHexFromMakeCodeColor } from "../../../../utils/colors/getColorFromMakeCodeColor";
 
 interface Props {
   color: MakeCodeColor;

@@ -5,7 +5,7 @@ import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
-import { EditorTools } from "../../../types";
+import { EditorTools } from "../../../types/tools";
 
 export const usePan = (
   offset: Coordinates,

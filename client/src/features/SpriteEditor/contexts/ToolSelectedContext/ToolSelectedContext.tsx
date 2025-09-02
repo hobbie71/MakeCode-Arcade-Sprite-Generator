@@ -1,6 +1,6 @@
 import { createContext, useState, useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { EditorTools } from "../../../../types";
+import { EditorTools } from "../../../../types/tools";
 
 type ToolSelectedType = {
   tool: EditorTools;

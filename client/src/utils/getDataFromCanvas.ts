@@ -1,4 +1,4 @@
-import { rgbaToHsla, type HSLA, type RGBA } from "./colorConversion";
+import { rgbaToHsla, type HSLA, type RGBA } from "./colors/colorConversion";
 
 export const getImageDataFromCanvas = (
   canvas: HTMLCanvasElement

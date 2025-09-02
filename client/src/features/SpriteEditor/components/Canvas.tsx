@@ -10,7 +10,7 @@ import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize"
 import {
   isValidMakeCodeSprite,
   parseMakeCodeSprite,
-} from "../../../utils/makeCodeSprite";
+} from "../../../utils/makeCodeSpriteValidation";
 
 // Hook import
 import { useSpriteEditorCanvas } from "../hooks/useSpriteEditorCanvas";

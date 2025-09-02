@@ -12,7 +12,8 @@ import { handleDraw } from "../libs/handleDraw";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
-import { EditorTools, MakeCodeColor } from "../../../types";
+import { EditorTools } from "../../../types/tools";
+import { MakeCodeColor } from "../../../types/color";
 
 export const useEraser = () => {
   const { canvasRef } = useCanvas();

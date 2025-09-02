@@ -1,8 +1,9 @@
-import { getPaletteHslMap } from "../../../utils/colorUtils";
-import { hexToHsl } from "../../../utils/colorConversion";
+import { getPaletteHslMap } from "../../../utils/colors/getPaletteMap";
+import { hexToHsl } from "../../../utils/colors/colorConversion";
+import { getHexFromMakeCodeColor } from "../../../utils/colors/getColorFromMakeCodeColor";
 import { MakeCodeColor } from "../../../types/color";
 import type { MakeCodePalette } from "../../../types/color";
-import type { HSL } from "../../../utils/colorConversion";
+import type { HSL } from "../../../utils/colors/colorConversion";
 import type { HueZone, LuminanceZone } from "../../../types/hueZone";
 
 /**
@@ -40,9 +41,15 @@ const getInitLuminanceZoneArray = (
   palette: MakeCodePalette
 ): LuminanceZone[] => {
   return [
-    getInitLuminanceZone(MakeCodeColor.BLACK, hexToHsl(palette.f)),
+    getInitLuminanceZone(
+      MakeCodeColor.BLACK,
+      hexToHsl(getHexFromMakeCodeColor(MakeCodeColor.BLACK, palette))
+    ),
     getInitLuminanceZone(color, hsl),
-    getInitLuminanceZone(MakeCodeColor.WHITE, hexToHsl(palette[1])),
+    getInitLuminanceZone(
+      MakeCodeColor.WHITE,
+      hexToHsl(getHexFromMakeCodeColor(MakeCodeColor.WHITE, palette))
+    ),
   ];
 };
 

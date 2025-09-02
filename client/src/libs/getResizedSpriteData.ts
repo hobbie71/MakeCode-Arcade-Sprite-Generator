@@ -1,4 +1,4 @@
-import { MakeCodeColor } from "../types";
+import { MakeCodeColor } from "../types/color";
 
 export function getResizedSpriteData(
   oldData: MakeCodeColor[][],

@@ -18,7 +18,7 @@ import { useFill } from "./useFill";
 // import { useRectangle } from "./useRectangle";
 // import { useCircle } from "./useCircle";
 // import { useSelect } from "./useSelect";
-import { EditorTools } from "../../../types";
+import { EditorTools } from "../../../types/tools";
 
 export const useMouseHandler = () => {
   const { mouseCoordinates, setMouseCoordinates } = useMouseCoordinates();

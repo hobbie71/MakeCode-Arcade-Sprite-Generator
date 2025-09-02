@@ -1,12 +1,17 @@
-import { MakeCodeColor, ArcadePalette } from "../types/color";
-import type { MakeCodePalette } from "../types/color";
 import { hexToRgb, rgbToHsl, type RGB, type HSL } from "./colorConversion";
+import { MakeCodeColor } from "../../types/color";
+import type { MakeCodePalette } from "../../types/color";
 
-// Build a reverse lookup map for each palette with RGB values
 const paletteRgbMap = new WeakMap<MakeCodePalette, Map<MakeCodeColor, RGB>>();
 const paletteHslMap = new WeakMap<MakeCodePalette, Map<MakeCodeColor, HSL>>();
+const paletteHexMap = new WeakMap<
+  MakeCodePalette,
+  Map<MakeCodeColor, string>
+>();
 
-function getPaletteRgbMap(palette: MakeCodePalette): Map<MakeCodeColor, RGB> {
+export const getPaletteRgbMap = (
+  palette: MakeCodePalette
+): Map<MakeCodeColor, RGB> => {
   let map = paletteRgbMap.get(palette);
   if (!map) {
     map = new Map<MakeCodeColor, RGB>();
@@ -22,11 +27,11 @@ function getPaletteRgbMap(palette: MakeCodePalette): Map<MakeCodeColor, RGB> {
     paletteRgbMap.set(palette, map);
   }
   return map;
-}
+};
 
-export function getPaletteHslMap(
+export const getPaletteHslMap = (
   palette: MakeCodePalette
-): Map<MakeCodeColor, HSL> {
+): Map<MakeCodeColor, HSL> => {
   let map = paletteHslMap.get(palette);
   if (!map) {
     map = new Map<MakeCodeColor, HSL>();
@@ -38,14 +43,20 @@ export function getPaletteHslMap(
     paletteHslMap.set(palette, map);
   }
   return map;
-}
+};
 
-export function getHexFromMakeCodeColor(
-  color: MakeCodeColor,
-  palette: MakeCodePalette = ArcadePalette
-): string {
-  // Fallback to transparent if color not found
-  return (
-    palette[color] ?? palette[MakeCodeColor.TRANSPARENT] ?? "rgba(0,0,0,0)"
-  );
-}
+export const getPaletteHexMap = (
+  palette: MakeCodePalette
+): Map<MakeCodeColor, string> => {
+  let map = paletteHexMap.get(palette);
+  if (!map) {
+    map = new Map<MakeCodeColor, string>();
+    // Use palette directly since it already contains hex values
+    for (const [makeCodeColor, colorHex] of Object.entries(palette)) {
+      if (colorHex.toLowerCase().startsWith("rgba")) continue;
+      map.set(makeCodeColor as MakeCodeColor, colorHex);
+    }
+    paletteHexMap.set(palette, map);
+  }
+  return map;
+};

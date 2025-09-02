@@ -10,7 +10,7 @@ import {
   rgbToMakeCodeColor,
   hexToMakeCodeColor,
   rgbaToMakeCodeColor,
-} from "../libs/colorConverters";
+} from "../../../utils/colors/getMakeCodeColor";
 import { convertImageDataToRGBA } from "../utils/convertImageDataToRGBA";
 
 // Util imports

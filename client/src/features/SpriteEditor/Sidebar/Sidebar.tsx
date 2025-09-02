@@ -6,7 +6,7 @@ import ToolIcon from "./components/ToolIcon";
 import ZoomIcons from "./components/ZoomIcons";
 
 // Type imports
-import { EditorTools } from "../../../types";
+import { EditorTools } from "../../../types/tools";
 import { STROKE_SIZES } from "../../../types/pixel";
 
 const TOOL_ICONS: Array<{ tool: EditorTools; icon: string }> = [

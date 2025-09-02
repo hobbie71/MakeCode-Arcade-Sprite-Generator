@@ -12,7 +12,7 @@ import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 import { useColorToMakeCodeConverter } from "../../InputSection/hooks/useColorToMakeCodeConverter";
 
 // Type imports
-import { MakeCodeColor } from "../../../types";
+import { MakeCodeColor } from "../../../types/color";
 // Util imports
 import { getImageDataFromCanvas } from "../../../utils/getDataFromCanvas";
 

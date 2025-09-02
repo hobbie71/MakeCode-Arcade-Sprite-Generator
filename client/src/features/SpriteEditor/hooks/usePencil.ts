@@ -13,7 +13,7 @@ import { handleDraw } from "../libs/handleDraw";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
-import { EditorTools } from "../../../types";
+import { EditorTools } from "../../../types/tools";
 
 export const usePencil = () => {
   const { canvasRef } = useCanvas();
