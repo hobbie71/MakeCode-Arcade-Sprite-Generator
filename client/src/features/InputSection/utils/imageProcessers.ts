@@ -1,16 +1,6 @@
-// Lib imports
-import {
-  cropToContent,
-  removeBackground as removeBackgroundFromImage,
-  removeBackgroundAndCrop,
-} from "../libs/backgroundDetection";
-
-// Type imports
-import type { ImageExportSettings } from "../../../types/export";
-
 export const createCanvasFromImage = (
   img: HTMLImageElement
-): HTMLCanvasElement => {
+): HTMLCanvasElement | null => {
   const canvas = document.createElement("canvas");
   canvas.width = img.width;
   canvas.height = img.height;
@@ -20,7 +10,7 @@ export const createCanvasFromImage = (
     alpha: true,
   });
 
-  if (!ctx) throw new Error("Failed to get ctx");
+  if (!ctx) return null;
 
   ctx.globalCompositeOperation = "source-over";
   ctx.drawImage(img, 0, 0);
@@ -28,28 +18,21 @@ export const createCanvasFromImage = (
   return canvas;
 };
 
-export const processImageWithSettings = (
-  canvas: HTMLCanvasElement,
-  settings: ImageExportSettings
-): HTMLCanvasElement => {
-  const { cropEdges, removeBackground, tolerance } = settings;
-
-  if (cropEdges && removeBackground) {
-    return removeBackgroundAndCrop(canvas, tolerance);
-  }
-
-  if (cropEdges) {
-    return cropToContent(canvas, tolerance);
-  }
-
-  if (removeBackground) {
-    return removeBackgroundFromImage(canvas, tolerance);
-  }
-
-  return canvas;
+export const fileToImageElement = (file: File): Promise<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Failed to load image"));
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => reject(new Error("Failed to load image"));
+    reader.readAsDataURL(file);
+  });
 };
 
-export const resizeCanvasToTarget = (
+export const scaleCanvasToTarget = (
   sourceCanvas: HTMLCanvasElement,
   targetWidth: number,
   targetHeight: number

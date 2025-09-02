@@ -9,14 +9,19 @@ import { useSprite } from "../../../context/SpriteContext/useSprite";
 // Lib imports
 import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
+import { useColorToMakeCodeConverter } from "../../InputSection/hooks/useColorToMakeCodeConverter";
+
 // Type imports
 import { MakeCodeColor } from "../../../types";
+// Util imports
+import { getImageDataFromCanvas } from "../../../utils/getDataFromCanvas";
 
 export const usePasteData = () => {
   const { canvasRef } = useCanvas();
   const { width, height } = useCanvasSize();
   const { palette } = usePaletteSelected();
   const { setSpriteData } = useSprite();
+  const { convertImageToSpriteData } = useColorToMakeCodeConverter();
 
   const pasteSpriteData = useCallback(
     (pastedData: MakeCodeColor[][]) => {
@@ -38,5 +43,18 @@ export const usePasteData = () => {
     [canvasRef, height, width, setSpriteData, palette]
   );
 
-  return { pasteSpriteData };
+  const pasteCanvas = useCallback(
+    (canvas: HTMLCanvasElement) => {
+      const imageData = getImageDataFromCanvas(canvas);
+      const spriteData = convertImageToSpriteData(
+        imageData,
+        canvas.width,
+        canvas.height
+      );
+      pasteSpriteData(spriteData);
+    },
+    [convertImageToSpriteData, pasteSpriteData]
+  );
+
+  return { pasteSpriteData, pasteCanvas };
 };

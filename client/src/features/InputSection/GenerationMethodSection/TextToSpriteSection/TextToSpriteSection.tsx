@@ -25,7 +25,7 @@ const TextToSpriteSection = () => {
   const {
     importedImage,
     generateAIImageAndConvertToSprite,
-    convertImageToSprite,
+    processImageToSprite,
   } = useImageFileHandler();
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const TextToSpriteSection = () => {
       {importedImage ? (
         <>
           <Button
-            onClick={() => convertImageToSprite()}
+            onClick={() => processImageToSprite()}
             isLoading={isGenerating}
             variant="primary"
             className="w-full">

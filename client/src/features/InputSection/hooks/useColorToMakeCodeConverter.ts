@@ -10,42 +10,44 @@ import {
   rgbToMakeCodeColor,
   hexToMakeCodeColor,
   rgbaToMakeCodeColor,
-} from "../libs/converters";
-import { convertImageDataToRGBA } from "../libs/convertImageDataToRGBA";
+} from "../libs/colorConverters";
+import { convertImageDataToRGBA } from "../utils/convertImageDataToRGBA";
 
 // Util imports
 import { calculateHueZones } from "../utils/hueZoneUtils";
 
 // Type imports
 import { MakeCodeColor } from "../../../types/color";
+import { drawSpriteDataOnCanvas } from "../../SpriteEditor/libs/drawPixelOnCanvas";
+import { getImageDataFromCanvas } from "../../../utils/getDataFromCanvas";
 
 export const useColorToMakeCodeConverter = () => {
   const { palette } = usePaletteSelected();
   const hueZones = useMemo(() => calculateHueZones(palette), [palette]);
 
   // Memoized conversion functions
-  const convertHsl = useCallback(
+  const converHslToMakeCodeColor = useCallback(
     (h: number, l: number): MakeCodeColor => {
       return hslToMakeCodeColor(h, l, hueZones);
     },
     [hueZones]
   );
 
-  const convertRgb = useCallback(
+  const convertRgbToMakeCodeColor = useCallback(
     (r: number, g: number, b: number): MakeCodeColor => {
       return rgbToMakeCodeColor(r, g, b, hueZones);
     },
     [hueZones]
   );
 
-  const convertHex = useCallback(
+  const convertHexToMakeCodeColor = useCallback(
     (hex: string): MakeCodeColor => {
       return hexToMakeCodeColor(hex, hueZones);
     },
     [hueZones]
   );
 
-  const convertRgba = useCallback(
+  const convertRgbaToMakeCodeColor = useCallback(
     (
       r: number,
       g: number,
@@ -58,7 +60,7 @@ export const useColorToMakeCodeConverter = () => {
     [hueZones]
   );
 
-  const convertImage = useCallback(
+  const convertImageToSpriteData = useCallback(
     (
       imageData: ImageData,
       width: number,
@@ -81,12 +83,39 @@ export const useColorToMakeCodeConverter = () => {
     [hueZones]
   );
 
+  const getCanvasToMakeCodeColor = useCallback(
+    (canvas: HTMLCanvasElement): HTMLCanvasElement => {
+      const updatedCanvas = document.createElement("canvas");
+      const ctx = updatedCanvas.getContext("2d");
+      if (!ctx) throw new Error("Failed to get CTX");
+
+      const imageData = getImageDataFromCanvas(canvas);
+
+      const spriteData = convertImageToSpriteData(
+        imageData,
+        canvas.width,
+        canvas.height
+      );
+
+      drawSpriteDataOnCanvas(
+        updatedCanvas,
+        { x: 0, y: 0 },
+        spriteData,
+        palette
+      );
+
+      return updatedCanvas;
+    },
+    [convertImageToSpriteData, palette]
+  );
+
   return {
     hueZones,
-    convertHsl,
-    convertRgb,
-    convertHex,
-    convertRgba,
-    convertImage,
+    converHslToMakeCodeColor,
+    convertRgbToMakeCodeColor,
+    convertHexToMakeCodeColor,
+    convertRgbaToMakeCodeColor,
+    convertImageToSpriteData,
+    getCanvasToMakeCodeColor,
   };
 };

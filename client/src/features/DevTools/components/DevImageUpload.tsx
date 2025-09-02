@@ -16,7 +16,7 @@ const DevImageUpload = ({ setCanvasArray }: Props) => {
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { height, width } = useCanvasSize();
-  const { convertImage } = useColorToMakeCodeConverter();
+  const { convertImageToSpriteData } = useColorToMakeCodeConverter();
   const { palette } = usePaletteSelected();
 
   const handleFile = (file: File) => {
@@ -102,7 +102,7 @@ const DevImageUpload = ({ setCanvasArray }: Props) => {
 
         // Step 4: Turn image to Makecode colors
 
-        const spriteData = convertImage(imageData, width, height);
+        const spriteData = convertImageToSpriteData(imageData, width, height);
 
         const finalCanvas = document.createElement("canvas");
         finalCanvas.width = width * PIXEL_SIZE;

@@ -13,17 +13,18 @@ import { useError } from "../../../context/ErrorContext/useError";
 
 // Hook imports
 import { usePasteData } from "../../../features/SpriteEditor/hooks/usePasteData";
-import { useColorToMakeCodeConverter } from "../../../features/InputSection/hooks/useColorToMakeCodeConverter";
+// import { useColorToMakeCodeConverter } from "../../../features/InputSection/hooks/useColorToMakeCodeConverter";
 
 // Lib imports
-import {
-  createCanvasFromImage,
-  processImageWithSettings,
-  resizeCanvasToTarget,
-} from "../libs/imageProcesser";
+import { createCanvasFromImage } from "../libs/imageProcesser";
 
 // Utils imports
 import { hasBadWord } from "../../../utils/hasBadWord";
+import {
+  fileToImageElement,
+  scaleCanvasToTarget,
+} from "../utils/imageProcessers";
+import { removeBackground, cropToContent } from "../utils/backgroundDetection";
 
 // API imports
 import {
@@ -38,8 +39,8 @@ export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();
   const { setImportedImage, importedImage } = useImageImports();
   const { startGeneration, stopGeneration } = useLoading();
-  const { pasteSpriteData } = usePasteData();
-  const { convertImage } = useColorToMakeCodeConverter();
+  const { pasteCanvas } = usePasteData();
+  // const { getCanvasToMakeCodeColor } = useColorToMakeCodeConverter();
   const { selectedModel } = useAiModel();
   const { settings: pixelLabSettings } = usePixelLabSettings();
   const { settings: openAISettings } = useOpenAISettings();
@@ -50,7 +51,8 @@ export const useImageFileHandler = () => {
   /**
    * Converts an image file to sprite data with post-processing settings applied
    */
-  const convertImageToSprite = useCallback(
+
+  const processImageToSprite = useCallback(
     async (file?: File) => {
       const imageFile = file ?? importedImage;
       if (!imageFile) {
@@ -58,87 +60,64 @@ export const useImageFileHandler = () => {
         return;
       }
 
-      return new Promise<void>((resolve, reject) => {
-        try {
-          startGeneration("Processing image to sprite...");
+      try {
+        startGeneration("Processing image to sprite...");
 
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = new window.Image();
-            img.onload = () => {
-              try {
-                // Create canvas from the image
-                const originalCanvas = createCanvasFromImage(img);
-                if (!originalCanvas) {
-                  reject(new Error("Failed to create canvas from image"));
-                  return;
-                }
+        // Creates Image Element
+        const imgElement = await fileToImageElement(imageFile);
 
-                // Process the image with settings (includes post-processing)
-                const processedCanvas = processImageWithSettings(
-                  originalCanvas,
-                  postProcessingSettings
-                );
+        // Creates Canvas with Image Drawn
+        let canvas: HTMLCanvasElement = createCanvasFromImage(imgElement);
 
-                // Resize to target dimensions
-                const resizedCanvas = resizeCanvasToTarget(
-                  processedCanvas,
-                  width,
-                  height
-                );
-                if (!resizedCanvas) {
-                  reject(new Error("Failed to resize canvas"));
-                  return;
-                }
+        /**
+         * Image Processing Pipeline
+         * 1. Remove Background
+         * 2. Convert Color to MakeCodeColors
+         * 3. Trim or Fill Canvas
+         * 4. Scale Canvas
+         */
 
-                // Get image data and convert to sprite
-                const imageData = resizedCanvas
-                  .getContext("2d", { willReadFrequently: true })
-                  ?.getImageData(0, 0, width, height);
+        // 1. Remove Background
 
-                if (!imageData) {
-                  reject(new Error("Failed to get image data"));
-                  return;
-                }
-
-                const spriteData = convertImage(imageData, width, height);
-                pasteSpriteData(spriteData);
-                resolve();
-              } catch (error) {
-                setError("Error processing image: " + error);
-                reject(error);
-              } finally {
-                stopGeneration();
-              }
-            };
-            img.onerror = () => {
-              reject(new Error("Failed to load image"));
-              stopGeneration();
-            };
-            img.src = e.target?.result as string;
-          };
-          reader.onerror = () => {
-            reject(new Error("Failed to read image file"));
-            stopGeneration();
-          };
-          reader.readAsDataURL(imageFile);
-        } catch (error) {
-          setError("Error reading image file: " + error);
-          reject(error);
-          stopGeneration();
+        if (postProcessingSettings.removeBackground) {
+          canvas = removeBackground(canvas, postProcessingSettings.tolerance);
         }
-      });
+
+        // 2. Convert Color to MakeCodeColor (Required)
+
+        // canvas = getCanvasToMakeCodeColor(canvas);
+
+        // 3. Trim or Fill Canvas
+
+        if (postProcessingSettings.cropEdges) {
+          canvas = cropToContent(canvas, postProcessingSettings.tolerance);
+        }
+
+        // 4. Scale Canvas
+
+        const scaledCanvas = scaleCanvasToTarget(canvas, width, height);
+
+        if (!scaledCanvas) throw new Error("Failed to scale Canvas");
+
+        // Upload Canvas to UI Sprite Editor
+
+        pasteCanvas(scaledCanvas);
+        stopGeneration();
+      } catch (error) {
+        setError("Error reading image file: " + error);
+        stopGeneration();
+      }
     },
     [
       importedImage,
+      setError,
+      startGeneration,
+      stopGeneration,
+      // getCanvasToMakeCodeColor,
       postProcessingSettings,
       width,
       height,
-      convertImage,
-      pasteSpriteData,
-      startGeneration,
-      stopGeneration,
-      setError,
+      pasteCanvas,
     ]
   );
 
@@ -205,7 +184,7 @@ export const useImageFileHandler = () => {
 
       // Store the generated image and convert to sprite with post-processing
       setImportedImage(file);
-      await convertImageToSprite(file);
+      await processImageToSprite(file);
     } catch (error) {
       setError("Error generating AI sprite: " + error);
       throw error;
@@ -219,11 +198,11 @@ export const useImageFileHandler = () => {
     selectedModel,
     pixelLabSettings,
     openAISettings,
-    convertImageToSprite,
     width,
     height,
     palette,
     setError,
+    processImageToSprite,
   ]);
 
   /**
@@ -232,15 +211,15 @@ export const useImageFileHandler = () => {
   const importImageManually = useCallback(
     async (file: File) => {
       setImportedImage(file);
-      await convertImageToSprite(file);
+      await processImageToSprite(file);
     },
-    [setImportedImage, convertImageToSprite]
+    [setImportedImage, processImageToSprite]
   );
 
   return {
     importImageManually,
-    convertImageToSprite,
     generateAIImageAndConvertToSprite,
     importedImage,
+    processImageToSprite,
   };
 };

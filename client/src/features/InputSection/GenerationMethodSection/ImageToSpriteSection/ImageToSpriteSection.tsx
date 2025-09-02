@@ -10,7 +10,7 @@ import { useImageFileHandler } from "../../hooks/useImageFileHandler";
 import { useLoading } from "../../../../context/LoadingContext/useLoading";
 
 const ImageToSpriteSection = () => {
-  const { importedImage, convertImageToSprite } = useImageFileHandler();
+  const { importedImage, processImageToSprite } = useImageFileHandler();
   const { isGenerating } = useLoading();
 
   return (
@@ -20,7 +20,7 @@ const ImageToSpriteSection = () => {
 
       {importedImage ? (
         <Button
-          onClick={() => convertImageToSprite()}
+          onClick={() => processImageToSprite()}
           isLoading={isGenerating}
           variant="primary"
           className="w-full">
@@ -28,7 +28,7 @@ const ImageToSpriteSection = () => {
         </Button>
       ) : (
         <Button
-          onClick={() => convertImageToSprite()}
+          onClick={() => processImageToSprite()}
           isLoading={isGenerating}
           className="w-full">
           Process Image
