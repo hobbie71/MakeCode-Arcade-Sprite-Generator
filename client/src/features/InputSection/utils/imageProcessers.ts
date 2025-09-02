@@ -1,6 +1,6 @@
 export const createCanvasFromImage = (
   img: HTMLImageElement
-): HTMLCanvasElement | null => {
+): HTMLCanvasElement => {
   const canvas = document.createElement("canvas");
   canvas.width = img.width;
   canvas.height = img.height;
@@ -10,7 +10,7 @@ export const createCanvasFromImage = (
     alpha: true,
   });
 
-  if (!ctx) return null;
+  if (!ctx) throw new Error("Failed to get CTX");
 
   ctx.globalCompositeOperation = "source-over";
   ctx.drawImage(img, 0, 0);

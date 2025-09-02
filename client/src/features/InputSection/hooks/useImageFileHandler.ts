@@ -16,7 +16,7 @@ import { usePasteData } from "../../../features/SpriteEditor/hooks/usePasteData"
 // import { useColorToMakeCodeConverter } from "../../../features/InputSection/hooks/useColorToMakeCodeConverter";
 
 // Lib imports
-import { createCanvasFromImage } from "../libs/imageProcesser";
+import { createCanvasFromImage } from "../utils/imageProcessers";
 
 // Utils imports
 import { hasBadWord } from "../../../utils/hasBadWord";

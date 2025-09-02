@@ -4,7 +4,7 @@ import { useRef, useEffect } from "react";
 import { useImageImports } from "../../../context/ImageImportContext/useImageImports";
 
 // Lib imports
-import { createCanvasFromImage } from "../../../features/InputSection/libs/imageProcesser";
+import { createCanvasFromImage } from "../../InputSection/utils/imageProcessers";
 
 const ImportPreview = () => {
   const { importedImage } = useImageImports();
