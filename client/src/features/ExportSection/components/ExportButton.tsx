@@ -7,7 +7,7 @@ interface Props {
 
 const ExportButton = ({ format, onClick }: Props) => {
   return (
-    <button className="btn-primary mr-4" onClick={onClick}>
+    <button className="btn-primary" onClick={onClick}>
       Download as {format.toUpperCase()}
     </button>
   );

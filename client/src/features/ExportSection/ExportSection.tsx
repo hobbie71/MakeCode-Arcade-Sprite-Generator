@@ -27,7 +27,7 @@ const ExportSection = () => {
 
       <h3 className="heading-3">Export Sprite Code</h3>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="export-grid">
         <div className="export-card">
           <h5 className="heading-5">Sprite Editor Code</h5>
           <CodeDisplay>{getImgCode()}</CodeDisplay>
