@@ -282,7 +282,7 @@ export const removeBackground = (
 
 /**
  * Crops canvas to visible content bounds (non-transparent pixels only)
- * Crops until content touches at least 2 opposite edges
+ * Tight crop: for each side (top, right, bottom, left), move inward until a colored (non-transparent) pixel is found.
  */
 export const cropToVisibleContent = (
   sourceCanvas: HTMLCanvasElement
@@ -328,34 +328,11 @@ export const cropToVisibleContent = (
     return newCanvas;
   }
 
-  // Calculate padding on each side
-  const leftPadding = minX;
-  const rightPadding = width - maxX - 1;
-  const topPadding = minY;
-  const bottomPadding = height - maxY - 1;
-
-  // Build two candidate crops:
-  // 1) Horizontal touch: remove all left+right padding so content touches both left and right
-  const horizSrcX = leftPadding;
-  const horizSrcY = 0;
-  const horizSrcW = Math.max(1, width - leftPadding - rightPadding); // = content width
-  const horizSrcH = height; // keep full height
-  const horizArea = horizSrcW * horizSrcH;
-
-  // 2) Vertical touch: remove all top+bottom padding so content touches both top and bottom
-  const vertSrcX = 0;
-  const vertSrcY = topPadding;
-  const vertSrcW = width; // keep full width
-  const vertSrcH = Math.max(1, height - topPadding - bottomPadding); // = content height
-  const vertArea = vertSrcW * vertSrcH;
-
-  // Choose the option that preserves the larger area (minimal cropping)
-  const useHorizontal = horizArea >= vertArea;
-
-  const srcX = useHorizontal ? horizSrcX : vertSrcX;
-  const srcY = useHorizontal ? horizSrcY : vertSrcY;
-  const srcW = useHorizontal ? horizSrcW : vertSrcW;
-  const srcH = useHorizontal ? horizSrcH : vertSrcH;
+  // Tight bounding box crop on all sides
+  const srcX = minX;
+  const srcY = minY;
+  const srcW = Math.max(1, maxX - minX + 1);
+  const srcH = Math.max(1, maxY - minY + 1);
 
   // Create new canvas with cropped dimensions
   const croppedCanvas = document.createElement("canvas");
@@ -556,4 +533,59 @@ const isColorSimilar = (
     bDiff <= tolerance &&
     aDiff <= tolerance
   );
+};
+
+export const scaleCanvasToTarget = (
+  sourceCanvas: HTMLCanvasElement,
+  targetWidth: number,
+  targetHeight: number
+): HTMLCanvasElement => {
+  // Calculate dimensions to maintain aspect ratio
+  const sourceAspectRatio = sourceCanvas.width / sourceCanvas.height;
+  const targetAspectRatio = targetWidth / targetHeight;
+
+  let drawWidth: number, drawHeight: number;
+
+  if (sourceAspectRatio > targetAspectRatio) {
+    // Source is wider, fit to width
+    drawWidth = targetWidth;
+    drawHeight = Math.round(targetWidth / sourceAspectRatio);
+  } else {
+    // Source is taller, fit to height
+    drawHeight = targetHeight;
+    drawWidth = Math.round(targetHeight * sourceAspectRatio);
+  }
+
+  // Create target canvas
+  const targetCanvas = document.createElement("canvas");
+  targetCanvas.width = targetWidth;
+  targetCanvas.height = targetHeight;
+
+  const ctx = targetCanvas.getContext("2d", {
+    willReadFrequently: true,
+    alpha: true,
+  });
+
+  if (!ctx) throw new Error("Failed to get CTX");
+
+  // Configure for pixel art (no smoothing)
+  ctx.imageSmoothingEnabled = false;
+
+  // Center the image within the target canvas
+  const offsetX = Math.floor((targetWidth - drawWidth) / 2);
+  const offsetY = Math.floor((targetHeight - drawHeight) / 2);
+
+  ctx.drawImage(
+    sourceCanvas,
+    0,
+    0,
+    sourceCanvas.width,
+    sourceCanvas.height,
+    offsetX,
+    offsetY,
+    drawWidth,
+    drawHeight
+  );
+
+  return targetCanvas;
 };

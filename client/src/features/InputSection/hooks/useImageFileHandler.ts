@@ -20,14 +20,12 @@ import { createCanvasFromImage } from "../utils/imageProcessers";
 
 // Utils imports
 import { hasBadWord } from "../../../utils/hasBadWord";
-import {
-  fileToImageElement,
-  scaleCanvasToTarget,
-} from "../utils/imageProcessers";
+import { fileToImageElement } from "../utils/imageProcessers";
 import {
   removeBackground,
   cropToVisibleContent,
   fillToEdges,
+  scaleCanvasToTarget,
 } from "../utils/canvasProcessing";
 
 // API imports
