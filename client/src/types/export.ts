@@ -74,9 +74,21 @@ export type ImageExportSettings = {
 
 export type PostProcessingSettings = {
   removeBackground: boolean;
-  cropEdges: boolean;
+  crop: Crop;
   tolerance: number;
 };
+
+export enum Crop {
+  None = "",
+  Edges = "edges",
+  Fill = "fill",
+}
+
+export const ALL_CROP_OPTIONS = [
+  { name: "None", option: Crop.None },
+  { name: "Edges", option: Crop.Edges },
+  { name: "Fill", option: Crop.Fill },
+];
 
 export const DEFAULT_TEXT_TO_SPRITE_SETTINGS: ImageExportSettings = {
   removeBackground: false,

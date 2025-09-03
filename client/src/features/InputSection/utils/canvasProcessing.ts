@@ -1,4 +1,8 @@
 import { type RGBA } from "../../../utils/colors/colorConversion";
+import {
+  getImageDataFromCanvas,
+  getPixel,
+} from "../../../utils/getDataFromCanvas";
 
 interface BackgroundDetectionResult {
   backgroundColor: string;
@@ -8,19 +12,6 @@ interface BackgroundDetectionResult {
     width: number;
     height: number;
   };
-}
-
-/**
- * Get a single pixel from image data
- */
-function getPixel(
-  data: Uint8ClampedArray,
-  width: number,
-  x: number,
-  y: number
-): RGBA {
-  const i = (y * width + x) * 4;
-  return { r: data[i], g: data[i + 1], b: data[i + 2], a: data[i + 3] };
 }
 
 /**
@@ -61,7 +52,7 @@ export const detectBackgroundAndBounds = (
   }
 
   const { width, height } = canvas;
-  const imageData = ctx.getImageData(0, 0, width, height);
+  const imageData = getImageDataFromCanvas(canvas);
   const data = imageData.data;
 
   // Sample border pixels to determine background color (more data than just corners)
@@ -181,12 +172,7 @@ export const removeBackground = (
     throw new Error("Could not get source canvas context");
   }
 
-  const sourceImageData = sourceCtx.getImageData(
-    0,
-    0,
-    sourceCanvas.width,
-    sourceCanvas.height
-  );
+  const sourceImageData = getImageDataFromCanvas(sourceCanvas);
   const sourceData = sourceImageData.data;
 
   // Create new image data for the processed canvas
@@ -296,7 +282,7 @@ export const removeBackground = (
 
 /**
  * Crops canvas to visible content bounds (non-transparent pixels only)
- * This function only looks at alpha values and doesn't make assumptions about background color
+ * Crops until content touches at least 2 opposite edges
  */
 export const cropToVisibleContent = (
   sourceCanvas: HTMLCanvasElement
@@ -307,7 +293,7 @@ export const cropToVisibleContent = (
   }
 
   const { width, height } = sourceCanvas;
-  const imageData = ctx.getImageData(0, 0, width, height);
+  const imageData = getImageDataFromCanvas(sourceCanvas);
   const data = imageData.data;
 
   // Find bounding box of non-transparent pixels
@@ -342,10 +328,39 @@ export const cropToVisibleContent = (
     return newCanvas;
   }
 
+  // Calculate padding on each side
+  const leftPadding = minX;
+  const rightPadding = width - maxX - 1;
+  const topPadding = minY;
+  const bottomPadding = height - maxY - 1;
+
+  // Build two candidate crops:
+  // 1) Horizontal touch: remove all left+right padding so content touches both left and right
+  const horizSrcX = leftPadding;
+  const horizSrcY = 0;
+  const horizSrcW = Math.max(1, width - leftPadding - rightPadding); // = content width
+  const horizSrcH = height; // keep full height
+  const horizArea = horizSrcW * horizSrcH;
+
+  // 2) Vertical touch: remove all top+bottom padding so content touches both top and bottom
+  const vertSrcX = 0;
+  const vertSrcY = topPadding;
+  const vertSrcW = width; // keep full width
+  const vertSrcH = Math.max(1, height - topPadding - bottomPadding); // = content height
+  const vertArea = vertSrcW * vertSrcH;
+
+  // Choose the option that preserves the larger area (minimal cropping)
+  const useHorizontal = horizArea >= vertArea;
+
+  const srcX = useHorizontal ? horizSrcX : vertSrcX;
+  const srcY = useHorizontal ? horizSrcY : vertSrcY;
+  const srcW = useHorizontal ? horizSrcW : vertSrcW;
+  const srcH = useHorizontal ? horizSrcH : vertSrcH;
+
   // Create new canvas with cropped dimensions
   const croppedCanvas = document.createElement("canvas");
-  croppedCanvas.width = maxX - minX + 1;
-  croppedCanvas.height = maxY - minY + 1;
+  croppedCanvas.width = srcW;
+  croppedCanvas.height = srcH;
   const croppedCtx = croppedCanvas.getContext("2d", {
     willReadFrequently: true,
     alpha: true,
@@ -358,17 +373,139 @@ export const cropToVisibleContent = (
   // Copy the cropped region from source to new canvas
   croppedCtx.drawImage(
     sourceCanvas,
-    minX,
-    minY,
-    croppedCanvas.width,
-    croppedCanvas.height,
-    0,
-    0,
-    croppedCanvas.width,
-    croppedCanvas.height
+    srcX, // source x
+    srcY, // source y
+    srcW, // source width
+    srcH, // source height
+    0, // dest x
+    0, // dest y
+    srcW, // dest width
+    srcH // dest height
   );
 
   return croppedCanvas;
+};
+
+/**
+ * Crops canvas until content touches all 4 edges, maintaining target aspect ratio
+ * Removes parts that don't fit to make content fill the entire canvas
+ */
+export const fillToEdges = (
+  sourceCanvas: HTMLCanvasElement,
+  targetWidth: number,
+  targetHeight: number
+): HTMLCanvasElement => {
+  const { width: sourceWidth, height: sourceHeight } = sourceCanvas;
+
+  // Validate input dimensions
+  if (sourceWidth <= 0 || sourceHeight <= 0) {
+    throw new Error("Source canvas must have positive dimensions");
+  }
+
+  if (targetWidth <= 0 || targetHeight <= 0) {
+    throw new Error("Target dimensions must be positive");
+  }
+
+  // Find the actual content bounds first
+  const imageData = getImageDataFromCanvas(sourceCanvas);
+  const data = imageData.data;
+
+  let minX = sourceWidth;
+  let minY = sourceHeight;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < sourceHeight; y++) {
+    for (let x = 0; x < sourceWidth; x++) {
+      const pixel = getPixel(data, sourceWidth, x, y);
+      if (pixel.a > 0) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  // If no content found, return canvas with target aspect ratio
+  if (maxX === -1) {
+    const filledCanvas = document.createElement("canvas");
+    filledCanvas.width = targetWidth;
+    filledCanvas.height = targetHeight;
+    return filledCanvas;
+  }
+
+  // Calculate content dimensions and center
+  const contentWidth = maxX - minX + 1;
+  const contentHeight = maxY - minY + 1;
+  const contentCenterX = minX + contentWidth / 2;
+  const contentCenterY = minY + contentHeight / 2;
+
+  // Calculate target aspect ratio
+  const targetAspect = targetWidth / targetHeight;
+
+  // Calculate crop dimensions that will touch all 4 edges while maintaining target aspect ratio
+  let cropWidth, cropHeight;
+
+  if (contentWidth / contentHeight > targetAspect) {
+    // Content is wider than target aspect, height determines crop size
+    cropHeight = contentHeight;
+    cropWidth = cropHeight * targetAspect;
+  } else {
+    // Content is taller than target aspect, width determines crop size
+    cropWidth = contentWidth;
+    cropHeight = cropWidth / targetAspect;
+  }
+
+  // Center the crop around content center
+  const cropX = Math.max(
+    0,
+    Math.min(sourceWidth - cropWidth, contentCenterX - cropWidth / 2)
+  );
+  const cropY = Math.max(
+    0,
+    Math.min(sourceHeight - cropHeight, contentCenterY - cropHeight / 2)
+  );
+
+  // Ensure crop dimensions are valid integers
+  const finalCropWidth = Math.max(
+    1,
+    Math.min(Math.floor(cropWidth), sourceWidth - Math.floor(cropX))
+  );
+  const finalCropHeight = Math.max(
+    1,
+    Math.min(Math.floor(cropHeight), sourceHeight - Math.floor(cropY))
+  );
+  const finalCropX = Math.floor(cropX);
+  const finalCropY = Math.floor(cropY);
+
+  // Create new canvas with target dimensions
+  const filledCanvas = document.createElement("canvas");
+  filledCanvas.width = targetWidth;
+  filledCanvas.height = targetHeight;
+  const filledCtx = filledCanvas.getContext("2d", {
+    willReadFrequently: true,
+    alpha: true,
+  });
+
+  if (!filledCtx) {
+    throw new Error("Could not get filled canvas context");
+  }
+
+  // Draw the cropped content to fill the entire target canvas
+  filledCtx.drawImage(
+    sourceCanvas,
+    finalCropX, // source x (crop start)
+    finalCropY, // source y (crop start)
+    finalCropWidth, // source width (cropped)
+    finalCropHeight, // source height (cropped)
+    0, // dest x
+    0, // dest y
+    targetWidth, // dest width (fill target)
+    targetHeight // dest height (fill target)
+  );
+
+  return filledCanvas;
 };
 
 /**

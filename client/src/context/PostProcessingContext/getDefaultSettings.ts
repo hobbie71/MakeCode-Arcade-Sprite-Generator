@@ -1,4 +1,4 @@
-import { AssetType } from "../../types/export";
+import { AssetType, Crop } from "../../types/export";
 import type { PostProcessingSettings } from "../../types/export";
 
 // Default PostProcessing settings based on asset type
@@ -6,7 +6,7 @@ export const getDefaultPostProcessingSettings = (
   assetType: AssetType
 ): PostProcessingSettings => {
   let settings: PostProcessingSettings = {
-    cropEdges: true,
+    crop: Crop.Edges,
     removeBackground: true,
     tolerance: 30,
   };
@@ -14,7 +14,7 @@ export const getDefaultPostProcessingSettings = (
   if (assetType === AssetType.Background) {
     settings = {
       ...settings,
-      cropEdges: false,
+      crop: Crop.Fill,
       removeBackground: false,
     };
   }

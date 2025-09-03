@@ -1,5 +1,18 @@
 import { rgbaToHsla, type HSLA, type RGBA } from "./colors/colorConversion";
 
+/**
+ * Get a single pixel from image data
+ */
+export const getPixel = (
+  data: Uint8ClampedArray,
+  width: number,
+  x: number,
+  y: number
+): RGBA => {
+  const i = (y * width + x) * 4;
+  return { r: data[i], g: data[i + 1], b: data[i + 2], a: data[i + 3] };
+};
+
 export const getImageDataFromCanvas = (
   canvas: HTMLCanvasElement
 ): ImageData => {

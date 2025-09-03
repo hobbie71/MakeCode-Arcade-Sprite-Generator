@@ -1,6 +1,6 @@
 import React, { createContext, useReducer, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
-import { AssetType } from "../../types/export";
+import { AssetType, Crop } from "../../types/export";
 import type { PostProcessingSettings } from "../../types/export";
 import { getDefaultPostProcessingSettings } from "./getDefaultSettings";
 
@@ -55,7 +55,7 @@ export const PostProcessingProvider: React.FC<PostProcessingProviderProps> = ({
 }) => {
   const [settings, dispatch] = useReducer(postProcessingReducer, {
     removeBackground: true,
-    cropEdges: true,
+    crop: Crop.Edges,
     tolerance: 30,
   });
 

@@ -1,7 +1,7 @@
 // Component imports
 import ImageUploadForm from "./components/ImageUploadForm";
 import Button from "../../../../components/Button";
-import PostProcessingSection from "../TextToSpriteSection/components/PostProcessingSection";
+import PostProcessingSection from "../../components/PostProcessingSection";
 
 // Hook imports
 import { useImageFileHandler } from "../../hooks/useImageFileHandler";
@@ -16,6 +16,9 @@ const ImageToSpriteSection = () => {
   return (
     <div className="">
       <PostProcessingSection />
+
+      <h4 className="heading-4">Upload Image</h4>
+
       <ImageUploadForm />
 
       {importedImage ? (

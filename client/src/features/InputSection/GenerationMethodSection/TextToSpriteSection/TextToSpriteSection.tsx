@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import DefaultDropDown from "../../../../components/DefaultDropDown";
 import PixelLabSettingsSection from "./components/PixelLabSettingsSection";
 import OpenAISettingsSection from "./components/OpenAISettingsSection";
-import PostProcessingSection from "./components/PostProcessingSection";
+import PostProcessingSection from "../../components/PostProcessingSection";
 import Button from "../../../../components/Button";
 
 // Hooks imports

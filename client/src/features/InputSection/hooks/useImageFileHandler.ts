@@ -27,6 +27,7 @@ import {
 import {
   removeBackground,
   cropToVisibleContent,
+  fillToEdges,
 } from "../utils/canvasProcessing";
 
 // API imports
@@ -36,7 +37,7 @@ import {
 } from "../../../api/generateImageApi";
 
 // Type imports
-import { AiModel } from "../../../types/export";
+import { AiModel, Crop } from "../../../types/export";
 
 export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();
@@ -93,8 +94,23 @@ export const useImageFileHandler = () => {
 
         // 3. Trim or Fill Canvas
 
-        if (postProcessingSettings.cropEdges) {
+        if (postProcessingSettings.crop === Crop.Edges) {
           canvas = cropToVisibleContent(canvas);
+        } else if (postProcessingSettings.crop === Crop.Fill) {
+          canvas = fillToEdges(canvas, width, height);
+        }
+
+        if (canvas) {
+          const clonedCanvas = canvas.cloneNode(true) as HTMLCanvasElement;
+          // Copy the canvas content onto the clonedCanvas
+          const ctx = clonedCanvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(canvas, 0, 0);
+          }
+          clonedCanvas.style.position = "fixed";
+          clonedCanvas.style.top = "0";
+          clonedCanvas.style.left = "0";
+          document.body.appendChild(clonedCanvas);
         }
 
         // 4. Scale Canvas
