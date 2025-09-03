@@ -24,7 +24,10 @@ import {
   fileToImageElement,
   scaleCanvasToTarget,
 } from "../utils/imageProcessers";
-import { removeBackground, cropToContent } from "../utils/backgroundDetection";
+import {
+  removeBackground,
+  cropToVisibleContent,
+} from "../utils/canvasProcessing";
 
 // API imports
 import {
@@ -91,7 +94,7 @@ export const useImageFileHandler = () => {
         // 3. Trim or Fill Canvas
 
         if (postProcessingSettings.cropEdges) {
-          canvas = cropToContent(canvas, postProcessingSettings.tolerance);
+          canvas = cropToVisibleContent(canvas);
         }
 
         // 4. Scale Canvas
