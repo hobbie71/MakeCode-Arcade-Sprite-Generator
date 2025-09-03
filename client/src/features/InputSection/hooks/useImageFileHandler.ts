@@ -100,19 +100,6 @@ export const useImageFileHandler = () => {
           canvas = fillToEdges(canvas, width, height);
         }
 
-        if (canvas) {
-          const clonedCanvas = canvas.cloneNode(true) as HTMLCanvasElement;
-          // Copy the canvas content onto the clonedCanvas
-          const ctx = clonedCanvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(canvas, 0, 0);
-          }
-          clonedCanvas.style.position = "fixed";
-          clonedCanvas.style.top = "0";
-          clonedCanvas.style.left = "0";
-          document.body.appendChild(clonedCanvas);
-        }
-
         // 4. Scale Canvas
 
         canvas = scaleCanvasToTarget(canvas, width, height);
