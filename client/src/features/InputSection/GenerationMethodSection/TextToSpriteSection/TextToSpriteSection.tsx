@@ -34,6 +34,10 @@ const TextToSpriteSection = () => {
 
   return (
     <div className="">
+      <PostProcessingSection />
+
+      <h4 className="heading-4">Ai Settings</h4>
+
       {/* AI Model Selection */}
       <DefaultDropDown
         onChange={(index: number) =>
@@ -46,8 +50,6 @@ const TextToSpriteSection = () => {
         disabled={isGenerating}>
         AI Model
       </DefaultDropDown>
-
-      <PostProcessingSection />
 
       {/* Render appropriate settings based on selected model */}
       {selectedModel === AiModel.PixelLab && <PixelLabSettingsSection />}
