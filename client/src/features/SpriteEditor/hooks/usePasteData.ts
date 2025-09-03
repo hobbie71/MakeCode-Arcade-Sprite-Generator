@@ -9,22 +9,20 @@ import { useSprite } from "../../../context/SpriteContext/useSprite";
 // Lib imports
 import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
-import { useColorToMakeCodeConverter } from "../../InputSection/hooks/useColorToMakeCodeConverter";
+import { useMakeCodeColorConverter } from "../../InputSection/hooks/useMakeCodeColorConverter";
 
 // Type imports
 import { MakeCodeColor } from "../../../types/color";
-// Util imports
-import { getImageDataFromCanvas } from "../../../utils/getDataFromCanvas";
 
 export const usePasteData = () => {
   const { canvasRef } = useCanvas();
   const { width, height } = useCanvasSize();
   const { palette } = usePaletteSelected();
   const { setSpriteData } = useSprite();
-  const { convertImageToSpriteData } = useColorToMakeCodeConverter();
+  const { getSpriteDataFromCanvas } = useMakeCodeColorConverter();
 
   const pasteSpriteData = useCallback(
-    (pastedData: MakeCodeColor[][]) => {
+    (spriteData: MakeCodeColor[][]) => {
       if (!canvasRef.current) return;
 
       for (let y = 0; y < height; y++) {
@@ -32,28 +30,23 @@ export const usePasteData = () => {
           drawPixelOnCanvas(
             canvasRef.current,
             { x, y },
-            pastedData[y][x],
+            spriteData[y][x],
             palette
           );
         }
       }
 
-      setSpriteData(pastedData);
+      setSpriteData(spriteData);
     },
     [canvasRef, height, width, setSpriteData, palette]
   );
 
   const pasteCanvas = useCallback(
     (canvas: HTMLCanvasElement) => {
-      const imageData = getImageDataFromCanvas(canvas);
-      const spriteData = convertImageToSpriteData(
-        imageData,
-        canvas.width,
-        canvas.height
-      );
+      const spriteData = getSpriteDataFromCanvas(canvas);
       pasteSpriteData(spriteData);
     },
-    [convertImageToSpriteData, pasteSpriteData]
+    [getSpriteDataFromCanvas, pasteSpriteData]
   );
 
   return { pasteSpriteData, pasteCanvas };

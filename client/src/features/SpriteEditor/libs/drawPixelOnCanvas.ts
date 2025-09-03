@@ -6,13 +6,13 @@ import { getHexFromMakeCodeColor } from "../../../utils/colors/getColorFromMakeC
 
 import { PIXEL_SIZE } from "../constants/pixelSize";
 
-export function drawPixelOnCanvas(
+export const drawPixelOnCanvas = (
   canvas: HTMLCanvasElement,
   position: Coordinates,
   color: MakeCodeColor,
   palette: MakeCodePalette,
   pixelSize: number = PIXEL_SIZE
-): void {
+) => {
   if (color === MakeCodeColor.TRANSPARENT) {
     drawCheckerboard(canvas, position, pixelSize);
     return;
@@ -30,15 +30,15 @@ export function drawPixelOnCanvas(
     pixelSize,
     pixelSize
   );
-}
+};
 
-export function drawPixelOnCanvasTransparent(
+export const drawPixelOnCanvasTransparent = (
   canvas: HTMLCanvasElement,
   position: Coordinates,
   color: MakeCodeColor,
   palette?: MakeCodePalette,
   pixelSize: number = PIXEL_SIZE
-): void {
+): void => {
   if (color === MakeCodeColor.TRANSPARENT) return;
 
   const ctx = canvas.getContext("2d");
@@ -53,15 +53,15 @@ export function drawPixelOnCanvasTransparent(
     pixelSize,
     pixelSize
   );
-}
+};
 
-export function drawSpriteDataOnCanvas(
+export const drawSpriteDataOnCanvas = (
   canvas: HTMLCanvasElement,
   startPosition: Coordinates,
   spriteData: MakeCodeColor[][],
   palette: MakeCodePalette,
   pixelSize: number = PIXEL_SIZE
-) {
+) => {
   for (let y = 0; y < spriteData.length; y++) {
     for (let x = 0; x < spriteData[y].length; x++) {
       drawPixelOnCanvas(
@@ -73,15 +73,35 @@ export function drawSpriteDataOnCanvas(
       );
     }
   }
-}
+};
 
-function drawCheckerboard(
+export const drawSpriteDataOnCanvasTransparent = (
+  canvas: HTMLCanvasElement,
+  startPosition: Coordinates,
+  spriteData: MakeCodeColor[][],
+  palette: MakeCodePalette,
+  pixelSize: number = PIXEL_SIZE
+) => {
+  for (let y = 0; y < spriteData.length; y++) {
+    for (let x = 0; x < spriteData[y].length; x++) {
+      drawPixelOnCanvasTransparent(
+        canvas,
+        { x: startPosition.x + x, y: startPosition.y + y },
+        spriteData[y][x],
+        palette,
+        pixelSize
+      );
+    }
+  }
+};
+
+const drawCheckerboard = (
   canvas: HTMLCanvasElement,
   position: Coordinates,
   pixelSize: number,
   colorA = "#aeaeae",
   colorB = "#dedede"
-) {
+) => {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -102,4 +122,4 @@ function drawCheckerboard(
       );
     }
   }
-}
+};

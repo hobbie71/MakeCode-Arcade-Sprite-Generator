@@ -13,7 +13,7 @@ import { useError } from "../../../context/ErrorContext/useError";
 
 // Hook imports
 import { usePasteData } from "../../../features/SpriteEditor/hooks/usePasteData";
-// import { useColorToMakeCodeConverter } from "../../../features/InputSection/hooks/useColorToMakeCodeConverter";
+import { useMakeCodeColorConverter } from "./useMakeCodeColorConverter";
 
 // Lib imports
 import { createCanvasFromImage } from "../utils/imageProcessers";
@@ -40,7 +40,7 @@ export const useImageFileHandler = () => {
   const { setImportedImage, importedImage } = useImageImports();
   const { startGeneration, stopGeneration } = useLoading();
   const { pasteCanvas } = usePasteData();
-  // const { getCanvasToMakeCodeColor } = useColorToMakeCodeConverter();
+  const { mapCanvasToMakeCodeColors } = useMakeCodeColorConverter();
   const { selectedModel } = useAiModel();
   const { settings: pixelLabSettings } = usePixelLabSettings();
   const { settings: openAISettings } = useOpenAISettings();
@@ -67,7 +67,8 @@ export const useImageFileHandler = () => {
         const imgElement = await fileToImageElement(imageFile);
 
         // Creates Canvas with Image Drawn
-        let canvas: HTMLCanvasElement = createCanvasFromImage(imgElement);
+        let canvas: HTMLCanvasElement | null =
+          createCanvasFromImage(imgElement);
 
         /**
          * Image Processing Pipeline
@@ -85,7 +86,7 @@ export const useImageFileHandler = () => {
 
         // 2. Convert Color to MakeCodeColor (Required)
 
-        // canvas = getCanvasToMakeCodeColor(canvas);
+        canvas = mapCanvasToMakeCodeColors(canvas, 1);
 
         // 3. Trim or Fill Canvas
 
@@ -95,16 +96,14 @@ export const useImageFileHandler = () => {
 
         // 4. Scale Canvas
 
-        const scaledCanvas = scaleCanvasToTarget(canvas, width, height);
-
-        if (!scaledCanvas) throw new Error("Failed to scale Canvas");
+        canvas = scaleCanvasToTarget(canvas, width, height);
 
         // Upload Canvas to UI Sprite Editor
 
-        pasteCanvas(scaledCanvas);
+        pasteCanvas(canvas);
         stopGeneration();
       } catch (error) {
-        setError("Error reading image file: " + error);
+        setError(String(error));
         stopGeneration();
       }
     },
@@ -113,7 +112,7 @@ export const useImageFileHandler = () => {
       setError,
       startGeneration,
       stopGeneration,
-      // getCanvasToMakeCodeColor,
+      mapCanvasToMakeCodeColors,
       postProcessingSettings,
       width,
       height,

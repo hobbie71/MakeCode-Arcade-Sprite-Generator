@@ -44,7 +44,7 @@ export const hexToMakeCodeColor = (
 };
 
 /**
- * Convert RGBA values to MakeCode color
+ * Convert RGBA values to MakeCode color (0-255 alpha range)
  */
 export const rgbaToMakeCodeColor = (
   r: number,
@@ -52,9 +52,9 @@ export const rgbaToMakeCodeColor = (
   b: number,
   a: number,
   hueZones: HueZone[],
-  alphaThreshold: number = 0.5
+  alphaThreshold: number = 127
 ): MakeCodeColor => {
-  // Handle transparency
+  // Handle transparency with 0-255 alpha range
   if (a < alphaThreshold) {
     return MakeCodeColor.TRANSPARENT;
   }

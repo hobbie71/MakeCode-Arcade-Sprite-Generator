@@ -36,7 +36,7 @@ export const scaleCanvasToTarget = (
   sourceCanvas: HTMLCanvasElement,
   targetWidth: number,
   targetHeight: number
-): HTMLCanvasElement | null => {
+): HTMLCanvasElement => {
   // Calculate dimensions to maintain aspect ratio
   const sourceAspectRatio = sourceCanvas.width / sourceCanvas.height;
   const targetAspectRatio = targetWidth / targetHeight;
@@ -63,7 +63,7 @@ export const scaleCanvasToTarget = (
     alpha: true,
   });
 
-  if (!ctx) return null;
+  if (!ctx) throw new Error("Failed to get CTX");
 
   // Configure for pixel art (no smoothing)
   ctx.imageSmoothingEnabled = false;
