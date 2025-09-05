@@ -142,15 +142,12 @@ export const useImageFileHandler = () => {
       if (selectedModel === AiModel.PixelLab) {
         const prompt = pixelLabSettings.prompt;
 
-        const isValid = await validatePrompt(
-          prompt,
-          setError,
-          setGenerationMessage
-        );
+        const isValid = await validatePrompt(prompt, setError);
 
         if (!isValid) return;
 
         setGenerationMessage("Generating AI Image");
+
         response = await generatePixelLabImage(
           pixelLabSettings,
           { width, height },
@@ -159,13 +156,11 @@ export const useImageFileHandler = () => {
       } else if (selectedModel === AiModel.GPTImage1) {
         const prompt = openAISettings.prompt;
 
-        const isValid = await validatePrompt(
-          prompt,
-          setError,
-          setGenerationMessage
-        );
+        const isValid = await validatePrompt(prompt, setError);
 
         if (!isValid) return;
+
+        setGenerationMessage("Generating AI Image");
 
         response = await generateOpenAiImage(
           openAISettings,

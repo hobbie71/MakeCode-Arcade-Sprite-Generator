@@ -32,8 +32,7 @@ export const getModerationError = (moderation: ModerationResponse): string => {
 
 export const validatePrompt = async (
   prompt: string,
-  setError: (msg: string) => void,
-  setGenerationMessage: (msg: string) => void
+  setError: (msg: string) => void
 ): Promise<boolean> => {
   if (!prompt) {
     setError("No Prompt Detected. Added a Prompt");
@@ -45,7 +44,6 @@ export const validatePrompt = async (
     return false;
   }
 
-  setGenerationMessage("Analyzing Prompt");
   const moderation = await moderatePrompt(prompt);
   if (!moderation.is_appropriate) {
     setError(getModerationError(moderation));
