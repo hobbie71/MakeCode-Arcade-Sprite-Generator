@@ -19,7 +19,7 @@ import { useMakeCodeColorConverter } from "./useMakeCodeColorConverter";
 import { createCanvasFromImage } from "../utils/imageProcessers";
 
 // Utils imports
-import { hasBadWord } from "../../../utils/hasBadWord";
+import { isTextInappropriate, filterBadWords } from "../../../utils/wordFilter";
 import { fileToImageElement } from "../utils/imageProcessers";
 import {
   removeBackground,
@@ -139,8 +139,10 @@ export const useImageFileHandler = () => {
           return;
         }
 
-        if (hasBadWord(pixelLabSettings.prompt)) {
-          setError("Bad Word Detected");
+        if (isTextInappropriate(pixelLabSettings.prompt)) {
+          setError(
+            `Prompt contains inappropriate text: ${filterBadWords(pixelLabSettings.prompt)}`
+          );
           return;
         }
 
@@ -155,8 +157,10 @@ export const useImageFileHandler = () => {
           return;
         }
 
-        if (hasBadWord(openAISettings.prompt)) {
-          setError("Bad Word Detected");
+        if (isTextInappropriate(openAISettings.prompt)) {
+          setError(
+            `Prompt contains inappropriate text: ${filterBadWords(openAISettings.prompt)}`
+          );
           return;
         }
 
