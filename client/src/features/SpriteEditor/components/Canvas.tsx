@@ -1,4 +1,4 @@
-import { useEffect, memo, useState } from "react";
+import { useEffect, memo, useState, useRef } from "react";
 
 // Context import
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
@@ -29,12 +29,19 @@ interface Props {
 }
 
 const Canvas = memo(({ pixelSize = 20 }: Props) => {
+  // Context
   const { canvasRef } = useCanvas();
   const { tool } = useToolSelected();
   const { zoom } = useZoom();
   const { width, height } = useCanvasSize();
 
+  // States
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+  // Refs
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Hooks
   const { initCanvas } = useSpriteEditorCanvas(width, height);
   const { pasteSpriteData } = usePasteData();
 
@@ -67,11 +74,26 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
     }
   };
 
-  useEffect(() => initCanvas(), [initCanvas]);
+  // Init Canvas and center canvas in screen
+  useEffect(() => {
+    // Init Canvas
+    initCanvas();
+
+    // Center Canvas
+    const container = containerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    setOffset({ x: centerX, y: centerY });
+  }, [initCanvas]);
 
   return (
     <div
       className="canvas-container"
+      ref={containerRef}
       style={{
         cursor: tool === "pan" ? "grab" : "crosshair",
       }}
@@ -93,8 +115,9 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         style={{
-          transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
-          transformOrigin: "top left",
+          transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
+          position: "absolute",
+          transformOrigin: "50% 50%",
           outline: "none",
         }}
       />
