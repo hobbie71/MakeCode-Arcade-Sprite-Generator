@@ -19,7 +19,6 @@ import { useMakeCodeColorConverter } from "./useMakeCodeColorConverter";
 import { createCanvasFromImage } from "../utils/imageProcessers";
 
 // Utils imports
-import { isTextInappropriate, filterBadWords } from "../../../utils/wordFilter";
 import { fileToImageElement } from "../utils/imageProcessers";
 import {
   removeBackground,
@@ -27,6 +26,7 @@ import {
   fillToEdges,
   scaleCanvasToTarget,
 } from "../utils/canvasProcessing";
+import { validatePrompt } from "../utils/promptModeration";
 
 // API imports
 import {
@@ -40,7 +40,8 @@ import { AiModel, Crop } from "../../../types/export";
 export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();
   const { setImportedImage, importedImage } = useImageImports();
-  const { startGeneration, stopGeneration } = useLoading();
+  const { startGeneration, stopGeneration, setGenerationMessage } =
+    useLoading();
   const { pasteCanvas } = usePasteData();
   const { mapCanvasToMakeCodeColors } = useMakeCodeColorConverter();
   const { selectedModel } = useAiModel();
@@ -56,6 +57,8 @@ export const useImageFileHandler = () => {
 
   const processImageToSprite = useCallback(
     async (file?: File) => {
+      setError(null);
+
       const imageFile = file ?? importedImage;
       if (!imageFile) {
         setError("No Image File Available for Sprite Generation");
@@ -63,7 +66,7 @@ export const useImageFileHandler = () => {
       }
 
       try {
-        startGeneration("Processing image to sprite...");
+        startGeneration("Processing Image to Sprite");
 
         // Creates Image Element
         const imgElement = await fileToImageElement(imageFile);
@@ -128,41 +131,41 @@ export const useImageFileHandler = () => {
    * Generates an image using AI and converts it to sprite with post-processing
    */
   const generateAIImageAndConvertToSprite = useCallback(async () => {
-    try {
-      startGeneration("Generating AI sprite from prompt...");
+    setError(null);
 
-      // Generate image using selected AI model
+    // Validate Prompt then Generate AI Image
+
+    try {
+      startGeneration("Validating Prompt");
+
       let response;
       if (selectedModel === AiModel.PixelLab) {
-        if (pixelLabSettings.prompt === "") {
-          setError("No Prompt Detected. Added a Prompt");
-          return;
-        }
+        const prompt = pixelLabSettings.prompt;
 
-        if (isTextInappropriate(pixelLabSettings.prompt)) {
-          setError(
-            `Prompt contains inappropriate text: ${filterBadWords(pixelLabSettings.prompt)}`
-          );
-          return;
-        }
+        const isValid = await validatePrompt(
+          prompt,
+          setError,
+          setGenerationMessage
+        );
 
+        if (!isValid) return;
+
+        setGenerationMessage("Generating AI Image");
         response = await generatePixelLabImage(
           pixelLabSettings,
           { width, height },
           palette
         );
       } else if (selectedModel === AiModel.GPTImage1) {
-        if (openAISettings.prompt === "") {
-          setError("No Prompt Detected. Added a Prompt");
-          return;
-        }
+        const prompt = openAISettings.prompt;
 
-        if (isTextInappropriate(openAISettings.prompt)) {
-          setError(
-            `Prompt contains inappropriate text: ${filterBadWords(openAISettings.prompt)}`
-          );
-          return;
-        }
+        const isValid = await validatePrompt(
+          prompt,
+          setError,
+          setGenerationMessage
+        );
+
+        if (!isValid) return;
 
         response = await generateOpenAiImage(
           openAISettings,
@@ -173,7 +176,8 @@ export const useImageFileHandler = () => {
         throw new Error(`Unsupported AI model: ${selectedModel}`);
       }
 
-      // Convert base64 data URL to File
+      // Convert Data To Image File
+
       const dataUrl = response.image_data;
       const byteString = atob(dataUrl.split(",")[1]);
       const mimeString = dataUrl.split(",")[0].split(":")[1].split(";")[0];
@@ -189,7 +193,6 @@ export const useImageFileHandler = () => {
         type: mimeString,
       });
 
-      // Store the generated image and convert to sprite with post-processing
       setImportedImage(file);
       await processImageToSprite(file);
     } catch (error) {
@@ -210,6 +213,7 @@ export const useImageFileHandler = () => {
     palette,
     setError,
     processImageToSprite,
+    setGenerationMessage,
   ]);
 
   /**
