@@ -1,17 +1,8 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
+from app.models.schemas import ModerationRequest, ModerationResponse
 from app.services.openai_services import OpenAIServices
 
 router = APIRouter()
-
-class ModerationRequest(BaseModel):
-    prompt: str
-
-class ModerationResponse(BaseModel):
-    is_appropriate: bool
-    flagged: bool
-    categories: dict
-    category_scores: dict
 
 @router.post("/moderate", response_model=ModerationResponse)
 async def moderate_prompt(request: ModerationRequest):

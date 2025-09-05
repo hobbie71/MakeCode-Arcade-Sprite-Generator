@@ -1,6 +1,4 @@
 from enum import Enum
-from typing import Dict
-from pydantic import BaseModel, RootModel
 
 # GENERAL MODELS
 
@@ -43,13 +41,6 @@ class GenerationOutline(Enum):
   BlackOutline = "single color black outline"
   ColorOutline = "single color outline"
 
-class Size(BaseModel):
-  width: int
-  height: int
-
-class MakeCodePalette(RootModel[dict[str, str]]):
-  root: dict[str, str]
-
 # PIXEL LAB SPECIFIC MODELS
 
 class PixelLabQuality(Enum):
@@ -68,31 +59,3 @@ class OpenAIFinalSize(Enum):
   Square = "1024x1024"
   Landscape = "1536x1024"
   Portrait = "1024x1536"
-
-# API MODELS
-
-class BaseGenerationSettings(BaseModel):
-  prompt: str
-  assetType: AssetType
-  style: Style
-
-class PixelLabGenerationSettings(BaseGenerationSettings):
-  addBackground: bool
-  fitFullCanvasSize: bool
-  quality: PixelLabQuality = PixelLabQuality.Auto
-  view: GenerationView = GenerationView.Auto
-  direction: GenerationDirection = GenerationDirection.Auto
-  outline: GenerationOutline = GenerationOutline.Auto
-
-class OpenAIGenerationSettings(BaseGenerationSettings):
-  quality: OpenAIQuality = OpenAIQuality.Medium
-
-class PixelLabSpriteGenerationRequest(BaseModel):
-  settings: PixelLabGenerationSettings
-  size: Size
-  palette: MakeCodePalette
-
-class OpenAISpriteGenerationRequest(BaseModel):
-  settings: OpenAIGenerationSettings
-  size: Size
-  palette: MakeCodePalette

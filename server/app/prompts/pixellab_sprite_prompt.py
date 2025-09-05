@@ -1,4 +1,4 @@
-from app.models.enums import PixelLabGenerationSettings, Size, MakeCodePalette
+from app.models.schemas import PixelLabGenerationSettings, Size, MakeCodePalette
 
 SPRITE_GENERATION_PROMPT = (
   "You are generating pixel-art {asset_type} in a {style} video game style. "

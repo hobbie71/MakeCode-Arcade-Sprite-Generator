@@ -2,7 +2,7 @@ import httpx
 from app.core.config import settings
 import pixellab
 import logging
-from app.models.enums import PixelLabGenerationSettings, Size, MakeCodePalette
+from app.models.schemas import PixelLabGenerationSettings, Size, MakeCodePalette
 from app.prompts.pixellab_sprite_prompt import get_sprite_generation_prompt
 import io
 import base64

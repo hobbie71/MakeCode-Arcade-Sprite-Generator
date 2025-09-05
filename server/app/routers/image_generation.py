@@ -1,5 +1,12 @@
 from fastapi import APIRouter
-from app.models.enums import PixelLabSpriteGenerationRequest, OpenAISpriteGenerationRequest, Size, PixelLabGenerationSettings, OpenAIGenerationSettings, MakeCodePalette
+from app.models.schemas import (
+    PixelLabSpriteGenerationRequest, 
+    OpenAISpriteGenerationRequest, 
+    Size, 
+    PixelLabGenerationSettings, 
+    OpenAIGenerationSettings, 
+    MakeCodePalette
+)
 from app.services.pixellab_services import PixelLabServices
 from app.services.openai_services import OpenAIServices
 

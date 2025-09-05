@@ -1,4 +1,4 @@
-from app.models.enums import OpenAIGenerationSettings, Size, MakeCodePalette
+from app.models.schemas import OpenAIGenerationSettings, Size, MakeCodePalette
 
 SPRITE_GENERATION_PROMPT = (
   "You are generating pixel-art {asset_type} in a {style} video game style. "

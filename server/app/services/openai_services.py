@@ -5,7 +5,8 @@ import logging
 from PIL import Image
 from openai import OpenAI
 from app.core.config import settings
-from app.models.enums import OpenAIGenerationSettings, Size, MakeCodePalette, OpenAIFinalSize
+from app.models.schemas import OpenAIGenerationSettings, Size, MakeCodePalette
+from app.models.enums import OpenAIFinalSize
 from app.prompts.openai_sprite_prompt import get_sprite_generation_prompt
 
 logger = logging.getLogger(__name__)
