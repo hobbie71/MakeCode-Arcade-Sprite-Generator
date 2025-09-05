@@ -5,8 +5,12 @@
 [![React](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4.3-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009639?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776ab?logo=python&logoColor=white)](https://python.org/)
 
 A powerful, AI-enhanced sprite generation and editing tool specifically designed for MakeCode Arcade development. Transform images and text prompts into pixel-perfect sprites with multiple export options.
+
+🚀 **Live Demo**: [makespritecode.com](https://makespritecode.com)
 
 ## 🎯 Features
 
@@ -17,88 +21,38 @@ A powerful, AI-enhanced sprite generation and editing tool specifically designed
 - **Professional Sprite Editor**: Full-featured pixel art editor with advanced tools
 - **Multi-format Export**: Export sprites as PNG images, JavaScript code, Python code, or MakeCode paste-ready format
 
-### Advanced Capabilities
-
-- **Animation Generation**: Create animated sprites and character movement sequences
-- **Smart Resizing**: Automatic sprite sizing optimization for MakeCode Arcade
-- **Color Palette Management**: MakeCode Arcade color palette enforcement
-- **Preview Integration**: Real-time preview in MakeCode Arcade style
-- **Export Optimization**: Optimized code generation for performance
-
 ## 🚀 Getting Started
 
-This project is currently in early development. Check back soon for usage instructions and demos!
+### Live Application
+
+Visit [makespritecode.com](https://makespritecode.com) to use the application directly in your browser. No installation required!
 
 ### Development Setup
 
 1. Clone the repository
-2. Copy `.env.example` to `.env` and configure your API keys and CORS settings
-3. Run `npm run setup` to install dependencies
-4. Run `npm run dev` to start the development server, or use the included `dev.sh` script:
+2. Copy `.env.example` to `.env` and configure your API keys
+3. Install dependencies: `npm run setup`
+4. Start development server: `npm run dev`
 
-```bash
-./dev.sh
-```
+### Production Deployment (Render.com)
 
-**Note:** The `.env` file is used for local development only. Do not commit it to git. For production, set environment variables in your deployment platform (see below).
-
-### Production Deployment
-
-This project is configured for deployment on platforms like Railway, Render, or Heroku.
+This project is deployed on [Render.com](https://render.com) with separate services for the FastAPI backend and React frontend.
 
 #### Environment Variables
 
-**For local development:**
+**Required environment variables:**
 
-Set your secrets and config in a `.env` file at the project root. Example:
-
-```env
-PIXELLAB_API_TOKEN=your_pixellab_api_token
-OPENAI_API_TOKEN=your_openai_api_token
-CORS_ORIGINS=["http://localhost:3000", "http://localhost:5173"]
-HOST=0.0.0.0
-PORT=8000
-ENVIRONMENT=development
-```
-
-**For production (Railway, Render, etc):**
-
-Set all required environment variables in your deployment platform's dashboard. Do not use a `.env` file in production. Example variables:
-
-- `PIXELLAB_API_TOKEN`
-- `OPENAI_API_TOKEN`
-- `CORS_ORIGINS` (e.g. `["https://your-frontend-url.up.railway.app"]`)
-- `HOST` (usually `0.0.0.0`)
-- `PORT` (usually `8000` or set by platform)
-- `ENVIRONMENT` (set to `production`)
+- `PIXELLAB_API_TOKEN` - Your PixelLab API token
+- `OPENAI_API_TOKEN` - Your OpenAI API key
+- `CORS_ORIGINS` - Allowed origins (e.g., `["https://makespritecode.com"]`)
+- `ENVIRONMENT` - Set to `production`
 
 #### Deployment Commands
 
-The project includes these npm scripts for deployment:
+- **Frontend Build**: `npm run build` (builds the React client)
+- **Backend Start**: `python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
-- `npm start`: Production start command (builds client and starts server)
-- `npm run build`: Build the client application
-- `npm run setup`: Install all dependencies (client and server)
-
-#### Platform-Specific Instructions
-
-**Railway (Docker):**
-
-- The project includes a `Dockerfile` for full-stack deployment (Node + Python)
-- Set all required environment variables in the Railway dashboard (do not use `.env`)
-- Railway will use the Dockerfile automatically; you do not need to set a start command
-
-**Heroku:**
-
-- Use the Node.js buildpack (or a custom Dockerfile if using Python)
-- Set environment variables in the Heroku dashboard
-- The app will automatically use the PORT environment variable
-
-**Render:**
-
-- Use Node.js environment (or Docker for full stack)
-- Build command: `npm run build`
-- Start command: `npm start`
+The FastAPI server serves the API endpoints while the React frontend is served as static files.
 
 ## 🎨 Usage
 
@@ -111,7 +65,7 @@ The project includes these npm scripts for deployment:
 
 ### AI Sprite Generation
 
-1. Enter a descriptive prompt (e.g., "8-bit style spaceship with blue flames")
+1. Enter a descriptive prompt (e.g., "a cute dragon breathing blue flames")
 2. Configure generation parameters
 3. Generate and refine the sprite
 4. Export the final result
@@ -153,13 +107,7 @@ const mySprite = sprites.create(
 
 ### Python Export
 
-- The project includes a `Procfile` and `start.sh` script
-- Ensure you have a `start` script in your package.json (✅ included)
-- Set environment variables in your Railway dashboard
-- **Set the Start Command to `./start.sh` in your Railway project settings.**
-
-# Create sprite with default character model
-
+```python
 my_sprite = arcade_sprites.create_sprite("""
 . . . . . . f f f f . . . . . .
 . . . . f f f 2 2 f f f . . . .
@@ -178,14 +126,13 @@ my_sprite = arcade_sprites.create_sprite("""
 . . . . . f f f f f f . . . . .
 . . . . . f f . . f f . . . . .
 """, sprite_kind="Player")
-
 ```
 
 ### MakeCode Paste Format
 
 ```
-
-img`. . . . . . f f f f . . . . . .
+img`
+. . . . . . f f f f . . . . . .
 . . . . f f f 2 2 f f f . . . .
 . . . f f f 2 2 2 2 f f f . . .
 . . f f f e e e e e e f f f . .
@@ -200,127 +147,16 @@ img`. . . . . . f f f f . . . . . .
 . . 4 d f 2 2 2 2 2 2 f d 4 . .
 . . 4 4 f 4 4 5 5 4 4 f 4 4 . .
 . . . . . f f f f f f . . . . .
-. . . . . f f . . f f . . . . .`
-
+. . . . . f f . . f f . . . . .
+`
 ```
 
-## Development Roadmap
+## 🏗️ Architecture
 
-### Phase 1: Core MVP (Essential Foundation)
-
-**Priority: Critical - Must have for basic functionality**
-
-#### Version 0.1.0 - Basic Sprite Editor
-
-- [x] Project initialization and setup
-- [x] **Canvas-based pixel editor** (multi-size grid support)
-- [x] **Basic drawing tools** (pencil, eraser)
-- [x] **MakeCode color palette** (16 colors) integration
-- [x] **Real-time preview** of sprite changes
-- [x] **PNG export** functionality
-
-#### Version 0.2.0 - MakeCode Integration
-
-- [x] **MakeCode paste format export** (highest priority for users)
-- [x] **JavaScript code export** with sprites.create()
-- [x] **Copy to clipboard** functionality
-- [x] **Grid size selection**
-- [x] **Zoom controls** for precise editing
-
-### Phase 2: Image Processing (High Value Features)
-
-**Priority: High - Significantly increases utility**
-
-#### Version 0.3.0 - Image Import & Conversion
-
-- [x] **Image upload** (PNG, JPG)
-- [x] **Automatic resizing** to MakeCode dimensions
-- [x] **Color quantization** to MakeCode palette
-- [ ] ~~**Dithering options** for better image quality~~ <br> <sub><sup>_Canceled: Not applicable due to the fixed 15-color palette limitation of MakeCode Arcade._</sup></sub>
-- [ ] ~~**Multiple conversion algorithms** (nearest neighbor, bilinear)~~ <br> <sub><sup>_Canceled: Not applicable due to the fixed 15-color palette limitation of MakeCode Arcade._</sup></sub>
-
-#### Version 0.4.0 - Smart Processing
-
-- [x] **Edge detection** for cleaner sprite conversion
-- [x] **Background removal** tools
-- [x] **Contrast/brightness** adjustment
-- [x] **Preview comparison** (original vs converted)
-- [ ] **Batch size processing** (multiple dimensions at once) <br> <sub><sup>_Put on Hold: MVP first before quality of life features_</sup></sub>
-
-### Phase 3: AI Integration (Differentiating Feature)
-
-**Priority: High - Unique selling point**
-
-#### Version 0.5.0 - AI Sprite Generation
-
-- [x] **Text-to-sprite AI model** integration
-- [x] **Style selection** (pixel art, 8-bit, retro)
-- [x] **Prompt engineering** interface
-- [ ] **Multiple generation attempts** per prompt <br> <sub><sup>_Put on Hold: MVP first before quality of life features_</sup></sub>
-- [ ] **AI result refinement** tools <br> <sub><sup>_Put on Hold: MVP first before quality of life features_</sup></sub>
-
-#### Version 0.6.0 - Advanced AI Features
-
-- [ ] **Style transfer** (apply existing sprite styles)
-- [ ] **Sprite variation generation**
-- [ ] **Character pose generation** (walking, jumping, etc.)
-- [ ] **AI-powered upscaling** for low-res inputs
-- [ ] **Intelligent color palette** suggestions
-
-### Phase 4: Professional Tools (Quality of Life)
-
-**Priority: Medium - Professional workflow features**
-
-#### Version 0.7.0 - Advanced Editing
-
-- [ ] **Layer system** for complex sprites
-- [ ] **Undo/Redo system** (unlimited history)
-- [ ] **Selection tools** (rectangle, line, fill bucket, etc)
-- [ ] **Copy/paste** between sprites
-- [ ] **Transformation tools** (rotate, flip, scale)
-
-#### Version 0.8.0 - Animation Support
-
-- [ ] **Frame-based animation** editor
-- [ ] **Onion skinning** for animation preview
-- [ ] **Timeline controls** (play, pause, frame rate)
-- [ ] **Animation export** (GIF, sprite sheets)
-- [ ] **Loop configuration** and preview
-
-### Phase 5: Workflow Enhancement (Nice to Have)
-
-**Priority: Low-Medium - Productivity features**
-
-#### Version 0.9.0 - Project Management
-
-- [ ] **Save/Load projects** (local storage)
-- [ ] **Sprite library** management
-- [ ] **Export presets** (custom settings)
-- [ ] **Keyboard shortcuts** for power users
-- [ ] **Recent files** quick access
-
-#### Version 1.0.0 - Polish & Performance
-
-- [ ] **Cloud save** functionality (optional)
-- [ ] **Collaboration features** (share sprites)
-- [ ] **Performance optimization** (large sprite handling)
-- [ ] **Mobile responsive** design
-- [ ] **Comprehensive tutorials** and documentation
-
-### Phase 6: Advanced Features (Future Enhancements)
-
-**Priority: Low - Advanced use cases**
-
-#### Version 1.1.0+ - Pro Features
-
-- [ ] **Custom color palettes** beyond MakeCode
-- [ ] **Vector sprite** support
-- [ ] **Plugin system** for custom tools
-- [ ] **API integration** with MakeCode Arcade
-- [ ] **Sprite analytics** (size optimization, performance tips)
-- [ ] **Community gallery** (with authorization system)
-- [ ] **Advanced AI models** (custom training)
-- [ ] **Batch automation** (scripted processing)
+- **Frontend**: React 19 with TypeScript and Tailwind CSS
+- **Backend**: FastAPI (Python) with async support
+- **AI Integration**: OpenAI GPT models and PixelLab API
+- **Deployment**: Render.com (separate frontend/backend services)
 
 ## 🤝 Contributing
 
@@ -352,6 +188,7 @@ For licensing inquiries, feature requests, or authorized collaboration:
 
 - **GitHub**: [@hobbie71](https://github.com/hobbie71)
 - **Project Repository**: [MakeCode-Arcade-Sprite-Generator](https://github.com/hobbie71/MakeCode-Arcade-Sprite-Generator)
+- **Report an Issue**: [https://forms.gle/RMooZuywkBVUQwtw8](https://forms.gle/RMooZuywkBVUQwtw8)
 
 ## ⚠️ Disclaimer
 
@@ -360,4 +197,3 @@ This project is not affiliated with Microsoft Corporation or the official MakeCo
 ---
 
 _Built with ❤️ for the MakeCode Arcade community_
-```
