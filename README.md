@@ -12,6 +12,8 @@ A powerful, AI-enhanced sprite generation and editing tool specifically designed
 
 🚀 **Live Demo**: [makespritecode.com](https://makespritecode.com)
 
+![App Preview](client/public/preview.gif)
+
 ## 🎯 Features
 
 ### Core Functionality
