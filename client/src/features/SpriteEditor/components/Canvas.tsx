@@ -85,7 +85,7 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
         ref={canvasRef}
         width={width * pixelSize}
         height={height * pixelSize}
-        className="sprite-canvas"
+        className="absolute"
         tabIndex={0}
         onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}
@@ -93,11 +93,8 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         style={{
-          left: offset.x,
-          top: offset.y,
-          transform: `scale(${zoom})`,
+          transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
           transformOrigin: "top left",
-          imageRendering: "pixelated",
           outline: "none",
         }}
       />

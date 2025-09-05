@@ -292,10 +292,6 @@
     @apply relative bg-white rounded-lg shadow-lg overflow-hidden;
   }
 
-  .sprite-canvas {
-    @apply absolute border border-neutral-300;
-  }
-
   /* Export Components */
   .export-grid {
     @apply grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4;
