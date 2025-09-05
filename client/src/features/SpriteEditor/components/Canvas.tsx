@@ -104,6 +104,4 @@ const Canvas = memo(({ pixelSize = 20 }: Props) => {
   );
 });
 
-Canvas.displayName = "Canvas";
-
 export default Canvas;
