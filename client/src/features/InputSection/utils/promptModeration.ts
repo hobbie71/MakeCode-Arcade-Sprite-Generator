@@ -1,4 +1,4 @@
-import type { ModerationResponse } from "../../../api/moderatePrompt";
+import type { ModerationResponse } from "../../../types/export";
 import { Filter } from "bad-words";
 import { moderatePrompt } from "../../../api/moderatePrompt";
 

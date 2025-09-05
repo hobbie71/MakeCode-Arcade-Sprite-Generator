@@ -1,11 +1,5 @@
 import { IS_APPROPRIATE_API_URL } from "../constants/api";
-
-export interface ModerationResponse {
-  is_appropriate: boolean;
-  flagged: boolean;
-  categories: Record<string, boolean>;
-  category_scores: Record<string, number>;
-}
+import type { ModerationResponse } from "../types/export";
 
 export const moderatePrompt = async (
   prompt: string
