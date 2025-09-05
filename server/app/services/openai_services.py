@@ -77,3 +77,11 @@ class OpenAIServices:
     except Exception as e:
       logger.error(f"OpenAI API error: {e}")
       raise Exception(f"Failed to generate sprite: {str(e)}")
+  
+  async def get_moderate_prompt(self, prompt: str):
+    response = self.client.moderations.create(
+      model="omni-moderation-latest",
+      input=prompt,
+    )
+
+    return response

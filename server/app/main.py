@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import List
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from .routers import image_generation, background_removal
+from .routers import image_generation, moderation ,background_removal
 from .core.config import settings
 
 # Configure logging
@@ -48,6 +48,7 @@ class LogRequestMiddleware(BaseHTTPMiddleware):
 app.add_middleware(LogRequestMiddleware)
 
 # Include routers
+app.include_router(moderation.router, prefix="/moderation", tags=["moderation"])
 app.include_router(image_generation.router, prefix="/generate-image", tags=["generate-image"])
 # app.include_router(background_removal.router, prefix="/remove-background", tags=["remove-background"])
 
