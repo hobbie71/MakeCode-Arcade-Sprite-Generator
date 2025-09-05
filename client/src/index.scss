@@ -98,7 +98,7 @@
   }
 
   .toolbox {
-    @apply w-auto max-w-24 p-2 bg-neutral-50 border-l border-neutral-200 flex-shrink-0 overflow-y-auto;
+    @apply w-auto max-w-24 p-2 bg-neutral-50 flex-shrink-0 overflow-y-auto;
   }
 
   .toolbox-mobile {
