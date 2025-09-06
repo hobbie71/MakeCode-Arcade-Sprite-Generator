@@ -22,13 +22,16 @@ import { usePasteData } from "../hooks/usePasteData";
 import SelectionOverlay from "./SelectionOverlay";
 import ImportPreview from "./ImportPreview";
 
+// Const imports
+import { PIXEL_SIZE } from "../constants/canvas";
+
 interface Props {
   width: number;
   height: number;
   pixelSize?: number;
 }
 
-const Canvas = memo(({ pixelSize = 20 }: Props) => {
+const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   // Context
   const { canvasRef } = useCanvas();
   const { tool } = useToolSelected();

@@ -5,7 +5,7 @@ import { useSelectionArea } from "../contexts/SelectionArea/useSelectionArea";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
 
 // Type imports
-import { PIXEL_SIZE } from "../constants/pixelSize";
+import { PIXEL_SIZE } from "../constants/canvas";
 
 const SelectionOverlay = () => {
   const { selectionArea, setSelectionArea } = useSelectionArea();

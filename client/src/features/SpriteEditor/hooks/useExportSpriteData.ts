@@ -9,7 +9,7 @@ import { drawPixelOnCanvasTransparent } from "../libs/drawPixelOnCanvas";
 
 // Type imports
 import { ImageExportFormats } from "../../../types/export";
-import { PIXEL_SIZE } from "../constants/pixelSize";
+import { PIXEL_SIZE } from "../constants/canvas";
 
 export const useExportSpriteData = () => {
   const { spriteData } = useSprite();

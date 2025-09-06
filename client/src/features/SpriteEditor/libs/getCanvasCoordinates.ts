@@ -1,5 +1,5 @@
 import type { Coordinates } from "../../../types/pixel";
-import { PIXEL_SIZE } from "../constants/pixelSize";
+import { PIXEL_SIZE } from "../constants/canvas";
 
 export function getCanvasCoordinates(
   canvas: HTMLCanvasElement,

@@ -20,7 +20,7 @@ import { getRgbaDataFromCanvas } from "../../../utils/getDataFromCanvas";
 import { MakeCodeColor } from "../../../types/color";
 import { drawSpriteDataOnCanvasTransparent } from "../../SpriteEditor/libs/drawPixelOnCanvas";
 import type { HSL, RGB, RGBA } from "../../../utils/colors/colorConversion";
-import { PIXEL_SIZE } from "../../SpriteEditor/constants/pixelSize";
+import { PIXEL_SIZE } from "../../SpriteEditor/constants/canvas";
 
 export const useMakeCodeColorConverter = () => {
   const { palette } = usePaletteSelected();

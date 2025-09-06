@@ -4,7 +4,7 @@ import type { MakeCodePalette } from "../../../types/color";
 
 import { getHexFromMakeCodeColor } from "../../../utils/colors/getColorFromMakeCodeColor";
 
-import { PIXEL_SIZE } from "../constants/pixelSize";
+import { PIXEL_SIZE } from "../constants/canvas";
 
 export const drawPixelOnCanvas = (
   canvas: HTMLCanvasElement,

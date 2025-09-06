@@ -1,21 +1,24 @@
 // Context imports
 import { useZoom } from "../../contexts/ZoomContext/useZoom";
 
+// Const imports
+import { MAX_ZOOM, MIN_ZOOM, ZOOM_AMOUNT } from "../../constants/canvas";
+
 const ZoomIcons = () => {
   const { setZoom } = useZoom();
 
   const handleZoomIn = () => {
     setZoom((prevZoom) => {
-      let newZoom = prevZoom + 0.2;
-      if (newZoom > 3) newZoom = 3;
+      let newZoom = prevZoom + ZOOM_AMOUNT;
+      if (newZoom > MAX_ZOOM) newZoom = MAX_ZOOM;
       return newZoom;
     });
   };
 
   const handleZoomOut = () => {
     setZoom((prevZoom) => {
-      let newZoom = prevZoom - 0.2;
-      if (newZoom <= 0) newZoom = 0.2;
+      let newZoom = prevZoom - ZOOM_AMOUNT;
+      if (newZoom < MIN_ZOOM) newZoom = MIN_ZOOM;
       return newZoom;
     });
   };
