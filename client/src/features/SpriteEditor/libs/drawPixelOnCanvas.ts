@@ -95,6 +95,18 @@ export const drawSpriteDataOnCanvasTransparent = (
   }
 };
 
+export const drawPixelsOnCanvas = (
+  canvas: HTMLCanvasElement,
+  positions: Coordinates[],
+  color: MakeCodeColor,
+  palette: MakeCodePalette,
+  pixelSize: number = PIXEL_SIZE
+) => {
+  positions.forEach((position) => {
+    drawPixelOnCanvas(canvas, position, color, palette, pixelSize);
+  });
+};
+
 const drawCheckerboard = (
   canvas: HTMLCanvasElement,
   position: Coordinates,

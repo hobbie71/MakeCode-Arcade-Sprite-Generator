@@ -24,11 +24,16 @@ export const useSpriteData = () => {
   }
 
   const setSpriteDataCoordinates = useCallback(
-    (coordinates: Coordinates, color: MakeCodeColor) => {
-      if (coordinates.x >= width || coordinates.y >= height) return;
+    (coordinates: Coordinates | Coordinates[], color: MakeCodeColor) => {
+      const coordsArray = Array.isArray(coordinates)
+        ? coordinates
+        : [coordinates];
 
-      if (!spriteDataRef.current[coordinates.y]) return;
-      spriteDataRef.current[coordinates.y][coordinates.x] = color;
+      coordsArray.forEach(({ x, y }) => {
+        if (x >= width || y >= height) return;
+        if (!spriteDataRef.current[y]) return;
+        spriteDataRef.current[y][x] = color;
+      });
     },
     [height, width]
   );

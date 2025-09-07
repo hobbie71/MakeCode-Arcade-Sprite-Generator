@@ -14,19 +14,22 @@ import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected
 import { usePencil } from "./usePencil";
 import { useEraser } from "./useEraser";
 import { useFill } from "./useFill";
-// import { useLine } from "./useLine";
+import { useLine } from "./useLine";
 // import { useRectangle } from "./useRectangle";
 // import { useCircle } from "./useCircle";
 // import { useSelect } from "./useSelect";
 import { EditorTools } from "../../../types/tools";
+import { useCanvasPreview } from "./useCanvasPreview";
 
 export const useMouseHandler = () => {
   const { mouseCoordinates, setMouseCoordinates } = useMouseCoordinates();
   const { canvasRef } = useCanvas();
   const { zoom } = useZoom();
   const { tool } = useToolSelected();
+  const { drawDotPreview, clearPreview } = useCanvasPreview();
 
-  const isMouseDown = useRef<boolean>(false);
+  const isMouseDownRef = useRef<boolean>(false);
+  const startCoordinates = useRef<Coordinates | null>(null);
 
   const {
     handlePointerDown: handlePencilDown,
@@ -39,11 +42,11 @@ export const useMouseHandler = () => {
     handlePointerUp: handleEraserUp,
   } = useEraser();
   const { handlePointerDown: handleFillDown } = useFill();
-  // const {
-  //   handlePointerDown: handleLineDown,
-  //   handlePointerMove: handleLineMove,
-  //   handlePointerUp: handleLineUp,
-  // } = useLine();
+  const {
+    handlePointerDown: handleLineDown,
+    handlePointerMove: handleLineMove,
+    handlePointerUp: handleLineUp,
+  } = useLine();
   // const {
   //   handlePointerDown: handleRectangleDown,
   //   handlePointerMove: handleRectangleMove,
@@ -81,36 +84,28 @@ export const useMouseHandler = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      isMouseDown.current = true;
+      isMouseDownRef.current = true;
 
       const coordinates = getCanvasCoordinates(canvas, e, zoom);
-
-      switch (tool) {
-        case EditorTools.Pencil:
-          handlePencilDown(coordinates);
-          break;
-        case EditorTools.Eraser:
-          handleEraserDown(coordinates);
-          break;
-        case EditorTools.Fill:
-          handleFillDown(coordinates);
-          break;
-        // case EditorTools.Line:
-        //   handleLineDown(coordinates);
-        //   break;
-        // case EditorTools.Rectangle:
+      startCoordinates.current = coordinates;
+      if (tool === EditorTools.Pencil) {
+        handlePencilDown(coordinates);
+      } else if (tool === EditorTools.Eraser) {
+        handleEraserDown(coordinates);
+      } else if (tool === EditorTools.Fill) {
+        handleFillDown(coordinates);
+      } else if (tool === EditorTools.Line) {
+        handleLineDown(coordinates);
+        // } else if (tool === EditorTools.Rectangle) {
         //   handleRectangleDown(coordinates);
-        //   break;
-        // case EditorTools.Circle:
+        // } else if (tool === EditorTools.Circle) {
         //   handleCircleDown(coordinates);
-        //   break;
-        // case EditorTools.Select:
+        // } else if (tool === EditorTools.Select) {
         //   handleSelectDown(coordinates);
-        //   break;
-        case EditorTools.Pan:
-          break;
-        default:
-          break;
+      } else if (tool === EditorTools.Pan) {
+        // Do nothing for Pan
+      } else {
+        // Default case, do nothing
       }
     },
     [
@@ -120,106 +115,108 @@ export const useMouseHandler = () => {
       handlePencilDown,
       handleEraserDown,
       handleFillDown,
-      // handleLineDown,
+      handleLineDown,
       // handleRectangleDown,
       // handleCircleDown,
       // handleSelectDown,
     ]
   );
 
-  const handleMouseUp = useCallback(() =>
-    // e: React.MouseEvent<HTMLCanvasElement>
-    {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      isMouseDown.current = false;
-
-      // const coordinates = getCanvasCoordinates(canvas, e, zoom);
-
-      switch (tool) {
-        case EditorTools.Pencil:
-          handlePencilUp();
-          break;
-        case EditorTools.Eraser:
-          handleEraserUp();
-          break;
-        case EditorTools.Fill:
-          break;
-        // case EditorTools.Line:
-        //   handleLineUp(coordinates);
-        //   break;
-        // case EditorTools.Rectangle:
-        //   handleRectangleUp(coordinates);
-        //   break;
-        // case EditorTools.Circle:
-        //   handleCircleUp(coordinates);
-        //   break;
-        // case EditorTools.Select:
-        //   handleSelectUp(coordinates);
-        //   break;
-        case EditorTools.Pan:
-          break;
-        default:
-          break;
-      }
-    }, [
-    canvasRef,
-    // zoom,
-    tool,
-    handlePencilUp,
-    handleEraserUp,
-    // handleLineUp,
-    // handleRectangleUp,
-    // handleCircleUp,
-    // handleSelectUp,
-  ]);
-
-  const handleMouseMove = useCallback(
+  const handleMouseUp = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!isMouseDown.current) return;
-
       const canvas = canvasRef.current;
       if (!canvas) return;
+
+      isMouseDownRef.current = false;
+      startCoordinates.current = null;
 
       const coordinates = getCanvasCoordinates(canvas, e, zoom);
-      updateMousePosition(coordinates);
 
-      switch (tool) {
-        case EditorTools.Pencil:
-          handlePencilMove(coordinates);
-          break;
-        case EditorTools.Eraser:
-          handleEraserMove(coordinates);
-          break;
-        case EditorTools.Fill:
-          break;
-        // case EditorTools.Line:
-        //   handleLineMove(coordinates);
-        //   break;
-        // case EditorTools.Rectangle:
-        //   handleRectangleMove(coordinates);
-        //   break;
-        // case EditorTools.Circle:
-        //   handleCircleMove(coordinates);
-        //   break;
-        // case EditorTools.Select:
-        //   handleSelectMove(coordinates);
-        //   break;
-        case EditorTools.Pan:
-          break;
-        default:
-          break;
+      if (tool === EditorTools.Pencil) {
+        handlePencilUp();
+      } else if (tool === EditorTools.Eraser) {
+        handleEraserUp();
+      } else if (tool === EditorTools.Line) {
+        handleLineUp(coordinates);
+      } else if (tool === EditorTools.Rectangle) {
+        //   handleRectangleUp(coordinates);
+        // } else if (tool === EditorTools.Circle) {
+        //   handleCircleUp(coordinates);
+        // } else if (tool === EditorTools.Select) {
+        //   handleSelectUp(coordinates);
+      } else if (tool === EditorTools.Pan) {
+        // Do nothing for Pan
+      } else {
+        // Default case, do nothing
       }
     },
     [
       canvasRef,
       zoom,
       tool,
+      handlePencilUp,
+      handleEraserUp,
+      handleLineUp,
+      // handleRectangleUp,
+      // handleCircleUp,
+      // handleSelectUp,
+    ]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const coordinates = getCanvasCoordinates(canvas, e, zoom);
+
+      // Do nothing if coordinates haven't changed
+      if (
+        coordinates.x === mouseCoordinates?.x &&
+        coordinates.y === mouseCoordinates.y
+      ) {
+        return;
+      }
+
+      // Draw dot preview if Left Mouse Button not down
+      if (!isMouseDownRef.current) {
+        drawDotPreview(coordinates);
+        return;
+      }
+
+      updateMousePosition(coordinates);
+
+      // Handle drawing/dragging
+      if (tool === EditorTools.Pencil) {
+        handlePencilMove(coordinates);
+      } else if (tool === EditorTools.Eraser) {
+        handleEraserMove(coordinates);
+      }
+      if (tool === EditorTools.Line) {
+        handleLineMove(coordinates);
+        // } else if (tool === EditorTools.Rectangle) {
+        //   handleRectangleMove(coordinates);
+        // } else if (tool === EditorTools.Circle) {
+        //   handleCircleMove(coordinates);
+        // }
+        // } else if (tool === EditorTools.Select) {
+        //   handleSelectMove(coordinates);
+      } else if (tool === EditorTools.Pan) {
+        // Do nothing for Pan
+      } else {
+        // Default case, do nothing
+      }
+    },
+    [
+      canvasRef,
+      zoom,
+      tool,
+      mouseCoordinates,
+      drawDotPreview,
       updateMousePosition,
       handlePencilMove,
       handleEraserMove,
-      // handleLineMove,
+      handleLineMove,
       // handleRectangleMove,
       // handleCircleMove,
       // handleSelectMove,
@@ -237,9 +234,11 @@ export const useMouseHandler = () => {
   );
 
   const handleMouseLeave = useCallback(() => {
-    isMouseDown.current = false;
+    isMouseDownRef.current = false;
+    startCoordinates.current = null;
     setMouseCoordinates(null);
-  }, [setMouseCoordinates]);
+    clearPreview();
+  }, [setMouseCoordinates, clearPreview]);
 
   return {
     handleMouseDown,

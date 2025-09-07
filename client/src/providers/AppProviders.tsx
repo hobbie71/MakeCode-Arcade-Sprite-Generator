@@ -11,6 +11,7 @@ import { PixelLabSettingsProvider } from "../context/PixelLabSettingsContext/Pix
 import { OpenAISettingsProvider } from "../context/OpenAISettingsContext/OpenAISettingsContext";
 import { PostProcessingProvider } from "../context/PostProcessingContext/PostProcessingContext";
 import { ErrorProvider } from "../context/ErrorContext/ErrorContext";
+import { PreviewCanvasProvider } from "../context/PreviewCanvasContext/PreviewCanvasContext";
 
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -26,7 +27,9 @@ const AppProviders = ({ children }: { children: React.ReactNode }) => {
                       <OpenAISettingsProvider>
                         <ImageImportProvider>
                           <PostProcessingProvider>
-                            <ErrorProvider>{children}</ErrorProvider>
+                            <PreviewCanvasProvider>
+                              <ErrorProvider>{children}</ErrorProvider>
+                            </PreviewCanvasProvider>
                           </PostProcessingProvider>
                         </ImageImportProvider>
                       </OpenAISettingsProvider>
