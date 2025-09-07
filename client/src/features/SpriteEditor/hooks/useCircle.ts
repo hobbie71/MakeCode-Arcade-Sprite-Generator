@@ -1,10 +1,62 @@
-// import { useCallback } from "react";
-// import type { Coordinates } from "../../../types/pixel";
+import { useCallback, useRef } from "react";
+
+// Hook imports
+import { useCanvasPreview } from "./useCanvasPreview";
+import { useSpriteData } from "./useSpriteData";
+
+// Lib imports
+import { getCircleCoordinates } from "../libs/getShapeCoordinates";
+import { drawPixelsOnCanvas } from "../libs/drawPixelOnCanvas";
+
+// Context imports
+import { useCanvas } from "../../../context/CanvasContext/useCanvas";
+import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+
+// Type imports
+import type { Coordinates } from "../../../types/pixel";
 
 export const useCircle = () => {
-  // TODO: Add circle drawing logic
-  // const handlePointerDown = useCallback((coordinates: Coordinates) => {}, []);
-  // const handlePointerMove = useCallback((coordinates: Coordinates) => {}, []);
-  // const handlePointerUp = useCallback((coordinates: Coordinates) => {}, []);
-  // return { handlePointerDown, handlePointerMove, handlePointerUp };
+  const { canvasRef } = useCanvas();
+  const { color } = useColorSelected();
+  const { palette } = usePaletteSelected();
+  const { drawCirclePreview, drawDotPreview } = useCanvasPreview();
+  const { setSpriteDataCoordinates, commitSpriteData } = useSpriteData();
+
+  const startCoordinates = useRef<Coordinates | null>(null);
+
+  const handlePointerDown = useCallback(
+    (start: Coordinates) => {
+      startCoordinates.current = start;
+      drawDotPreview(start);
+    },
+    [drawDotPreview]
+  );
+
+  const handlePointerMove = useCallback(
+    (end: Coordinates) => {
+      if (!startCoordinates.current) return;
+
+      drawCirclePreview(startCoordinates.current, end);
+    },
+    [drawCirclePreview]
+  );
+
+  const handlePointerUp = useCallback(
+    (end: Coordinates) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      if (!startCoordinates.current) return;
+
+      const coordinates = getCircleCoordinates(startCoordinates.current, end);
+      drawPixelsOnCanvas(canvas, coordinates, color, palette);
+
+      setSpriteDataCoordinates(coordinates, color);
+      commitSpriteData();
+    },
+    [canvasRef, color, palette, setSpriteDataCoordinates, commitSpriteData]
+  );
+
+  return { handlePointerDown, handlePointerMove, handlePointerUp };
 };

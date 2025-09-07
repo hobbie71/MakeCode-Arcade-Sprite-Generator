@@ -80,9 +80,15 @@ export const getCircleCoordinates = (
   const dy = end.y - start.y;
   const radius = Math.round(Math.sqrt(dx * dx + dy * dy));
 
+  if (radius === 0) {
+    coordinates.push({ x: centerX, y: centerY });
+    return coordinates;
+  }
+
+  // Modified circle algorithm for more rounded appearance
   let x = 0;
   let y = radius;
-  let d = 3 - 2 * radius;
+  let radiusError = 0 - radius;
 
   const plotCirclePoints = (cx: number, cy: number, x: number, y: number) => {
     coordinates.push({ x: cx + x, y: cy + y });
@@ -95,14 +101,14 @@ export const getCircleCoordinates = (
     coordinates.push({ x: cx - y, y: cy - x });
   };
 
-  while (y >= x) {
+  while (x <= y) {
     plotCirclePoints(centerX, centerY, x, y);
     x++;
-    if (d > 0) {
-      y--;
-      d = d + 4 * (x - y) + 10;
+    if (radiusError < 0) {
+      radiusError += 2 * x + 1;
     } else {
-      d = d + 4 * x + 6;
+      y--;
+      radiusError += 2 * (x - y) + 1;
     }
   }
 
