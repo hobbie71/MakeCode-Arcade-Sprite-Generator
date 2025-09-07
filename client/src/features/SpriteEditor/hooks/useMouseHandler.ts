@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useEffect } from "react";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
@@ -6,6 +6,7 @@ import type { Coordinates } from "../../../types/pixel";
 // Context imports
 import { useMouseCoordinates } from "../contexts/MouseCoordinatesContext/useMouseCoordinates";
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { useZoom } from "../contexts/ZoomContext/useZoom";
 import { getCanvasCoordinates } from "../libs/getCanvasCoordinates";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
@@ -27,9 +28,13 @@ export const useMouseHandler = () => {
   const { zoom } = useZoom();
   const { tool } = useToolSelected();
   const { drawDotPreview, clearPreview } = useCanvasPreview();
+  const { width: canvasWidth, height: canvasHeight } = useCanvasSize();
 
   const isMouseDownRef = useRef<boolean>(false);
+  const isDrawing = useRef<boolean>(false);
   const startCoordinates = useRef<Coordinates | null>(null);
+  // Keep track of last in-bounds coordinates without triggering renders
+  const lastCoordinatesRef = useRef<Coordinates | null>(null);
 
   const {
     handlePointerDown: handlePencilDown,
@@ -63,8 +68,16 @@ export const useMouseHandler = () => {
   //   handlePointerUp: handleSelectUp,
   // } = useSelect();
 
+  // Helper to ensure we ignore coordinates that fall outside the sprite bounds
+  const isInsideBounds = useCallback(
+    (c: Coordinates) =>
+      c.x >= 0 && c.y >= 0 && c.x < canvasWidth && c.y < canvasHeight,
+    [canvasWidth, canvasHeight]
+  );
+
   const updateMousePosition = useCallback(
     (newCoordinates: Coordinates) => {
+      lastCoordinatesRef.current = newCoordinates;
       if (mouseCoordinates === null) {
         setMouseCoordinates(newCoordinates);
         return;
@@ -85,6 +98,7 @@ export const useMouseHandler = () => {
       if (!canvas) return;
 
       isMouseDownRef.current = true;
+      isDrawing.current = true;
 
       const coordinates = getCanvasCoordinates(canvas, e, zoom);
       startCoordinates.current = coordinates;
@@ -118,41 +132,50 @@ export const useMouseHandler = () => {
     ]
   );
 
-  const handleMouseUp = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
+  // Finalize drawing (used by normal mouseUp and global mouseup outside canvas)
+  const finalizeDrawing = useCallback(
+    (coordinates: Coordinates | null) => {
       isMouseDownRef.current = false;
+      isDrawing.current = false;
       startCoordinates.current = null;
-
-      const coordinates = getCanvasCoordinates(canvas, e, zoom);
 
       if (tool === EditorTools.Pencil) {
         handlePencilUp();
       } else if (tool === EditorTools.Eraser) {
         handleEraserUp();
       } else if (tool === EditorTools.Line) {
-        handleLineUp(coordinates);
+        if (coordinates && isInsideBounds(coordinates))
+          handleLineUp(coordinates);
       } else if (tool === EditorTools.Rectangle) {
-        handleRectangleUp(coordinates);
+        if (coordinates && isInsideBounds(coordinates))
+          handleRectangleUp(coordinates);
       } else if (tool === EditorTools.Circle) {
-        handleCircleUp(coordinates);
+        if (coordinates && isInsideBounds(coordinates))
+          handleCircleUp(coordinates);
       } else if (tool === EditorTools.Select) {
-        //   handleSelectUp(coordinates);
+        // handleSelectUp(coordinates);
       }
     },
     [
-      canvasRef,
-      zoom,
       tool,
       handlePencilUp,
       handleEraserUp,
       handleLineUp,
       handleRectangleUp,
       handleCircleUp,
-      // handleSelectUp,
+      isInsideBounds,
     ]
+  );
+
+  const handleMouseUp = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const coordinates = getCanvasCoordinates(canvas, e, zoom);
+      finalizeDrawing(coordinates);
+    },
+    [canvasRef, zoom, finalizeDrawing]
   );
 
   const handleMouseMove = useCallback(
@@ -162,16 +185,21 @@ export const useMouseHandler = () => {
 
       const coordinates = getCanvasCoordinates(canvas, e, zoom);
 
+      // Ignore moves outside the logical pixel grid to avoid drawing glitches
+      if (!isInsideBounds(coordinates)) {
+        return;
+      }
+
       // Do nothing if coordinates haven't changed
       if (
         coordinates.x === mouseCoordinates?.x &&
-        coordinates.y === mouseCoordinates.y
+        coordinates.y === mouseCoordinates?.y
       ) {
         return;
       }
 
       // Draw dot preview if Left Mouse Button not down
-      if (!isMouseDownRef.current) {
+      if (!isMouseDownRef.current && !isDrawing.current) {
         drawDotPreview(coordinates);
         return;
       }
@@ -205,6 +233,7 @@ export const useMouseHandler = () => {
       handleLineMove,
       handleRectangleMove,
       handleCircleMove,
+      isInsideBounds,
       // handleSelectMove,
     ]
   );
@@ -220,11 +249,30 @@ export const useMouseHandler = () => {
   );
 
   const handleMouseLeave = useCallback(() => {
-    isMouseDownRef.current = false;
-    startCoordinates.current = null;
-    setMouseCoordinates(null);
+    // If not actively drawing, clear everything. If drawing, keep the flags so we can resume on re-enter.
+    if (!isMouseDownRef.current) {
+      startCoordinates.current = null;
+      setMouseCoordinates(null);
+      lastCoordinatesRef.current = null;
+    }
     clearPreview();
   }, [setMouseCoordinates, clearPreview]);
+
+  // Attach a global mouseup to capture releases occurring outside the canvas
+  // Stable global listener registered once; uses refs for latest state
+  const finalizeDrawingRef = useRef(finalizeDrawing);
+  useEffect(() => {
+    finalizeDrawingRef.current = finalizeDrawing;
+  }, [finalizeDrawing]);
+
+  useEffect(() => {
+    const handleWindowMouseUp = () => {
+      if (!isMouseDownRef.current) return;
+      finalizeDrawingRef.current(lastCoordinatesRef.current);
+    };
+    window.addEventListener("mouseup", handleWindowMouseUp);
+    return () => window.removeEventListener("mouseup", handleWindowMouseUp);
+  }, []);
 
   return {
     handleMouseDown,
