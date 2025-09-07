@@ -9,11 +9,10 @@ import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelec
 import { useSpriteData } from "./useSpriteData";
 
 // Lib imports
-import { handleDraw } from "../libs/handleDraw";
+import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
-import { EditorTools } from "../../../types/tools";
 
 export const usePencil = () => {
   const { canvasRef } = useCanvas();
@@ -25,15 +24,9 @@ export const usePencil = () => {
     (coordinates: Coordinates) => {
       if (!canvasRef.current) return;
 
-      const colorDrawn = handleDraw(
-        canvasRef.current,
-        coordinates,
-        color,
-        palette,
-        EditorTools.Pencil
-      );
+      drawPixelOnCanvas(canvasRef.current, coordinates, color, palette);
 
-      setSpriteDataCoordinates(coordinates, colorDrawn);
+      setSpriteDataCoordinates(coordinates, color);
     },
     [canvasRef, color, palette, setSpriteDataCoordinates]
   );
@@ -42,15 +35,9 @@ export const usePencil = () => {
     (coordinates: Coordinates) => {
       if (!canvasRef.current) return;
 
-      const colorDrawn = handleDraw(
-        canvasRef.current,
-        coordinates,
-        color,
-        palette,
-        EditorTools.Pencil
-      );
+      drawPixelOnCanvas(canvasRef.current, coordinates, color, palette);
 
-      setSpriteDataCoordinates(coordinates, colorDrawn);
+      setSpriteDataCoordinates(coordinates, color);
     },
     [canvasRef, color, palette, setSpriteDataCoordinates]
   );

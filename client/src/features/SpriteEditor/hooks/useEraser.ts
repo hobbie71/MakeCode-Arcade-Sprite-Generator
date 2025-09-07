@@ -8,11 +8,10 @@ import { usePaletteSelected } from "../../../context/PaletteSelectedContext/useP
 import { useSpriteData } from "./useSpriteData";
 
 // Lib imports
-import { handleDraw } from "../libs/handleDraw";
+import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
-import { EditorTools } from "../../../types/tools";
 import { MakeCodeColor } from "../../../types/color";
 
 export const useEraser = () => {
@@ -24,15 +23,14 @@ export const useEraser = () => {
     (coordinates: Coordinates) => {
       if (!canvasRef.current) return;
 
-      const colorDrawn = handleDraw(
+      drawPixelOnCanvas(
         canvasRef.current,
         coordinates,
         MakeCodeColor.TRANSPARENT,
-        palette,
-        EditorTools.Pencil
+        palette
       );
 
-      setSpriteDataCoordinates(coordinates, colorDrawn);
+      setSpriteDataCoordinates(coordinates, MakeCodeColor.TRANSPARENT);
     },
     [canvasRef, palette, setSpriteDataCoordinates]
   );
@@ -41,12 +39,11 @@ export const useEraser = () => {
     (coordinates: Coordinates) => {
       if (!canvasRef.current) return;
 
-      handleDraw(
+      drawPixelOnCanvas(
         canvasRef.current,
         coordinates,
         MakeCodeColor.TRANSPARENT,
-        palette,
-        EditorTools.Pencil
+        palette
       );
 
       setSpriteDataCoordinates(coordinates, MakeCodeColor.TRANSPARENT);

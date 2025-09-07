@@ -21,6 +21,7 @@ import { usePasteData } from "../hooks/usePasteData";
 // Component imports
 import SelectionOverlay from "./SelectionOverlay";
 import ImportPreview from "./ImportPreview";
+import PreviewCanvas from "./PreviewCanvas";
 
 // Const imports
 import { PIXEL_SIZE } from "../constants/canvas";
@@ -119,10 +120,16 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
         onMouseUp={handleMouseUp}
         style={{
           transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
-          position: "absolute",
           transformOrigin: "50% 50%",
           outline: "none",
         }}
+      />
+      <PreviewCanvas
+        width={width}
+        height={height}
+        pixelSize={pixelSize}
+        offset={offset}
+        zoom={zoom}
       />
       <ImportPreview />
       <SelectionOverlay />
