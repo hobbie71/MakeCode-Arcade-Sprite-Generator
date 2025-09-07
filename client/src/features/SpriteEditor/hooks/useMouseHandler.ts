@@ -15,7 +15,7 @@ import { usePencil } from "./usePencil";
 import { useEraser } from "./useEraser";
 import { useFill } from "./useFill";
 import { useLine } from "./useLine";
-// import { useRectangle } from "./useRectangle";
+import { useRectangle } from "./useRectangle";
 // import { useCircle } from "./useCircle";
 // import { useSelect } from "./useSelect";
 import { EditorTools } from "../../../types/tools";
@@ -47,11 +47,11 @@ export const useMouseHandler = () => {
     handlePointerMove: handleLineMove,
     handlePointerUp: handleLineUp,
   } = useLine();
-  // const {
-  //   handlePointerDown: handleRectangleDown,
-  //   handlePointerMove: handleRectangleMove,
-  //   handlePointerUp: handleRectangleUp,
-  // } = useRectangle();
+  const {
+    handlePointerDown: handleRectangleDown,
+    handlePointerMove: handleRectangleMove,
+    handlePointerUp: handleRectangleUp,
+  } = useRectangle();
   // const {
   //   handlePointerDown: handleCircleDown,
   //   handlePointerMove: handleCircleMove,
@@ -96,8 +96,8 @@ export const useMouseHandler = () => {
         handleFillDown(coordinates);
       } else if (tool === EditorTools.Line) {
         handleLineDown(coordinates);
-        // } else if (tool === EditorTools.Rectangle) {
-        //   handleRectangleDown(coordinates);
+      } else if (tool === EditorTools.Rectangle) {
+        handleRectangleDown(coordinates);
         // } else if (tool === EditorTools.Circle) {
         //   handleCircleDown(coordinates);
         // } else if (tool === EditorTools.Select) {
@@ -116,7 +116,7 @@ export const useMouseHandler = () => {
       handleEraserDown,
       handleFillDown,
       handleLineDown,
-      // handleRectangleDown,
+      handleRectangleDown,
       // handleCircleDown,
       // handleSelectDown,
     ]
@@ -139,7 +139,7 @@ export const useMouseHandler = () => {
       } else if (tool === EditorTools.Line) {
         handleLineUp(coordinates);
       } else if (tool === EditorTools.Rectangle) {
-        //   handleRectangleUp(coordinates);
+        handleRectangleUp(coordinates);
         // } else if (tool === EditorTools.Circle) {
         //   handleCircleUp(coordinates);
         // } else if (tool === EditorTools.Select) {
@@ -157,7 +157,7 @@ export const useMouseHandler = () => {
       handlePencilUp,
       handleEraserUp,
       handleLineUp,
-      // handleRectangleUp,
+      handleRectangleUp,
       // handleCircleUp,
       // handleSelectUp,
     ]
@@ -194,8 +194,8 @@ export const useMouseHandler = () => {
       }
       if (tool === EditorTools.Line) {
         handleLineMove(coordinates);
-        // } else if (tool === EditorTools.Rectangle) {
-        //   handleRectangleMove(coordinates);
+      } else if (tool === EditorTools.Rectangle) {
+        handleRectangleMove(coordinates);
         // } else if (tool === EditorTools.Circle) {
         //   handleCircleMove(coordinates);
         // }
@@ -217,7 +217,7 @@ export const useMouseHandler = () => {
       handlePencilMove,
       handleEraserMove,
       handleLineMove,
-      // handleRectangleMove,
+      handleRectangleMove,
       // handleCircleMove,
       // handleSelectMove,
     ]
