@@ -10,7 +10,7 @@ import ExportSection from "./features/ExportSection/ExportSection";
 import InputSection from "./features/InputSection/InputSection";
 import IssueReportButton from "./features/IssueReport/IssueReportButton";
 import Error from "./components/Error";
-import HorizontalResponiveAd from "./components/AdComponents/HorizontalResponiveAd";
+// import HorizontalResponiveAd from "./components/AdComponents/HorizontalResponiveAd";
 
 function App() {
   const [highlightIssueButton, setHighlightIssueButton] = useState(false);
@@ -24,9 +24,9 @@ function App() {
 
   return (
     <AppProviders>
-      <div className="flex justify-center w-full max-w-2xl mx-auto max-h-40 overflow-hidden">
+      {/* <div className="flex justify-center w-full max-w-2xl mx-auto max-h-40 overflow-hidden">
         <HorizontalResponiveAd />
-      </div>
+      </div> */}
       <main className="app-layout">
         <section className="sidebar">
           <InputSection />
