@@ -13,7 +13,7 @@ const ExportSection = () => {
     useExportSpriteData();
 
   return (
-    <section className="export-section bg-neutral-900 ">
+    <section className="export-section bg-neutral-900 py-16 sm:py-4">
       <h3 className="heading-3">Export Sprite Image</h3>
       <div className="export-grid">
         {Object.values(ImageExportFormats).map((format) => (

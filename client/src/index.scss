@@ -70,15 +70,15 @@
 
   /* Layout Components */
   .app-layout {
-    @apply h-screen w-full flex overflow-hidden;
+    @apply h-screen w-full flex overflow-hidden flex-col sm:flex-row;
   }
 
   .sidebar {
-    @apply w-80 bg-neutral-900 border-r border-neutral-200 overflow-y-auto flex-shrink-0;
+    @apply hidden sm:block w-80 bg-neutral-900 border-r border-neutral-200 overflow-y-auto flex-shrink-0;
   }
 
   .sidebar-mobile {
-    @apply fixed inset-y-0 left-0 z-50 w-80 bg-neutral-50 border-r border-neutral-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0;
+    @apply fixed inset-0 z-50 w-full h-full bg-neutral-900 transform -translate-x-full transition-transform duration-300 ease-in-out sm:translate-x-0 sm:static sm:inset-0 sm:w-80 sm:h-auto overflow-y-auto;
   }
 
   .sidebar-mobile.open {
@@ -98,11 +98,7 @@
   }
 
   .toolbox {
-    @apply w-auto max-w-24 p-2 bg-neutral-50 flex-shrink-0 overflow-y-auto;
-  }
-
-  .toolbox-mobile {
-    @apply hidden lg:block;
+    @apply w-auto max-w-24 p-2 bg-neutral-50 flex-shrink-0 overflow-y-auto hidden sm:block;
   }
 
   .export-section {
@@ -123,9 +119,7 @@
   }
 
   .btn-primary {
-    @apply btn;
-    background-color: #058b9b;
-    box-shadow: 2px 2px 0px #087984;
+    @apply btn bg-primary-500 shadow-[2px_2px_0px_theme('colors.primary.700')];
   }
 
   .btn-primary:hover:not(:disabled) {
@@ -138,9 +132,7 @@
   }
 
   .btn-secondary {
-    @apply btn;
-    background-color: #6b7280;
-    box-shadow: 2px 2px 0px #4b5563;
+    @apply btn bg-secondary-500 shadow-[2px_2px_0px_theme('colors.secondary.600')];
   }
 
   .btn-secondary:hover:not(:disabled) {
@@ -153,9 +145,7 @@
   }
 
   .btn-danger {
-    @apply btn;
-    background-color: #dc2626;
-    box-shadow: 2px 2px 0px #b91c1c;
+    @apply btn bg-danger-500 shadow-[2px_2px_0px_theme('colors.danger.600')];
   }
 
   .btn-danger:hover:not(:disabled) {
@@ -280,7 +270,7 @@
 
   /* Canvas Components */
   .canvas-container {
-    @apply flex-1 bg-[#1e1e1e] overflow-hidden relative;
+    @apply flex-1 bg-[#1e1e1e] overflow-hidden relative h-screen sm:h-auto;
 
     &:focus {
       outline: none;
@@ -302,12 +292,18 @@
   }
 
   /* Mobile Components */
-  .mobile-menu-button {
-    @apply lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-md shadow-md border border-neutral-200;
+
+  .mobile-menu-button:hover {
+    @apply opacity-90;
+  }
+
+  .mobile-menu-button:active {
+    @apply translate-y-0.5;
+    box-shadow: none;
   }
 
   .mobile-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden;
+    @apply fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden;
   }
 
   /* Responsive Utilities */

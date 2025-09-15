@@ -17,9 +17,16 @@ export default {
           900: "#144b52",
         },
         secondary: {
-          400: "#9ca3af", // Hover color
-          500: "#6b7280", // Main secondary color
-          600: "#4b5563", // Shadow color
+          50: "#fff5ef",
+          100: "#ffe3d5",
+          200: "#ffc2a8",
+          300: "#ff9b6d",
+          400: "#ff7a3d", // Hover color
+          500: "#f66721", // Main secondary color
+          600: "#c94f1a", // Shadow color
+          700: "#a03e15",
+          800: "#7a2f10",
+          900: "#5c230c",
         },
         danger: {
           400: "#ef4444", // Hover color
