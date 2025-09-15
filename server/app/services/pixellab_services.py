@@ -68,7 +68,7 @@ class PixelLabServices:
       
       # Add PixelLab specific parameters only if they are not empty/auto
       if settings.quality.value and settings.quality.value.strip():
-        params["quality"] = settings.quality.value
+        params["detail"] = settings.quality.value
       
       if settings.view.value and settings.view.value.strip():
         params["view"] = settings.view.value
