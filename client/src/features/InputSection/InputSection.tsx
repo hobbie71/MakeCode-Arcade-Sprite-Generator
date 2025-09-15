@@ -2,7 +2,6 @@
 import GenerationMethodSection from "./GenerationMethodSection/GenerationMethodSection";
 import AssetOptionsSelection from "./components/AssetOptionsSelection";
 import PaletteSelection from "./components/PaletteSelection";
-import LoadingOverlay from "../../components/LoadingOverlay";
 
 interface Props {
   closeMobileSidebar: () => void;
@@ -40,7 +39,6 @@ const InputSection = ({ closeMobileSidebar }: Props) => {
         <PaletteSelection />
         <GenerationMethodSection />
       </section>
-      <LoadingOverlay />
     </>
   );
 };

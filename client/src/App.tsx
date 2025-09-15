@@ -11,6 +11,7 @@ import InputSection from "./features/InputSection/InputSection";
 import IssueReportButton from "./features/IssueReport/IssueReportButton";
 import Error from "./components/Error";
 import Button from "./components/Button";
+import LoadingOverlay from "./components/LoadingOverlay";
 // import HorizontalResponiveAd from "./components/AdComponents/HorizontalResponiveAd";
 
 function App() {
@@ -70,6 +71,7 @@ function App() {
         </section>
       </main>
       {/* <DevToolsButton /> */}
+      <LoadingOverlay />
       <IssueReportButton highlight={highlightIssueButton} />
       <Error />
     </AppProviders>
