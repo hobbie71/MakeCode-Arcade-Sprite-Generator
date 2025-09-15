@@ -14,6 +14,7 @@ import Error from "./components/Error";
 
 function App() {
   const [highlightIssueButton, setHighlightIssueButton] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     setHighlightIssueButton(true);
@@ -22,13 +23,36 @@ function App() {
     }, 5000); // Highlight for 5 seconds
   }, []);
 
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
+  };
+
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false);
+  };
+
   return (
     <AppProviders>
       {/* <div className="flex justify-center w-full max-w-2xl mx-auto max-h-40 overflow-hidden">
         <HorizontalResponiveAd />
       </div> */}
+
+      {/* Mobile menu button */}
+      <button
+        className="mobile-menu-button"
+        onClick={toggleMobileSidebar}
+        aria-label="Toggle sidebar">
+        Generate Sprite
+      </button>
+
+      {/* Mobile overlay */}
+      {isMobileSidebarOpen && (
+        <div className="mobile-overlay" onClick={closeMobileSidebar} />
+      )}
+
       <main className="app-layout">
-        <section className="sidebar">
+        <section
+          className={`sidebar-mobile ${isMobileSidebarOpen ? "open" : ""}`}>
           <InputSection />
         </section>
         <section className="main-content">

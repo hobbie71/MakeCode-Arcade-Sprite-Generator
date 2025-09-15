@@ -24,7 +24,7 @@ import ImportPreview from "./ImportPreview";
 import PreviewCanvas from "./PreviewCanvas";
 
 // Const imports
-import { PIXEL_SIZE } from "../constants/canvas";
+import { PIXEL_SIZE, MAX_ZOOM, MIN_ZOOM } from "../constants/canvas";
 
 interface Props {
   width: number;
@@ -36,7 +36,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   // Context
   const { canvasRef } = useCanvas();
   const { tool } = useToolSelected();
-  const { zoom } = useZoom();
+  const { zoom, setZoom } = useZoom();
   const { width, height } = useCanvasSize();
 
   // States
@@ -78,12 +78,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     }
   };
 
-  // Init Canvas and center canvas in screen
-  useEffect(() => {
-    // Init Canvas
-    initCanvas();
-
-    // Center Canvas
+  const centerCanvas = () => {
     const container = containerRef.current;
     if (!container) return;
 
@@ -92,7 +87,57 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     const centerY = rect.height / 2;
 
     setOffset({ x: centerX, y: centerY });
+  };
+
+  // Init Canvas and center canvas in screen
+  useEffect(() => {
+    // Init Canvas
+    initCanvas();
+
+    // Center Canvas
+    centerCanvas();
   }, [initCanvas]);
+
+  // effect: Center canvas on resize
+  useEffect(() => {
+    const handleResize = () => {
+      centerCanvas();
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // effect: Auto-adjust zoom when canvas size changes
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+
+    // Calculate the actual canvas dimensions (in pixels)
+    const canvasWidth = width * pixelSize;
+    const canvasHeight = height * pixelSize;
+
+    // Leave some padding around the canvas (10% of container size)
+    const padding = 0.1;
+    const availableWidth = containerRect.width * (1 - padding);
+    const availableHeight = containerRect.height * (1 - padding);
+
+    // Calculate zoom needed to fit both width and height
+    const zoomX = availableWidth / canvasWidth;
+    const zoomY = availableHeight / canvasHeight;
+
+    // Use the smaller zoom to ensure canvas fits in both dimensions
+    const optimalZoom = Math.min(zoomX, zoomY);
+
+    // Clamp zoom within allowed limits
+    const clampedZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, optimalZoom));
+
+    setZoom(clampedZoom);
+  }, [width, height, pixelSize, setZoom]);
 
   return (
     <div
