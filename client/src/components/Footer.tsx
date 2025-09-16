@@ -1,5 +1,5 @@
 const Footer = () => (
-  <footer className="text-center py-1 text-sm text-gray-400 flex flex-row flex-wrap justify-around items-center gap-2">
+  <footer className="text-center py-1 text-sm text-gray-400 flex md:flex-row flex-col flex-wrap justify-around items-center gap-2">
     <div>
       <div>Copyright © 2025 hobbie71. All rights reserved.</div>
       <div>
