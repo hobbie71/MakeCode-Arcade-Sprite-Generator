@@ -2,14 +2,15 @@ import React from "react";
 
 interface X_ButtonProps {
   onClick: () => void;
+  className?: string;
 }
 
-const X_Button: React.FC<X_ButtonProps> = ({ onClick }) => {
+const X_Button: React.FC<X_ButtonProps> = ({ onClick, className }) => {
   return (
     <button
       onClick={onClick}
-      className="text-white hover:text-gray-300 transition-colors sm:hidden"
-      aria-label="Close sidebar">
+      className={`text-white hover:text-gray-300 transition-colors ${className}`}
+      aria-label="Close menu">
       <svg
         className="w-6 h-6"
         fill="none"
