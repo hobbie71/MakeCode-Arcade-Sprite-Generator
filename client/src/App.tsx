@@ -10,8 +10,8 @@ import ExportSection from "./features/ExportSection/ExportSection";
 import InputSection from "./features/InputSection/InputSection";
 import IssueReportButton from "./features/IssueReport/IssueReportButton";
 import Error from "./components/Error";
-import Button from "./components/Button";
 import LoadingOverlay from "./components/LoadingOverlay";
+import NavBar from "./components/NavBar";
 // import HorizontalResponiveAd from "./components/AdComponents/HorizontalResponiveAd";
 
 function App() {
@@ -40,20 +40,7 @@ function App() {
       </div> */}
 
       {/* Mobile title */}
-      <div className="sm:hidden bg-[#171717]">
-        <h1 className="text-white text-lg font-bold text-center p-4">
-          MakeCode Arcade AI Sprite Generator
-        </h1>
-      </div>
-
-      {/* Mobile menu button */}
-      <Button
-        onClick={toggleMobileSidebar}
-        aria-label="Toggle sidebar"
-        variant="secondary"
-        className="fixed sm:hidden bottom-4 right-4 z-40">
-        Generate Sprite
-      </Button>
+      <NavBar toggleMobileSidebar={toggleMobileSidebar} />
 
       {/* Mobile overlay */}
       {isMobileSidebarOpen && (
