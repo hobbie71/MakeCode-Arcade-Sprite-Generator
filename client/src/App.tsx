@@ -12,6 +12,7 @@ import IssueReportButton from "./features/IssueReport/IssueReportButton";
 import Error from "./components/Error";
 import LoadingOverlay from "./components/LoadingOverlay";
 import NavBar from "./components/NavBar";
+import Footer from "./components/Footer";
 // import HorizontalResponiveAd from "./components/AdComponents/HorizontalResponiveAd";
 
 function App() {
@@ -52,6 +53,8 @@ function App() {
           <ExportSection />
         </section>
       </main>
+      <Footer />
+
       {/* <DevToolsButton /> */}
       <LoadingOverlay />
       <IssueReportButton highlight={highlightIssueButton} />
