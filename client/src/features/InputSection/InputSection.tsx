@@ -9,7 +9,7 @@ interface Props {
 
 const InputSection = ({ closeMobileSidebar }: Props) => {
   return (
-    <section className="sidebar-content w-full h-full text-center">
+    <div className="sidebar-content w-full h-full text-center">
       {/* Close button for mobile sidebar */}
       <div className="flex justify-between sm:justify-center items-center p-4 border-b border-neutral-200">
         <h2 className="text-white text-lg font-semibold">Generate Sprite</h2>
@@ -35,7 +35,7 @@ const InputSection = ({ closeMobileSidebar }: Props) => {
       <AssetOptionsSelection />
       <PaletteSelection />
       <GenerationMethodSection />
-    </section>
+    </div>
   );
 };
 
