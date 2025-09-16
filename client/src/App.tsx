@@ -39,13 +39,8 @@ function App() {
         <HorizontalResponiveAd />
       </div> */}
 
-      {/* Mobile title */}
+      {/* Navbar */}
       <NavBar toggleMobileSidebar={toggleMobileSidebar} />
-
-      {/* Mobile overlay */}
-      {isMobileSidebarOpen && (
-        <div className="mobile-overlay" onClick={closeMobileSidebar} />
-      )}
 
       <main className="app-layout">
         <section

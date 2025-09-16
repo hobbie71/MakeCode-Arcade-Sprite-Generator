@@ -302,10 +302,6 @@
     box-shadow: none;
   }
 
-  .mobile-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden;
-  }
-
   /* Responsive Utilities */
   .responsive-grid {
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
