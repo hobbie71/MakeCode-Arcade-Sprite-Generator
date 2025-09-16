@@ -43,26 +43,6 @@ const ExportSection = () => {
           <CodeDisplay codingLanguage="python">{getPythonCode()}</CodeDisplay>
         </div>
       </div>
-
-      {/* Instructional Preview Section */}
-
-      <h3 className="heading-3">How To Export Into Arcade MakeCode</h3>
-
-      <div className="mb-4 flex flex-col gap-6">
-        <p className="text-neutral-300 text-sm">
-          Copy the <b>Sprite Editor Code</b> above and paste it directly into
-          the <b>MakeCode Arcade Sprite Editor</b> to import your sprite!
-        </p>
-        <div className="text-neutral-300 text-sm">
-          Paste using: <span className="font-mono">Ctrl + V</span> (Windows) or{" "}
-          <span className="font-mono">Cmd + V</span> (Mac)
-        </div>
-        <img
-          src="../preview.gif"
-          alt="How to copy and paste into MakeCode Arcade"
-          className="max-w-[640px] h-auto rounded shadow"
-        />
-      </div>
     </section>
   );
 };

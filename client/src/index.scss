@@ -70,7 +70,7 @@
 
   /* Layout Components */
   .app-layout {
-    @apply h-screen w-full flex flex-col sm:flex-row overflow-auto;
+    @apply min-h-screen w-full flex flex-col sm:flex-row;
   }
 
   .sidebar {
@@ -78,7 +78,7 @@
   }
 
   .sidebar-mobile {
-    @apply fixed inset-0 z-50 w-full h-full bg-neutral-900 transform -translate-x-full transition-transform duration-300 ease-in-out sm:translate-x-0 sm:static sm:inset-0 sm:w-80 sm:h-auto;
+    @apply fixed inset-0 z-50 w-full h-full bg-neutral-900 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-x-auto sm:overflow-visible sm:translate-x-0 sm:static sm:inset-0 sm:w-80 sm:h-auto;
   }
 
   .sidebar-mobile.open {
@@ -103,6 +103,14 @@
 
   .export-section {
     @apply bg-white border-t border-neutral-200 p-4;
+  }
+
+  .popup {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60;
+  }
+
+  .popup-content {
+    @apply bg-[#171717] rounded-lg shadow-lg p-6 max-w-md w-full relative text-neutral-200;
   }
 
   .absolute-center {
