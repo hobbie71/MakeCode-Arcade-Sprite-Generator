@@ -14,7 +14,7 @@ const NavBar = ({ toggleMobileSidebar, toggleExportInstructions }: Props) => {
           src="/web-app-manifest-192x192.png"
           alt="MakeSpriteCode.com"
         />
-        <h1 className="text-white font-bold text-center pl-4 hidden sm:text-lg">
+        <h1 className="text-white font-bold text-center pl-4 hidden sm:block text-lg ">
           MakeCode Arcade AI Sprite Generator
         </h1>
       </div>
