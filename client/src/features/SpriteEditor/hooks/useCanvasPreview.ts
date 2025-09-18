@@ -18,6 +18,9 @@ import {
 } from "../libs/getShapeCoordinates";
 
 // Type imports
+import { PIXEL_SIZE } from "../constants/canvas";
+
+// Type imports
 import type { Coordinates } from "../../../types/pixel";
 
 export const useCanvasPreview = () => {
@@ -43,7 +46,14 @@ export const useCanvasPreview = () => {
 
       clearPreview();
 
-      drawPixelOnCanvas(canvas, position, color, palette, strokeSize);
+      drawPixelOnCanvas(
+        canvas,
+        position,
+        color,
+        palette,
+        PIXEL_SIZE,
+        strokeSize
+      );
     },
     [clearPreview, previewCanvasRef, color, palette, strokeSize]
   );
@@ -56,7 +66,14 @@ export const useCanvasPreview = () => {
       clearPreview();
 
       const coordinates = getLineCoordinates(startCoordinates, endCoordinates);
-      drawPixelsOnCanvas(canvas, coordinates, color, palette, strokeSize);
+      drawPixelsOnCanvas(
+        canvas,
+        coordinates,
+        color,
+        palette,
+        PIXEL_SIZE,
+        strokeSize
+      );
     },
     [clearPreview, color, palette, previewCanvasRef, strokeSize]
   );
@@ -72,7 +89,14 @@ export const useCanvasPreview = () => {
         startCoordinates,
         endCoordinates
       );
-      drawPixelsOnCanvas(canvas, coordinates, color, palette, strokeSize);
+      drawPixelsOnCanvas(
+        canvas,
+        coordinates,
+        color,
+        palette,
+        PIXEL_SIZE,
+        strokeSize
+      );
     },
     [clearPreview, color, palette, previewCanvasRef, strokeSize]
   );
@@ -88,7 +112,14 @@ export const useCanvasPreview = () => {
         startCoordinates,
         endCoordinates
       );
-      drawPixelsOnCanvas(canvas, coordinates, color, palette, strokeSize);
+      drawPixelsOnCanvas(
+        canvas,
+        coordinates,
+        color,
+        palette,
+        PIXEL_SIZE,
+        strokeSize
+      );
     },
     [clearPreview, color, palette, previewCanvasRef, strokeSize]
   );
