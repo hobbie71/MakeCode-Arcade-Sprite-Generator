@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useToolSelected } from "../../contexts/ToolSelectedContext/useToolSelected";
 
 interface Props {
-  strokeSize: number;
+  strokeSize: 1 | 3 | 5;
 }
 
 const StrokeIcon = ({ strokeSize }: Props) => {

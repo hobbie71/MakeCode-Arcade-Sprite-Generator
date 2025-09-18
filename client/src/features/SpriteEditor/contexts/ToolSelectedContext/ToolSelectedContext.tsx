@@ -1,12 +1,13 @@
 import { createContext, useState, useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { EditorTools } from "../../../../types/tools";
+import type { StrokeSize } from "../../../../types/pixel";
 
 type ToolSelectedType = {
   tool: EditorTools;
   setTool: Dispatch<SetStateAction<EditorTools>>;
-  strokeSize: number;
-  setStrokeSize: Dispatch<SetStateAction<number>>;
+  strokeSize: StrokeSize;
+  setStrokeSize: Dispatch<SetStateAction<StrokeSize>>;
 };
 
 const ToolSelectedContext = createContext<undefined | ToolSelectedType>(
@@ -19,7 +20,7 @@ export const ToolSelectedProvider = ({
   children: React.ReactNode;
 }) => {
   const [tool, setTool] = useState<EditorTools>(EditorTools.Pencil);
-  const [strokeSize, setStrokeSize] = useState<number>(1);
+  const [strokeSize, setStrokeSize] = useState<StrokeSize>(1);
 
   const contextValue = useMemo(
     () => ({ tool, setTool, strokeSize, setStrokeSize }),
