@@ -1,4 +1,4 @@
-import { useEffect, memo, useState, useRef } from "react";
+import { useEffect, memo, useState, useRef, useCallback } from "react";
 
 // Context import
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
@@ -89,32 +89,10 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     setOffset({ x: centerX, y: centerY });
   };
 
-  // Init Canvas and center canvas in screen
-  useEffect(() => {
-    // Init Canvas
-    initCanvas();
-
-    // Center Canvas
-    centerCanvas();
-  }, [initCanvas]);
-
-  // effect: Center canvas on resize
-  useEffect(() => {
-    const handleResize = () => {
-      centerCanvas();
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  // effect: Auto-adjust zoom when canvas size changes
-  useEffect(() => {
-    if (!containerRef.current) return;
-
+  const getInitZoom = useCallback((): number => {
     const container = containerRef.current;
+    if (!container) throw new Error("No container");
+
     const containerRect = container.getBoundingClientRect();
 
     // Calculate the actual canvas dimensions (in pixels)
@@ -135,9 +113,47 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
 
     // Clamp zoom within allowed limits
     const clampedZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, optimalZoom));
+    return clampedZoom;
+  }, [height, width, pixelSize]);
 
-    setZoom(clampedZoom);
-  }, [width, height, pixelSize, setZoom]);
+  // Init Canvas and center canvas in screen
+  useEffect(() => {
+    // Init Canvas
+    initCanvas();
+
+    // Center Canvas
+    centerCanvas();
+
+    const newZoom = getInitZoom();
+    setZoom(newZoom);
+  }, [initCanvas, getInitZoom, setZoom, zoom]);
+
+  // effect: Center canvas on resize
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    centerCanvas();
+
+    const handleResize = () => {
+      centerCanvas();
+
+      const newZoom = getInitZoom();
+      setZoom(newZoom);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [getInitZoom, setZoom]);
+
+  // effect: Auto-adjust zoom when canvas size changes
+  useEffect(() => {
+    const newZoom = getInitZoom();
+    setZoom(newZoom);
+  }, [width, height, pixelSize, setZoom, getInitZoom]);
 
   return (
     <div
