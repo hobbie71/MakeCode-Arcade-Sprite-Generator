@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
+import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
 
 // Hook imports
 import { useSpriteData } from "./useSpriteData";
@@ -13,33 +14,49 @@ import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
+import { PIXEL_SIZE } from "../constants/canvas";
 
 export const usePencil = () => {
   const { canvasRef } = useCanvas();
   const { color } = useColorSelected();
   const { palette } = usePaletteSelected();
   const { setSpriteDataCoordinates, commitSpriteData } = useSpriteData();
+  const { strokeSize } = useStrokeSize();
 
   const handlePointerDown = useCallback(
     (coordinates: Coordinates) => {
       if (!canvasRef.current) return;
 
-      drawPixelOnCanvas(canvasRef.current, coordinates, color, palette);
+      drawPixelOnCanvas(
+        canvasRef.current,
+        coordinates,
+        color,
+        palette,
+        PIXEL_SIZE,
+        strokeSize
+      );
 
       setSpriteDataCoordinates(coordinates, color);
     },
-    [canvasRef, color, palette, setSpriteDataCoordinates]
+    [canvasRef, color, palette, setSpriteDataCoordinates, strokeSize]
   );
 
   const handlePointerMove = useCallback(
     (coordinates: Coordinates) => {
       if (!canvasRef.current) return;
 
-      drawPixelOnCanvas(canvasRef.current, coordinates, color, palette);
+      drawPixelOnCanvas(
+        canvasRef.current,
+        coordinates,
+        color,
+        palette,
+        PIXEL_SIZE,
+        strokeSize
+      );
 
       setSpriteDataCoordinates(coordinates, color);
     },
-    [canvasRef, color, palette, setSpriteDataCoordinates]
+    [canvasRef, color, palette, setSpriteDataCoordinates, strokeSize]
   );
 
   const handlePointerUp = useCallback(() => {

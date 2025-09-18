@@ -12,9 +12,11 @@ import { drawPixelsOnCanvas } from "../libs/drawPixelOnCanvas";
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
 
 // Type imports
-import type { Coordinates } from "../../../types/pixel";
+import { type Coordinates } from "../../../types/pixel";
+import { PIXEL_SIZE } from "../constants/canvas";
 
 export const useLine = () => {
   const { canvasRef } = useCanvas();
@@ -22,6 +24,7 @@ export const useLine = () => {
   const { palette } = usePaletteSelected();
   const { drawLinePreview, drawDotPreview } = useCanvasPreview();
   const { setSpriteDataCoordinates, commitSpriteData } = useSpriteData();
+  const { strokeSize } = useStrokeSize();
 
   const startCoordinates = useRef<Coordinates | null>(null);
 
@@ -50,12 +53,26 @@ export const useLine = () => {
       if (!startCoordinates.current) return;
 
       const coordinates = getLineCoordinates(startCoordinates.current, end);
-      drawPixelsOnCanvas(canvas, coordinates, color, palette);
+      drawPixelsOnCanvas(
+        canvas,
+        coordinates,
+        color,
+        palette,
+        PIXEL_SIZE,
+        strokeSize
+      );
 
       setSpriteDataCoordinates(coordinates, color);
       commitSpriteData();
     },
-    [canvasRef, color, palette, setSpriteDataCoordinates, commitSpriteData]
+    [
+      canvasRef,
+      color,
+      palette,
+      setSpriteDataCoordinates,
+      commitSpriteData,
+      strokeSize,
+    ]
   );
   return { handlePointerDown, handlePointerMove, handlePointerUp };
 };

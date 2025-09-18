@@ -3,6 +3,8 @@ import { useCallback } from "react";
 // Context imports
 import { useSprite } from "../../../context/SpriteContext/useSprite";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
 
 // Lib imports
 import { drawPixelOnCanvasTransparent } from "../libs/drawPixelOnCanvas";
@@ -14,6 +16,8 @@ import { PIXEL_SIZE } from "../constants/canvas";
 export const useExportSpriteData = () => {
   const { spriteData } = useSprite();
   const { height, width } = useCanvasSize();
+  const { palette } = usePaletteSelected();
+  const { strokeSize } = useStrokeSize();
 
   const exportSpriteToImage = useCallback(
     (format: ImageExportFormats) => {
@@ -27,7 +31,14 @@ export const useExportSpriteData = () => {
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           const color = spriteData[y][x];
-          drawPixelOnCanvasTransparent(exportCanvas, { x, y }, color);
+          drawPixelOnCanvasTransparent(
+            exportCanvas,
+            { x, y },
+            color,
+            palette,
+            PIXEL_SIZE,
+            strokeSize
+          );
         }
       }
 
@@ -39,7 +50,7 @@ export const useExportSpriteData = () => {
       link.click();
       link.remove();
     },
-    [height, width, spriteData]
+    [height, width, spriteData, palette, strokeSize]
   );
 
   const getImgCode = useCallback((): string => {

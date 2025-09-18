@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { usePreviewCanvas } from "../../../context/PreviewCanvasContext/usePreviewCanvas";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
 
 // Lib imports
 import {
@@ -23,6 +24,7 @@ export const useCanvasPreview = () => {
   const { previewCanvasRef } = usePreviewCanvas();
   const { color } = useColorSelected();
   const { palette } = usePaletteSelected();
+  const { strokeSize } = useStrokeSize();
 
   const clearPreview = useCallback(() => {
     const canvas = previewCanvasRef.current;
@@ -41,9 +43,9 @@ export const useCanvasPreview = () => {
 
       clearPreview();
 
-      drawPixelOnCanvas(canvas, position, color, palette);
+      drawPixelOnCanvas(canvas, position, color, palette, strokeSize);
     },
-    [clearPreview, previewCanvasRef, color, palette]
+    [clearPreview, previewCanvasRef, color, palette, strokeSize]
   );
 
   const drawLinePreview = useCallback(
@@ -54,9 +56,9 @@ export const useCanvasPreview = () => {
       clearPreview();
 
       const coordinates = getLineCoordinates(startCoordinates, endCoordinates);
-      drawPixelsOnCanvas(canvas, coordinates, color, palette);
+      drawPixelsOnCanvas(canvas, coordinates, color, palette, strokeSize);
     },
-    [clearPreview, color, palette, previewCanvasRef]
+    [clearPreview, color, palette, previewCanvasRef, strokeSize]
   );
 
   const drawSquarePreview = useCallback(
@@ -70,9 +72,9 @@ export const useCanvasPreview = () => {
         startCoordinates,
         endCoordinates
       );
-      drawPixelsOnCanvas(canvas, coordinates, color, palette);
+      drawPixelsOnCanvas(canvas, coordinates, color, palette, strokeSize);
     },
-    [clearPreview, color, palette, previewCanvasRef]
+    [clearPreview, color, palette, previewCanvasRef, strokeSize]
   );
 
   const drawCirclePreview = useCallback(
@@ -86,9 +88,9 @@ export const useCanvasPreview = () => {
         startCoordinates,
         endCoordinates
       );
-      drawPixelsOnCanvas(canvas, coordinates, color, palette);
+      drawPixelsOnCanvas(canvas, coordinates, color, palette, strokeSize);
     },
-    [clearPreview, color, palette, previewCanvasRef]
+    [clearPreview, color, palette, previewCanvasRef, strokeSize]
   );
 
   return {

@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 
 // Context import
-import { useToolSelected } from "../../contexts/ToolSelectedContext/useToolSelected";
+import { useStrokeSize } from "../../contexts/StrokeSizeContext/useStrokeSize";
+
+// Type imports
+import type { StrokeSize } from "../../../../types/pixel";
 
 interface Props {
-  strokeSize: 1 | 3 | 5;
+  strokeSize: StrokeSize;
 }
 
 const StrokeIcon = ({ strokeSize }: Props) => {
-  const { strokeSize: currentStrokeSize, setStrokeSize } = useToolSelected();
+  const { strokeSize: currentStrokeSize, setStrokeSize } = useStrokeSize();
   const [isSelected, setIsSelected] = useState<boolean>(false);
 
   useEffect(

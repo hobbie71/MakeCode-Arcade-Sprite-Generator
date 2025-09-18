@@ -12,6 +12,7 @@ import { OpenAISettingsProvider } from "../context/OpenAISettingsContext/OpenAIS
 import { PostProcessingProvider } from "../context/PostProcessingContext/PostProcessingContext";
 import { ErrorProvider } from "../context/ErrorContext/ErrorContext";
 import { PreviewCanvasProvider } from "../context/PreviewCanvasContext/PreviewCanvasContext";
+import { StrokeSizeProvider } from "../features/SpriteEditor/contexts/StrokeSizeContext/StrokeSizeContext";
 
 const AppProviders = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -28,7 +29,9 @@ const AppProviders = ({ children }: { children: React.ReactNode }) => {
                         <ImageImportProvider>
                           <PostProcessingProvider>
                             <PreviewCanvasProvider>
-                              <ErrorProvider>{children}</ErrorProvider>
+                              <StrokeSizeProvider>
+                                <ErrorProvider>{children}</ErrorProvider>
+                              </StrokeSizeProvider>
                             </PreviewCanvasProvider>
                           </PostProcessingProvider>
                         </ImageImportProvider>
