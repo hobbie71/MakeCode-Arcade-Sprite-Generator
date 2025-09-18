@@ -3,6 +3,7 @@ import { ToolSelectedProvider } from "../contexts/ToolSelectedContext/ToolSelect
 import { ZoomProvider } from "../contexts/ZoomContext/ZoomContext";
 import { SelectionAreaProvider } from "../contexts/SelectionArea/SelectionAreaContext";
 import { MouseCoordinatesProvider } from "../contexts/MouseCoordinatesContext/MouseCoordinatesContext";
+import { StrokeSizeProvider } from "../contexts/StrokeSizeContext/StrokeSizeContext";
 
 const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -10,7 +11,9 @@ const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
       <ToolSelectedProvider>
         <SelectionAreaProvider>
           <MouseCoordinatesProvider>
-            <ZoomProvider>{children}</ZoomProvider>
+            <StrokeSizeProvider>
+              <ZoomProvider>{children}</ZoomProvider>
+            </StrokeSizeProvider>
           </MouseCoordinatesProvider>
         </SelectionAreaProvider>
       </ToolSelectedProvider>
