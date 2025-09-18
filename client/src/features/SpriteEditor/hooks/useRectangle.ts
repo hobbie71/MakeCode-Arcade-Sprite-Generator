@@ -8,6 +8,9 @@ import { useSpriteData } from "./useSpriteData";
 import { getSquareCoordinates } from "../libs/getShapeCoordinates";
 import { drawPixelsOnCanvas } from "../libs/drawPixelOnCanvas";
 
+// Utils imports
+import { getStrokeCoordinates } from "../utils/getStrokeCoordinates";
+
 // Context imports
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
@@ -62,7 +65,14 @@ export const useRectangle = () => {
         strokeSize
       );
 
-      setSpriteDataCoordinates(coordinates, color);
+      // Apply stroke size to each coordinate for sprite data
+      const allStrokeCoordinates: Coordinates[] = [];
+      coordinates.forEach((coord) => {
+        const strokeCoords = getStrokeCoordinates(coord, strokeSize);
+        allStrokeCoordinates.push(...strokeCoords);
+      });
+
+      setSpriteDataCoordinates(allStrokeCoordinates, color);
       commitSpriteData();
     },
     [

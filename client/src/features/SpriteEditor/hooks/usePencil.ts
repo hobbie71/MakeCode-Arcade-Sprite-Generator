@@ -12,6 +12,9 @@ import { useSpriteData } from "./useSpriteData";
 // Lib imports
 import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
+// Utils imports
+import { getStrokeCoordinates } from "../utils/getStrokeCoordinates";
+
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
 import { PIXEL_SIZE } from "../constants/canvas";
@@ -36,7 +39,9 @@ export const usePencil = () => {
         strokeSize
       );
 
-      setSpriteDataCoordinates(coordinates, color);
+      // Get all coordinates affected by stroke size for sprite data
+      const strokeCoordinates = getStrokeCoordinates(coordinates, strokeSize);
+      setSpriteDataCoordinates(strokeCoordinates, color);
     },
     [canvasRef, color, palette, setSpriteDataCoordinates, strokeSize]
   );
@@ -54,7 +59,9 @@ export const usePencil = () => {
         strokeSize
       );
 
-      setSpriteDataCoordinates(coordinates, color);
+      // Get all coordinates affected by stroke size for sprite data
+      const strokeCoordinates = getStrokeCoordinates(coordinates, strokeSize);
+      setSpriteDataCoordinates(strokeCoordinates, color);
     },
     [canvasRef, color, palette, setSpriteDataCoordinates, strokeSize]
   );

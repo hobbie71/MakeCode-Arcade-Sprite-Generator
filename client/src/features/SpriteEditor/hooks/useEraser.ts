@@ -11,6 +11,9 @@ import { useSpriteData } from "./useSpriteData";
 // Lib imports
 import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
+// Utils imports
+import { getStrokeCoordinates } from "../utils/getStrokeCoordinates";
+
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
 import { MakeCodeColor } from "../../../types/color";
@@ -37,7 +40,9 @@ export const useEraser = () => {
         strokeSize
       );
 
-      setSpriteDataCoordinates(coordinates, MakeCodeColor.TRANSPARENT);
+      // Get all coordinates affected by stroke size for sprite data
+      const strokeCoordinates = getStrokeCoordinates(coordinates, strokeSize);
+      setSpriteDataCoordinates(strokeCoordinates, MakeCodeColor.TRANSPARENT);
     },
     [canvasRef, palette, setSpriteDataCoordinates, strokeSize]
   );
@@ -55,7 +60,9 @@ export const useEraser = () => {
         strokeSize
       );
 
-      setSpriteDataCoordinates(coordinates, MakeCodeColor.TRANSPARENT);
+      // Get all coordinates affected by stroke size for sprite data
+      const strokeCoordinates = getStrokeCoordinates(coordinates, strokeSize);
+      setSpriteDataCoordinates(strokeCoordinates, MakeCodeColor.TRANSPARENT);
     },
     [canvasRef, palette, setSpriteDataCoordinates, strokeSize]
   );
