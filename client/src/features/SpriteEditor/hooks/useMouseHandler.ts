@@ -198,8 +198,12 @@ export const useMouseHandler = () => {
         return;
       }
 
-      // Draw dot preview if Left Mouse Button not down
-      if (!isMouseDownRef.current && !isDrawing.current) {
+      // Draw dot preview if Left Mouse Button not down AND tool is not fill
+      if (
+        !isMouseDownRef.current &&
+        !isDrawing.current &&
+        tool !== EditorTools.Fill
+      ) {
         drawDotPreview(coordinates);
         return;
       }
