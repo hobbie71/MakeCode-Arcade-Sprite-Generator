@@ -7,7 +7,7 @@ interface Props {
 
 const NavBar = ({ toggleMobileSidebar, toggleExportInstructions }: Props) => {
   return (
-    <nav className="bg-[#171717] flex flex-row justify-between p-4">
+    <nav className="bg-[#171717] flex flex-row justify-between p-4 border-b-[1px] border-solid border-white">
       <div className="flex flex-row items-center">
         <img
           className="max-h-12"
