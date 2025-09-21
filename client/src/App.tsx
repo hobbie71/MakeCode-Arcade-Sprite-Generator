@@ -45,6 +45,19 @@ function App() {
     setIsExportInstructionsOpen(false);
   };
 
+  useEffect(() => {
+    const root = document.getElementById("root");
+    if (!root) throw "No root element";
+
+    if (isMobileSidebarOpen) {
+      root.style.overflowY = "hidden";
+      root.style.height = "100vh";
+    } else {
+      root.style.overflowY = "";
+      root.style.height = "";
+    }
+  }, [isMobileSidebarOpen]);
+
   return (
     <AppProviders>
       {/* <div className="flex justify-center w-full max-w-2xl mx-auto max-h-40 overflow-hidden">
