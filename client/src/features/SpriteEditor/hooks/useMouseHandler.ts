@@ -203,7 +203,9 @@ export const useMouseHandler = () => {
       if (
         !isMouseDownRef.current &&
         !isDrawing.current &&
-        tool !== EditorTools.Fill
+        tool !== EditorTools.Fill &&
+        tool !== EditorTools.Select &&
+        tool !== EditorTools.Pan
       ) {
         // if eraser draw clear preview
         if (tool === EditorTools.Eraser) {
