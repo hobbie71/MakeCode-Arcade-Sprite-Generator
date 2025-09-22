@@ -21,6 +21,7 @@ import { useCircle } from "./useCircle";
 // import { useSelect } from "./useSelect";
 import { EditorTools } from "../../../types/tools";
 import { useCanvasPreview } from "./useCanvasPreview";
+import { MakeCodeColor } from "../../../types/color";
 
 export const useMouseHandler = () => {
   const { mouseCoordinates, setMouseCoordinates } = useMouseCoordinates();
@@ -204,7 +205,12 @@ export const useMouseHandler = () => {
         !isDrawing.current &&
         tool !== EditorTools.Fill
       ) {
-        drawDotPreview(coordinates);
+        // if eraser draw clear preview
+        if (tool === EditorTools.Eraser) {
+          drawDotPreview(coordinates, MakeCodeColor.TRANSPARENT);
+        } else {
+          drawDotPreview(coordinates);
+        }
         return;
       }
 

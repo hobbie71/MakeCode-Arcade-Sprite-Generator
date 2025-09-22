@@ -22,6 +22,7 @@ import { PIXEL_SIZE } from "../constants/canvas";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
+import type { MakeCodeColor } from "../../../types/color";
 
 export const useCanvasPreview = () => {
   const { previewCanvasRef } = usePreviewCanvas();
@@ -40,7 +41,7 @@ export const useCanvasPreview = () => {
   }, [previewCanvasRef]);
 
   const drawDotPreview = useCallback(
-    (position: Coordinates) => {
+    (position: Coordinates, previewColor: MakeCodeColor = color) => {
       const canvas = previewCanvasRef.current;
       if (!canvas) return;
 
@@ -49,7 +50,7 @@ export const useCanvasPreview = () => {
       drawPixelOnCanvas(
         canvas,
         position,
-        color,
+        previewColor,
         palette,
         PIXEL_SIZE,
         strokeSize
