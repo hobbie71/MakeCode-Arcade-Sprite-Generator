@@ -23,6 +23,11 @@ export const usePan = (
 
       lastPanPosition.current = { x: e.clientX, y: e.clientY };
       isMouseDown.current = true;
+
+      // Update mouse style
+      if (e.currentTarget.style.cursor === "grab") {
+        e.currentTarget.style.cursor = "grabbing";
+      }
     },
     [tool]
   );
@@ -42,13 +47,33 @@ export const usePan = (
     },
     [offset, setOffset, tool]
   );
-  const handlePointerUp = useCallback(() => {
-    isMouseDown.current = false;
-  }, []);
+  const handlePointerUp = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (tool !== EditorTools.Pan) return;
 
-  const handlePointerLeave = useCallback(() => {
-    isMouseDown.current = false;
-  }, []);
+      isMouseDown.current = false;
+
+      // Update mouse style
+      if (e.currentTarget.style.cursor === "grabbing") {
+        e.currentTarget.style.cursor = "grab";
+      }
+    },
+    [tool]
+  );
+
+  const handlePointerLeave = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (tool !== EditorTools.Pan) return;
+
+      // Update mouse style
+      if (e.currentTarget.style.cursor === "grabbing") {
+        e.currentTarget.style.cursor = "grab";
+      }
+
+      isMouseDown.current = false;
+    },
+    [tool]
+  );
 
   return {
     handlePointerDown,
