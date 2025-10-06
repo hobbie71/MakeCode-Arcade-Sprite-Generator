@@ -1,5 +1,6 @@
 import React from "react";
 import { useLoading } from "../context/LoadingContext/useLoading";
+import SquareResponiveAd from "./AdComponents/SquareResponiveAd";
 
 const LoadingOverlay: React.FC = () => {
   const { isGenerating, generationMessage } = useLoading();
@@ -7,15 +8,15 @@ const LoadingOverlay: React.FC = () => {
   if (!isGenerating) return null;
 
   return (
-    <div className="loading-overlay">
-      <div className="loading-content">
+    <div className="popup">
+      <div className="popup-content text-center max-w-md mx-auto">
         {/* Loading Spinner */}
-        <div className="mb-3">
+        <div className="mb-4">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto"></div>
         </div>
 
         {/* Loading Message */}
-        <h4 className="heading-4">
+        <h4 className="heading-4 mb-4">
           {generationMessage || "Generating Sprite..."}
         </h4>
 
@@ -34,13 +35,18 @@ const LoadingOverlay: React.FC = () => {
             </svg>
             <div className="text-center">
               <p className="text-yellow-200">
-                Please wait - this may take a few minutes
+                Please wait. This usually takes 1 - 2 minutes
               </p>
               <p className="text-neutral-200 text-sm mt-1">
                 Do not close this window or navigate away
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Ad Container - flexible sizing */}
+        <div className="mb-4 min-h-[200px] flex items-center justify-center">
+          <SquareResponiveAd />
         </div>
 
         {/* Additional Info */}
