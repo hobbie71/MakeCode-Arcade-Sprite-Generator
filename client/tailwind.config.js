@@ -4,39 +4,74 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Dark theme colors (default)
+        "bg-dark": "oklch(0.1 0.03 209)",
+        bg: "oklch(0.15 0.03 209)",
+        "bg-light": "oklch(0.2 0.03 209)",
+        text: "oklch(0.96 0.06 209)",
+        "text-muted": "oklch(0.60 0.06 209)",
+        highlight: "oklch(0.5 0.06 209)",
+        border: "oklch(0.4 0.06 209)",
+        "border-muted": "oklch(0.3 0.06 209)",
+
+        // Theme-aware colors with light mode variants
         primary: {
-          50: "#f0fdff",
-          100: "#ccf7fe",
-          200: "#99eefd",
-          300: "#60defa",
-          400: "#22c5f0",
-          500: "#058b9b", // Main primary color
-          600: "#087984", // Shadow color
-          700: "#0c6b75",
-          800: "#105a62",
-          900: "#144b52",
+          400: "oklch(0.55 0.1 209)",
+          500: "oklch(0.60 0.1 209)", // Dark theme primary
+          600: "oklch(0.65 0.1 209)",
+          // Light theme override
+          light: "oklch(0.4 0.1 209)",
         },
         secondary: {
-          50: "#fff5ef",
-          100: "#ffe3d5",
-          200: "#ffc2a8",
-          300: "#ff9b6d",
-          400: "#ff7a3d", // Hover color
-          500: "#f66721", // Main secondary color
-          600: "#c94f1a", // Shadow color
-          700: "#a03e15",
-          800: "#7a2f10",
-          900: "#5c230c",
+          400: "oklch(0.55 0.1 29)",
+          500: "oklch(0.60 0.1 29)", // Dark theme secondary
+          600: "oklch(0.65 0.1 29)",
+          // Light theme override
+          light: "oklch(0.4 0.1 29)",
         },
         danger: {
-          400: "#ef4444", // Hover color
-          500: "#dc2626", // Main danger color
-          600: "#b91c1c", // Shadow color
+          400: "oklch(0.65 0.06 30)",
+          500: "oklch(0.7 0.06 30)", // Using OKLCH for consistency
+          600: "oklch(0.75 0.06 30)",
+          light: "oklch(0.5 0.06 30)",
         },
-        focus: "#0078d4",
-        "focus-dark": "#005fa3",
+        warning: {
+          400: "oklch(0.65 0.06 100)",
+          500: "oklch(0.7 0.06 100)",
+          600: "oklch(0.75 0.06 100)",
+          light: "oklch(0.5 0.06 100)",
+        },
+        success: {
+          400: "oklch(0.65 0.06 160)",
+          500: "oklch(0.7 0.06 160)",
+          600: "oklch(0.75 0.06 160)",
+          light: "oklch(0.5 0.06 160)",
+        },
+        info: {
+          400: "oklch(0.65 0.06 260)",
+          500: "oklch(0.7 0.06 260)",
+          600: "oklch(0.75 0.06 260)",
+          light: "oklch(0.5 0.06 260)",
+        },
+
+        // Light theme specific colors
+        light: {
+          "bg-dark": "oklch(0.92 0.03 209)",
+          bg: "oklch(0.96 0.03 209)",
+          "bg-light": "oklch(1 0.03 209)",
+          text: "oklch(0.15 0.06 209)",
+          "text-muted": "oklch(0.4 0.06 209)",
+          highlight: "oklch(1 0.06 209)",
+          border: "oklch(0.6 0.06 209)",
+          "border-muted": "oklch(0.7 0.06 209)",
+        },
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Plugin to handle light theme variants
+    function ({ addVariant }) {
+      addVariant("light", "body.light &");
+    },
+  ],
 };
