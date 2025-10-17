@@ -10,9 +10,9 @@ interface Props {
 
 const InputSection = ({ closeMobileSidebar }: Props) => {
   return (
-    <div className="sidebar-content w-full min-h-full text-center border-r-[1px] border-solid border-white">
+    <div className="w-full min-h-full text-cente p-4 bg-default-200 rounded-3xl shadow-default-lg">
       {/* Close button for mobile sidebar */}
-      <div className="flex justify-between sm:justify-center items-center p-4 border-b border-neutral-200">
+      <div className="flex justify-between items-center pb-6 pt-2 sm:justify-center">
         <h2 className="text-white text-lg font-semibold">Generate Sprite</h2>
         <X_Button onClick={closeMobileSidebar} className="sm:hidden" />
       </div>

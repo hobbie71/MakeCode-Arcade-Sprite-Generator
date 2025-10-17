@@ -53,6 +53,14 @@ export default {
           600: "oklch(0.75 0.06 260)",
         },
       },
+      boxShadow: {
+        "default-sm":
+          "inset 0 1px 2px #ffffff30, 0 1px 2px #00000030, 0 2px 4px #00000015",
+        "default-md":
+          "inset 0 1px 2px #ffffff50, 0 1px 2px #00000030, 0 2px 4px #00000015",
+        "default-lg":
+          "inset 0 1px 2px #ffffff70, 0 1px 2px #00000030, 0 2px 4px #00000015",
+      },
     },
   },
   plugins: [

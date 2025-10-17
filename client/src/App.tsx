@@ -70,12 +70,12 @@ function App() {
         toggleExportInstructions={toggleExportInstructions}
       />
 
-      <main className="min-h-screen w-full flex flex-col sm:flex-row p-4 bg-default-100">
+      <main className="min-h-screen w-full flex flex-col p-4 gap-4 bg-default-100 sm:flex-row">
         <section
           className={`sidebar-mobile ${isMobileSidebarOpen ? "open" : ""}`}>
           <InputSection closeMobileSidebar={closeMobileSidebar} />
         </section>
-        <section className="main-content">
+        <section className="flex-1 flex flex-col gap-4">
           <SpriteEditor />
           <ExportSection />
         </section>

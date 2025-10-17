@@ -75,7 +75,7 @@
   }
 
   .sidebar-mobile {
-    @apply fixed inset-0 z-50 w-full h-full bg-neutral-900 transform -translate-x-full transition-transform duration-300 ease-in-out overflow-x-auto sm:overflow-visible sm:translate-x-0 sm:static sm:inset-0 sm:w-80 sm:h-auto;
+    @apply fixed inset-0 z-50 w-full h-full transform -translate-x-full transition-transform duration-300 ease-in-out overflow-x-auto sm:overflow-visible sm:translate-x-0 sm:static sm:inset-0 sm:w-80 sm:h-auto;
   }
 
   .sidebar-mobile.open {
@@ -86,20 +86,8 @@
     @apply p-4 space-y-4;
   }
 
-  .main-content {
-    @apply flex-1 flex flex-col;
-  }
-
-  .editor-section {
-    @apply flex-1 flex flex-row;
-  }
-
   .toolbox {
-    @apply w-auto max-w-24 p-2 bg-neutral-50 flex-shrink-0 overflow-y-auto hidden sm:block;
-  }
-
-  .export-section {
-    @apply bg-white border-t border-neutral-200 p-4;
+    @apply w-auto max-w-24 p-2 flex-shrink-0 overflow-y-auto hidden sm:block;
   }
 
   .popup {
@@ -267,7 +255,7 @@
 
   /* Canvas Components */
   .canvas-container {
-    @apply flex-1 bg-[#1e1e1e] overflow-hidden relative h-screen sm:h-auto;
+    @apply flex-1 overflow-hidden relative h-screen sm:h-auto;
 
     &:focus {
       outline: none;

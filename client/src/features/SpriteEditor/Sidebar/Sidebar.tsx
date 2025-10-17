@@ -20,9 +20,11 @@ const TOOL_ICONS: Array<{ tool: EditorTools; icon: string }> = [
   { tool: EditorTools.Pan, icon: "HandsFree" },
 ];
 
+// Old toolback background color: bg-[#333333]
+
 const SideBar = () => {
   return (
-    <div className="toolbox bg-[#333333]">
+    <div className="toolbox">
       <div className="stroke-icon-container flex flex-row justify-around items-center my-2">
         {STROKE_SIZES.map((size, i) => (
           <StrokeIcon key={i} strokeSize={size} />

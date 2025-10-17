@@ -32,6 +32,8 @@ interface Props {
   pixelSize?: number;
 }
 
+// Old canvas-container background color: bg-[#1e1e1e]
+
 const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   // Context
   const { canvasRef } = useCanvas();
