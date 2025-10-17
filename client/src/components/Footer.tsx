@@ -1,5 +1,5 @@
 const Footer = () => (
-  <footer className="text-center p-3 text-sm text-gray-400 flex md:flex-row flex-col flex-wrap justify-around items-center gap-2 border-t-[1px] border-solid border-white">
+  <footer className="text-center p-3 text-sm text-text-default-100 flex md:flex-row flex-col flex-wrap justify-around items-center gap-2 bg-default-100">
     <div>
       <div>Copyright © 2025 hobbie71. All rights reserved.</div>
       <div>
@@ -8,7 +8,7 @@ const Footer = () => (
           href="https://github.com/hobbie71/MakeCode-Arcade-Sprite-Generator"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline text-gray-400 hover:text-gray-300">
+          className="underline text-text-default-200 hover:text-text-default-300">
           MakeCode-Arcade-Sprite-Generator
         </a>
       </div>

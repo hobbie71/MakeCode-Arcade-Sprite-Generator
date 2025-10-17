@@ -7,14 +7,14 @@ interface Props {
 
 const NavBar = ({ toggleMobileSidebar, toggleExportInstructions }: Props) => {
   return (
-    <nav className="bg-[#171717] flex flex-row justify-between p-4 border-b-[1px] border-solid border-white">
+    <nav className="flex flex-row justify-between p-4 bg-default-100">
       <div className="flex flex-row items-center">
         <img
           className="max-h-12"
           src="/web-app-manifest-192x192.png"
           alt="MakeSpriteCode.com"
         />
-        <h1 className="text-white font-bold text-center pl-4 hidden sm:block text-lg ">
+        <h1 className="text-text-default-300 font-bold text-center pl-4 hidden sm:block text-lg ">
           MakeCode Arcade AI Sprite Generator
         </h1>
       </div>

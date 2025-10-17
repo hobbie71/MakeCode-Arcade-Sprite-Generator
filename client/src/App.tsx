@@ -70,7 +70,7 @@ function App() {
         toggleExportInstructions={toggleExportInstructions}
       />
 
-      <main className="app-layout">
+      <main className="min-h-screen w-full flex flex-col sm:flex-row p-4 bg-default-100">
         <section
           className={`sidebar-mobile ${isMobileSidebarOpen ? "open" : ""}`}>
           <InputSection closeMobileSidebar={closeMobileSidebar} />

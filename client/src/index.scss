@@ -69,9 +69,6 @@
   }
 
   /* Layout Components */
-  .app-layout {
-    @apply min-h-screen w-full flex flex-col sm:flex-row;
-  }
 
   .sidebar {
     @apply hidden sm:block w-80 bg-neutral-900 border-r border-neutral-200 flex-shrink-0;
@@ -133,10 +130,6 @@
   .btn-primary:active:not(:disabled) {
     @apply translate-y-0.5;
     box-shadow: none;
-  }
-
-  .btn-secondary {
-    @apply btn bg-secondary-500 shadow-[2px_2px_0px_theme('colors.secondary.600')];
   }
 
   .btn-secondary:hover:not(:disabled) {
