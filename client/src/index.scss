@@ -5,47 +5,47 @@
 @layer components {
   /* Typography Components */
   .heading-1 {
-    @apply text-3xl lg:text-4xl font-bold text-neutral-100 mb-4 mt-6 leading-tight;
+    @apply text-3xl lg:text-4xl font-bold text-text-default-300 mb-4 mt-6 leading-tight;
   }
 
   .heading-2 {
-    @apply text-2xl lg:text-3xl font-bold text-neutral-100 mb-3 mt-5 leading-tight;
+    @apply text-2xl lg:text-3xl font-bold text-text-default-300 mb-3 mt-5 leading-tight;
   }
 
   .heading-3 {
-    @apply text-xl lg:text-2xl font-semibold text-neutral-100 mb-3 mt-4 leading-snug;
+    @apply text-xl lg:text-2xl font-semibold text-text-default-300 mb-3 mt-4 leading-snug;
   }
 
   .heading-4 {
-    @apply text-lg lg:text-xl font-semibold text-neutral-100 mb-2 mt-4 leading-snug;
+    @apply text-lg lg:text-xl font-semibold text-text-default-300 mb-2 mt-4 leading-snug;
   }
 
   .heading-5 {
-    @apply text-base lg:text-lg font-medium text-neutral-100 mb-2 mt-3 leading-normal;
+    @apply text-base lg:text-lg font-medium text-text-default-300 mb-2 mt-3 leading-normal;
   }
 
   .heading-6 {
-    @apply text-sm lg:text-base font-medium text-neutral-100 mb-2 mt-3 leading-normal;
+    @apply text-sm lg:text-base font-medium text-text-default-300 mb-2 mt-3 leading-normal;
   }
 
   .paragraph {
-    @apply text-base text-neutral-100 mb-4 leading-relaxed;
+    @apply text-base text-text-default-300 mb-4 leading-relaxed;
   }
 
   .paragraph-sm {
-    @apply text-sm text-neutral-100 mb-3 leading-relaxed;
+    @apply text-sm text-text-default-300 mb-3 leading-relaxed;
   }
 
   .paragraph-lg {
-    @apply text-lg text-neutral-100 mb-4 leading-relaxed;
+    @apply text-lg text-text-default-300 mb-4 leading-relaxed;
   }
 
   .text-muted {
-    @apply text-neutral-300 text-sm;
+    @apply text-text-default-200 text-sm;
   }
 
   .text-caption {
-    @apply text-xs text-neutral-300 uppercase tracking-wide font-medium;
+    @apply text-xs text-text-default-200 uppercase tracking-wide font-medium;
   }
 
   .text-emphasis {
@@ -71,7 +71,7 @@
   /* Layout Components */
 
   .sidebar {
-    @apply hidden sm:block w-80 bg-neutral-900 border-r border-neutral-200 flex-shrink-0;
+    @apply hidden sm:block w-80 bg-default-200 border-r border-text-default-200 flex-shrink-0;
   }
 
   .sidebar-mobile {
@@ -95,7 +95,7 @@
   }
 
   .popup-content {
-    @apply bg-[#171717] rounded-lg shadow-lg p-6 max-w-md mx-auto w-full relative text-neutral-200;
+    @apply bg-[#171717] rounded-lg shadow-lg p-6 max-w-md mx-auto w-full relative text-text-default-200;
   }
 
   .absolute-center {
@@ -104,15 +104,15 @@
 
   /* Button Components */
   .btn {
-    @apply text-white font-medium rounded shadow transition-all duration-200 px-3 py-2 my-2 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 border-none;
+    @apply text-text-default-300 font-medium rounded-3xl shadow transition-all duration-200 px-3 py-2 my-2 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 border-none;
   }
 
   .btn-primary {
-    @apply btn bg-primary-500 shadow-[2px_2px_0px_theme('colors.primary.700')];
+    @apply btn bg-primary-500 shadow-default-lg;
   }
 
   .btn-primary:hover:not(:disabled) {
-    @apply opacity-90;
+    @apply bg-primary-600;
   }
 
   .btn-primary:active:not(:disabled) {
@@ -165,11 +165,11 @@
   }
 
   .form-label {
-    @apply block font-medium text-neutral-100 mb-1;
+    @apply block font-medium text-text-default-200 mb-1;
   }
 
   .form-input {
-    @apply px-2 py-1 text-neutral-800 border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors;
+    @apply px-2 py-1 text-default-200 border border-text-default-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors;
   }
 
   .form-select {
@@ -199,10 +199,10 @@
   }
 
   .tab-button {
-    @apply px-4 py-2 text-sm font-medium rounded text-neutral-300 focus:outline-none hover:text-neutral-100;
+    @apply px-4 py-2 text-sm font-medium rounded text-text-default-200 focus:outline-none hover:text-text-default-300;
 
     &.active {
-      @apply bg-primary-500 text-neutral-100;
+      @apply bg-primary-500 text-text-default-300;
     }
   }
 
@@ -212,11 +212,11 @@
 
   /* Card Components */
   .card {
-    @apply rounded-lg shadow border overflow-hidden;
+    @apply rounded-3xl shadow-default-lg border overflow-hidden;
   }
 
   .card-header {
-    @apply px-4 py-3 bg-neutral-50 border-b;
+    @apply px-4 py-3 bg-default-300 border-b;
   }
 
   .card-body {
@@ -224,7 +224,7 @@
   }
 
   .card-footer {
-    @apply px-4 py-3 bg-neutral-50 border-t;
+    @apply px-4 py-3 bg-default-300 border-t;
   }
 
   /* Tool Components */
@@ -249,7 +249,7 @@
     @apply w-8 h-8 rounded shadow-default-lg cursor-pointer hover:scale-110 transition-transform;
 
     &.active {
-      @apply border-neutral-800 scale-110;
+      @apply border-default-200 scale-110;
     }
   }
 
@@ -303,7 +303,7 @@
 
   /* Input Range/Slider */
   .range-input {
-    @apply w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer;
+    @apply w-full h-2 bg-default-300 rounded-lg appearance-none cursor-pointer;
   }
 
   .range-input::-webkit-slider-thumb {

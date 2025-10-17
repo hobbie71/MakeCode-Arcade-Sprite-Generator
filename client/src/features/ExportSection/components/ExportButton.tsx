@@ -1,4 +1,5 @@
 import { ImageExportFormats } from "../../../types/export";
+import Button from "../../../components/Button";
 
 interface Props {
   format: ImageExportFormats;
@@ -7,9 +8,9 @@ interface Props {
 
 const ExportButton = ({ format, onClick }: Props) => {
   return (
-    <button className="btn-primary" onClick={onClick}>
+    <Button variant="primary" onClick={onClick}>
       Download as {format.toUpperCase()}
-    </button>
+    </Button>
   );
 };
 
