@@ -30,7 +30,7 @@ const StrokeIcon = ({ strokeSize }: Props) => {
         padding: Math.max(8 - strokeSize, 0),
       }}>
       <div
-        className="rounded-sm bg-white"
+        className="rounded-sm bg-white shadow-default-lg "
         style={{
           backgroundColor: "#adadad",
           width: 8 + (strokeSize - 1) * 2,

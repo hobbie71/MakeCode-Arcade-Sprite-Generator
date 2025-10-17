@@ -233,7 +233,7 @@
   }
 
   .tool-button {
-    @apply flex w-8 h-8 text-white items-center justify-center rounded
+    @apply flex w-8 h-8 text-white bg-default-300 shadow-default-md items-center justify-center rounded
     focus:outline-none;
 
     &.active {
@@ -246,7 +246,7 @@
   }
 
   .color-swatch {
-    @apply w-8 h-8 rounded border border-black cursor-pointer hover:scale-110 transition-transform;
+    @apply w-8 h-8 rounded shadow-default-lg cursor-pointer hover:scale-110 transition-transform;
 
     &.active {
       @apply border-neutral-800 scale-110;
