@@ -229,14 +229,14 @@ export const SteamPunkPalette: MakeCodePalette = {
 };
 
 export const ALL_PALETTES = [
-  { name: "Arcade Palette", palette: ArcadePalette },
-  { name: "Matte Palette", palette: MattePalette },
-  { name: "Pastel Palette", palette: PastelPalette },
-  { name: "Sweet Palette", palette: SweetPalette },
-  { name: "Poke Palette", palette: PokePalette },
-  { name: "Adventure Palette", palette: AdventurePalette },
-  { name: "DIY Palette", palette: DIYPalette },
-  { name: "Adafruit Palette", palette: AdafruitPalette },
-  { name: "StillLife Palette", palette: StillLifePalette },
-  { name: "SteamPunk Palette", palette: SteamPunkPalette },
+  { name: "Arcade", palette: ArcadePalette },
+  { name: "Matte", palette: MattePalette },
+  { name: "Pastel", palette: PastelPalette },
+  { name: "Sweet", palette: SweetPalette },
+  { name: "Poke", palette: PokePalette },
+  { name: "Adventure", palette: AdventurePalette },
+  { name: "DIY", palette: DIYPalette },
+  { name: "Adafruit", palette: AdafruitPalette },
+  { name: "StillLife", palette: StillLifePalette },
+  { name: "SteamPunk", palette: SteamPunkPalette },
 ];

@@ -9,6 +9,7 @@ export default {
           100: "oklch(0.1 0 209)",
           200: "oklch(0.15 0 209)",
           300: "oklch(0.2 0 209)",
+          400: "oklch(0.25 0 209)",
           "light-100": "oklch(0.8 0 209)",
           "light-200": "oklch(0.85 0 209)",
           "light-300": "oklch(0.9 0 209)",

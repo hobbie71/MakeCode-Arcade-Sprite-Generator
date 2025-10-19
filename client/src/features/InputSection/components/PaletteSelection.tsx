@@ -13,13 +13,13 @@ const PaletteSelection = () => {
   };
 
   return (
-    <div className="form-group">
-      <h5 className="heading-5" id="palette-selection-label">
-        Palette Selection
-      </h5>
-      <div className="flex flex-col justify-around">
+    <div className="form-group flex flex-row justify-between">
+      <p className="form-label" id="palette-selection-label">
+        Palette:
+      </p>
+      <div>
         <select
-          className="form-select text-center"
+          className="form-select"
           value={ALL_PALETTES.findIndex((pal) => pal.palette === palette)}
           onChange={(e) =>
             setPalette(getPaletteFromIndex(parseInt(e.target.value)))

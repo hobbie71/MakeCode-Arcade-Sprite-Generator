@@ -117,7 +117,7 @@ const SizeInput = ({ type, fixedSize, disabled = false }: Props) => {
       ref={inputRef}
       className={`form-input input-no-arrows min-w-24 text-center ${
         fixedSize || disabled
-          ? "bg-gray-100 text-neutral-50-500 cursor-not-allowed"
+          ? "text-text-default-muted cursor-not-allowed"
           : ""
       }`}
       type="number"

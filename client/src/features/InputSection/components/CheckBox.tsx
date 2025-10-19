@@ -15,13 +15,15 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
   };
 
   return (
-    <div className="form-group justify-self-start my-2">
+    <div className="form-group flex flex-row justify-between items-center my-2">
       <label
-        className={`form-label ${disabled ? "text-gray-500 cursor-not-allowed" : "cursor-pointer"}`}
+        className={`form-label ${disabled ? "text-text-default-muted cursor-not-allowed" : "cursor-pointer"}`}
         htmlFor={children}>
+        {children}
+      </label>
+      <label className="relative inline-block w-10 h-6">
         <input
           type="checkbox"
-          className={`form-checkbox mr-2 ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
           id={children}
           name={children}
           checked={checked}
@@ -32,11 +34,31 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
           title={
             disabled ? "This input is disabled during generation" : undefined
           }
-          style={{
-            userSelect: disabled ? "none" : "auto",
-          }}
+          className="sr-only"
         />
-        {children}
+        <span
+          className={`
+            absolute cursor-pointer top-0 left-0 right-0 bottom-0 shadow-default-lg
+            rounded-full transition-colors duration-300 ease-in-out p-1
+            ${
+              checked
+                ? disabled
+                  ? "bg-default-300"
+                  : "bg-primary-600"
+                : disabled
+                  ? "bg-default-300"
+                  : "bg-default-300"
+            }
+            ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
+          `}>
+          <span
+            className={`
+              absolute top-0.5 left-0.5 w-5 h-5 bg-default-light-300 rounded-full 
+              transition-transform duration-300 ease-in-out
+              ${checked ? "transform translate-x-4" : ""}
+            `}
+          />
+        </span>
       </label>
     </div>
   );
