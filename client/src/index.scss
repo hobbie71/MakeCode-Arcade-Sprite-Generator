@@ -5,27 +5,27 @@
 @layer components {
   /* Typography Components */
   .heading-1 {
-    @apply text-3xl lg:text-4xl font-bold text-text-default-300 mb-4 mt-6 leading-tight;
+    @apply text-3xl lg:text-4xl font-bold text-text-default-300 mb-4 leading-tight;
   }
 
   .heading-2 {
-    @apply text-2xl lg:text-3xl font-bold text-text-default-300 mb-3 mt-5 leading-tight;
+    @apply text-2xl lg:text-3xl font-bold text-text-default-300 mb-3 leading-tight;
   }
 
   .heading-3 {
-    @apply text-xl lg:text-2xl font-semibold text-text-default-300 mb-3 mt-4 leading-snug;
+    @apply text-xl lg:text-2xl font-semibold text-text-default-300 mb-3 leading-snug;
   }
 
   .heading-4 {
-    @apply text-lg lg:text-xl font-semibold text-text-default-300 mb-2 mt-4 leading-snug;
+    @apply text-lg lg:text-xl font-semibold text-text-default-300 mb-2 leading-snug;
   }
 
   .heading-5 {
-    @apply text-base lg:text-lg font-medium text-text-default-300 mb-2 mt-3 leading-normal;
+    @apply text-base lg:text-lg font-medium text-text-default-300 mb-2 leading-normal;
   }
 
   .heading-6 {
-    @apply text-sm lg:text-base font-medium text-text-default-300 mb-2 mt-3 leading-normal;
+    @apply text-sm lg:text-base font-medium text-text-default-300 mb-2 leading-normal;
   }
 
   .paragraph {
@@ -212,7 +212,7 @@
 
   /* Card Components */
   .card {
-    @apply rounded-3xl shadow-default-lg border overflow-hidden;
+    @apply rounded-lg shadow-default-lg border overflow-hidden;
   }
 
   .card-header {

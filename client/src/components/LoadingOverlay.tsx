@@ -12,7 +12,7 @@ const LoadingOverlay: React.FC = () => {
       <div className="popup-content text-center max-w-md mx-auto">
         {/* Loading Spinner */}
         <div className="mb-4">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto"></div>
+          <div className="animate-spin rounded-lg h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto"></div>
         </div>
 
         {/* Loading Message */}
@@ -21,7 +21,7 @@ const LoadingOverlay: React.FC = () => {
         </h4>
 
         {/* Warning Message */}
-        <div className="bg-yellow-900 border border-yellow-600 rounded-md p-4 mb-4">
+        <div className="bg-yellow-900 border border-yellow-600 rounded-lg p-4 mb-4">
           <div className="flex items-center">
             <svg
               className="w-5 h-5 text-yellow-300 mr-2 flex-shrink-0"

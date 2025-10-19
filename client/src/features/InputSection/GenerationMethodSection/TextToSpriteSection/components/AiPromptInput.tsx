@@ -54,7 +54,7 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
       <textarea
         ref={textareaRef}
         id="ai-prompt-input"
-        className={`min-w-full min-h-24 mt-2 p-2 rounded text-black bg-white ${
+        className={`min-w-full min-h-24 mt-2 p-2 rounded-lg text-black bg-white ${
           disabled
             ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
             : ""

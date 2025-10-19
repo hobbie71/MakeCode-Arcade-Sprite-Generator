@@ -20,14 +20,14 @@ const SelectedColorIcons = () => {
       style={{ height: ICON_SIZE + 8 }} // +8 for overlap
       onClick={() => swapColors()}>
       <div
-        className={`absolute border border-black rounded w-4/5 top-0 left-0 z-10 shadow-default-lg ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
+        className={`absolute border border-black rounded-lg w-4/5 top-0 left-0 z-10 shadow-default-lg ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
         style={{
           height: ICON_SIZE,
           backgroundColor: getHexFromMakeCodeColor(color),
         }}
       />
       <div
-        className={`absolute border border-black rounded w-4/5 bottom-0 right-0 z-0 shadow-default-lg ${alternateColor === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
+        className={`absolute border border-black rounded-lg w-4/5 bottom-0 right-0 z-0 shadow-default-lg ${alternateColor === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
         style={{
           height: ICON_SIZE,
           backgroundColor: getHexFromMakeCodeColor(alternateColor),

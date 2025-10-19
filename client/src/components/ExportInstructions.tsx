@@ -41,7 +41,7 @@ const ExportInstructions = ({ closeExportInstructions }: Props) => {
         <img
           src="../preview.gif"
           alt="How to copy and paste into MakeCode Arcade"
-          className="max-w-[640px] h-auto rounded shadow"
+          className="max-w-[640px] h-auto rounded-lg shadow"
         />
       </div>
     </div>
