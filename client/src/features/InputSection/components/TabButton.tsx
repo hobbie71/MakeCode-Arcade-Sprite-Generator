@@ -1,3 +1,5 @@
+import Button from "../../../components/Button";
+
 interface Props {
   isSelected: boolean;
   onClick: () => void;
@@ -17,15 +19,14 @@ const TabButton = ({
   };
 
   return (
-    <button
+    <Button
       className={`tab-button ${isSelected ? "active" : ""} ${
-        disabled ? "cursor-not-allowed text-white/30" : ""
+        disabled ? "cursor-not-allowed text-text-default-muted" : ""
       }`}
-      type="button"
       onClick={handleClick}
       disabled={disabled}>
       {children}
-    </button>
+    </Button>
   );
 };
 

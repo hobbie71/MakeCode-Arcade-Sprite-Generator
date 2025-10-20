@@ -17,11 +17,11 @@ export enum ImageExportFormats {
 
 /** Types of assets that can be generated in MakeCode Arcade */
 export enum AssetType {
-  Sprite = "sprite",
-  Background = "background",
-  Tile = "tile",
-  Tilemap = "tilemap",
-  Animation = "animation",
+  Sprite = "Sprite",
+  Background = "Background",
+  Tile = "Tile",
+  Tilemap = "Tilemap",
+  Animation = "Animation",
 }
 
 /** Available asset types for generation */

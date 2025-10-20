@@ -199,7 +199,7 @@
   }
 
   .tab-button {
-    @apply px-4 py-2 text-sm font-medium rounded text-text-default-200 focus:outline-none hover:text-text-default-300;
+    @apply px-4 py-2 text-sm font-medium rounded-lg bg-default-300 text-text-default-200 hover:text-text-default-300;
 
     &.active {
       @apply bg-primary-500 text-text-default-300;
