@@ -4,7 +4,7 @@ interface Props {
 
 const ErrorSymbol = ({ className = "" }: Props) => (
   <svg
-    className={`w-6 h-6 group-hover:rotate-12 transition-transform duration-200 ${className}`}
+    className={`w-6 h-6 ${className}`}
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24">

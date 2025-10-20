@@ -8,7 +8,7 @@ import AppProviders from "./providers/AppProviders";
 import SpriteEditor from "./features/SpriteEditor/SpriteEditor";
 import ExportSection from "./features/ExportSection/ExportSection";
 import InputSection from "./features/InputSection/InputSection";
-import IssueReportButton from "./features/IssueReport/IssueReportButton";
+import IssueReportButton from "./components/IssueReportButton";
 import Error from "./components/Error";
 import LoadingOverlay from "./components/LoadingOverlay";
 import NavBar from "./components/NavBar";
