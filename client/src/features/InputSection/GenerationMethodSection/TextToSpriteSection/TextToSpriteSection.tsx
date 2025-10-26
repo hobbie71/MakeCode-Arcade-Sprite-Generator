@@ -58,29 +58,27 @@ const TextToSpriteSection = () => {
       {importedImage ? (
         <>
           <Button
-            onClick={() => processImageToSprite()}
+            onClick={() => generateAIImageAndConvertToSprite()}
             isLoading={isGenerating}
             variant="primary"
             className="w-full">
-            Reprocess Image
+            Generate New Sprite
           </Button>
           <Button
-            onClick={() => generateAIImageAndConvertToSprite()}
+            onClick={() => processImageToSprite()}
             isLoading={isGenerating}
             variant="secondary"
             className="w-full">
-            Generate New Sprite
+            Reprocess Image
           </Button>
         </>
       ) : (
-        <>
-          <Button
-            onClick={() => generateAIImageAndConvertToSprite()}
-            isLoading={isGenerating}
-            className="w-full">
-            Generate New Sprite
-          </Button>
-        </>
+        <Button
+          onClick={() => generateAIImageAndConvertToSprite()}
+          isLoading={isGenerating}
+          className="w-full">
+          Generate New Sprite
+        </Button>
       )}
     </div>
   );

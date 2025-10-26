@@ -120,6 +120,10 @@
     box-shadow: none;
   }
 
+  .btn-secondary {
+    @apply btn bg-default-400 shadow-default-lg;
+  }
+
   .btn-secondary:hover:not(:disabled) {
     @apply opacity-90;
   }
