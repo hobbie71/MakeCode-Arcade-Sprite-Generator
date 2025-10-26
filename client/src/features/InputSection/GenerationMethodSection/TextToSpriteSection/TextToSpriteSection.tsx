@@ -36,7 +36,7 @@ const TextToSpriteSection = () => {
     <div className="">
       <PostProcessingSection />
 
-      <h4 className="heading-4">Ai Settings</h4>
+      <h4 className="heading-4">AI Settings</h4>
 
       {/* AI Model Selection */}
       <DefaultDropDown

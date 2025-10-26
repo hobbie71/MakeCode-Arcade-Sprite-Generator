@@ -49,12 +49,12 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
   return (
     <div className="mt-4">
       <label htmlFor="ai-prompt-input" className="text-neutral-200">
-        Ai Prompt
+        AI Image Generation Prompt
       </label>
       <textarea
         ref={textareaRef}
         id="ai-prompt-input"
-        className={`min-w-full min-h-24 mt-2 p-2 rounded-lg bg-default-300 text-text-default-300 shadow-default-lg ${
+        className={`min-w-full min-h-24 mt-2 p-2 rounded-lg bg-default-300 text-text-default-300 shadow-default-lg placeholder-text-default-muted ${
           disabled
             ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
             : ""
