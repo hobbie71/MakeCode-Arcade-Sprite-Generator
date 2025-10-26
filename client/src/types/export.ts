@@ -11,6 +11,12 @@ export enum ImageExportFormats {
   WEBP = "webp",
 }
 
+export const ALL_IMAGE_EXPORT_FORMATS = [
+  { name: "PNG", format: ImageExportFormats.PNG },
+  { name: "JPEG", format: ImageExportFormats.JPEG },
+  { name: "WEBP", format: ImageExportFormats.WEBP },
+];
+
 // =============================================================================
 // ASSET TYPES
 // =============================================================================
