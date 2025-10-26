@@ -8,34 +8,32 @@ import AppProviders from "./providers/AppProviders";
 import SpriteEditor from "./features/SpriteEditor/SpriteEditor";
 import ExportSection from "./features/ExportSection/ExportSection";
 import InputSection from "./features/InputSection/InputSection";
+import MobileSidebar from "./components/MobileSidebar";
 import IssueReportButton from "./components/IssueReportButton";
 import Error from "./components/Error";
 import LoadingOverlay from "./components/LoadingOverlay";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import ExportInstructions from "./components/ExportInstructions";
+
+// Hook imports
+import { useSidebar } from "./hooks/useSidebar";
 // import HorizontalResponiveAd from "./components/AdComponents/HorizontalResponiveAd";
 
 function App() {
   const [highlightIssueButton, setHighlightIssueButton] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isExportInstructionsOpen, setIsExportInstructionsOpen] =
     useState(false);
+  const mobileSidebar = useSidebar();
 
   useEffect(() => {
     setHighlightIssueButton(true);
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setHighlightIssueButton(false);
-    }, 5000); // Highlight for 5 seconds
+    }, 5000);
+
+    return () => clearTimeout(timer);
   }, []);
-
-  const toggleMobileSidebar = () => {
-    setIsMobileSidebarOpen(!isMobileSidebarOpen);
-  };
-
-  const closeMobileSidebar = () => {
-    setIsMobileSidebarOpen(false);
-  };
 
   const toggleExportInstructions = () => {
     setIsExportInstructionsOpen(!isExportInstructionsOpen);
@@ -45,19 +43,6 @@ function App() {
     setIsExportInstructionsOpen(false);
   };
 
-  useEffect(() => {
-    const root = document.getElementById("root");
-    if (!root) throw "No root element";
-
-    if (isMobileSidebarOpen) {
-      root.style.overflowY = "hidden";
-      root.style.height = "100vh";
-    } else {
-      root.style.overflowY = "";
-      root.style.height = "";
-    }
-  }, [isMobileSidebarOpen]);
-
   return (
     <AppProviders>
       {/* <div className="flex justify-center w-full max-w-2xl mx-auto max-h-40 overflow-hidden">
@@ -66,28 +51,35 @@ function App() {
 
       {/* Navbar */}
       <NavBar
-        toggleMobileSidebar={toggleMobileSidebar}
+        toggleMobileSidebar={mobileSidebar.toggle}
         toggleExportInstructions={toggleExportInstructions}
       />
 
       <main className="min-h-screen w-full flex flex-col p-4 gap-4 bg-default-100 sm:flex-row">
-        <section
-          className={`sidebar-mobile ${isMobileSidebarOpen ? "open" : ""}`}>
-          <InputSection closeMobileSidebar={closeMobileSidebar} />
-        </section>
+        {/* Mobile Sidebar */}
+        <MobileSidebar
+          isOpen={mobileSidebar.isOpen}
+          onClose={mobileSidebar.close}>
+          <InputSection onClose={mobileSidebar.close} showCloseButton={true} />
+        </MobileSidebar>
+
+        {/* Main Content */}
         <section className="flex-1 flex flex-col gap-4">
           <SpriteEditor />
           <ExportSection />
         </section>
-        <section className={`${isExportInstructionsOpen ? "popup" : "hidden"}`}>
-          <ExportInstructions
-            closeExportInstructions={closeExportInstructions}
-          />
-        </section>
-      </main>
-      <Footer />
 
-      {/* <DevToolsButton /> */}
+        {/* Export Instructions Popup */}
+        {isExportInstructionsOpen && (
+          <section className="popup">
+            <ExportInstructions
+              closeExportInstructions={closeExportInstructions}
+            />
+          </section>
+        )}
+      </main>
+
+      <Footer />
       <LoadingOverlay />
       <IssueReportButton highlight={highlightIssueButton} />
       <Error />

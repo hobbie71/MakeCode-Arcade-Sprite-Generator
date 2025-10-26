@@ -7,11 +7,15 @@ import X_Button from "../../components/X_Button";
 // Context imports
 import { useAssetType } from "../../context/AssetTypeContext/useAssetType";
 
-interface Props {
-  closeMobileSidebar: () => void;
+interface InputSectionProps {
+  onClose?: () => void; // Optional, only used in mobile
+  showCloseButton?: boolean; // Control visibility
 }
 
-const InputSection = ({ closeMobileSidebar }: Props) => {
+const InputSection = ({
+  onClose,
+  showCloseButton = false,
+}: InputSectionProps) => {
   const { selectedAsset } = useAssetType();
 
   return (
@@ -21,7 +25,13 @@ const InputSection = ({ closeMobileSidebar }: Props) => {
         <h2 className="text-white text-lg font-semibold">
           Generate {selectedAsset}
         </h2>
-        <X_Button onClick={closeMobileSidebar} className="sm:hidden" />
+        {showCloseButton && onClose && (
+          <X_Button
+            onClick={onClose}
+            className="sm:hidden"
+            aria-label="Close sidebar"
+          />
+        )}
       </div>
 
       <AssetOptionsSelection />
