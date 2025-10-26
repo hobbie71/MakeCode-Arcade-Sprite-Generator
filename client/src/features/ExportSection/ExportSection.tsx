@@ -12,8 +12,11 @@ import { useExportSpriteData } from "../SpriteEditor/hooks/useExportSpriteData";
 import { OS } from "../../utils/getOS";
 
 // Type imports
-import { ImageExportFormats } from "../../types/export";
-import { ALL_IMAGE_EXPORT_FORMATS } from "../../types/export";
+import { ImageExportFormats, CodeExportFormats } from "../../types/export";
+import {
+  ALL_IMAGE_EXPORT_FORMATS,
+  ALL_CODE_EXPORT_FORMATS,
+} from "../../types/export";
 
 const ExportSection = () => {
   const { exportSpriteToImage, getImgCode, getJavaScriptCode, getPythonCode } =
@@ -22,7 +25,10 @@ const ExportSection = () => {
   const [showExportButton, setShowExportButton] =
     useState<null | ImageExportFormats>(null);
 
-  // Reset showExportButton when screen reaches medium width (1024px)
+  const [showCodeExport, setShowCodeExport] =
+    useState<null | CodeExportFormats>(null);
+
+  // Reset showExportButton and showCodeExport when screen reaches large width (1024px)
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 1024px)");
 
@@ -30,8 +36,10 @@ const ExportSection = () => {
       if (e.matches) {
         // Screen is large - reset to null
         setShowExportButton(null);
+        setShowCodeExport(null);
       } else {
         setShowExportButton(ImageExportFormats.PNG);
+        setShowCodeExport(CodeExportFormats.SPRITE_EDITOR);
       }
     };
 
@@ -78,27 +86,48 @@ const ExportSection = () => {
         })}
       </div>
 
-      <h5 className="heading-5">Export Sprite Code</h5>
+      <div className="flex justify-between items-center">
+        <h5 className="heading-5">Export Sprite Code</h5>
+        <DefaultDropDown
+          className="lg:hidden"
+          onChange={(index: number) =>
+            setShowCodeExport(ALL_CODE_EXPORT_FORMATS[index].format)
+          }
+          options={ALL_CODE_EXPORT_FORMATS}
+          value={ALL_CODE_EXPORT_FORMATS.findIndex(
+            (codeFormat) => showCodeExport === codeFormat.format
+          )}>
+          {""}
+        </DefaultDropDown>
+      </div>
 
       <p className="paragraph-sm text-text-default-muted">
         Copy ({command}+C) and Paste ({command}+V) code into MakeCode Arcade
       </p>
 
       <div className="export-grid">
-        <div className="export-card">
-          <h5 className="heading-5">Sprite Editor Code</h5>
-          <CodeDisplay>{getImgCode()}</CodeDisplay>
-        </div>
+        {(!showCodeExport ||
+          showCodeExport === CodeExportFormats.SPRITE_EDITOR) && (
+          <div className="export-card">
+            <h5 className="heading-5">Sprite Editor Code</h5>
+            <CodeDisplay>{getImgCode()}</CodeDisplay>
+          </div>
+        )}
 
-        <div className="export-card">
-          <h5 className="heading-5">Javascript Code</h5>
-          <CodeDisplay>{getJavaScriptCode()}</CodeDisplay>
-        </div>
+        {(!showCodeExport ||
+          showCodeExport === CodeExportFormats.JAVASCRIPT) && (
+          <div className="export-card">
+            <h5 className="heading-5">Javascript Code</h5>
+            <CodeDisplay>{getJavaScriptCode()}</CodeDisplay>
+          </div>
+        )}
 
-        <div className="export-card">
-          <h5 className="heading-5">Python Code</h5>
-          <CodeDisplay codingLanguage="python">{getPythonCode()}</CodeDisplay>
-        </div>
+        {(!showCodeExport || showCodeExport === CodeExportFormats.PYTHON) && (
+          <div className="export-card">
+            <h5 className="heading-5">Python Code</h5>
+            <CodeDisplay codingLanguage="python">{getPythonCode()}</CodeDisplay>
+          </div>
+        )}
       </div>
     </section>
   );

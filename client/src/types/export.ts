@@ -18,6 +18,23 @@ export const ALL_IMAGE_EXPORT_FORMATS = [
 ];
 
 // =============================================================================
+// CODE EXPORT FORMATS
+// =============================================================================
+
+/** Supported code export formats for sprites */
+export enum CodeExportFormats {
+  SPRITE_EDITOR = "sprite-editor",
+  JAVASCRIPT = "javascript",
+  PYTHON = "python",
+}
+
+export const ALL_CODE_EXPORT_FORMATS = [
+  { name: "Sprite Editor", format: CodeExportFormats.SPRITE_EDITOR },
+  { name: "Javascript", format: CodeExportFormats.JAVASCRIPT },
+  { name: "Python", format: CodeExportFormats.PYTHON },
+];
+
+// =============================================================================
 // ASSET TYPES
 // =============================================================================
 
