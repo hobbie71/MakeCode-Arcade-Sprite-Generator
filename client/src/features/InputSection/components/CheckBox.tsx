@@ -1,3 +1,5 @@
+import { useId, useRef } from "react";
+
 interface Props {
   children: string;
   onChange: (bool: boolean) => void;
@@ -6,6 +8,11 @@ interface Props {
 }
 
 const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const labelId = useId();
+  const inputId = useId();
+  const descriptionId = useId();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Don't allow change if disabled
     if (disabled) return;
@@ -14,31 +21,77 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
     onChange(newValue);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (disabled) return;
+
+    switch (e.key) {
+      case " ":
+      case "Enter":
+        // Prevent default to avoid double-toggling (browser handles space automatically)
+        // Toggle the checkbox
+        e.preventDefault();
+        onChange(!checked);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleSpanClick = () => {
+    // Allow clicking on the visual toggle to focus and toggle the input
+    if (!disabled && inputRef.current) {
+      inputRef.current.focus();
+      onChange(!checked);
+    }
+  };
+
+  const handleSpanKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+    // Make the visual span keyboard accessible
+    if (disabled) return;
+
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onChange(!checked);
+    }
+  };
+
   return (
     <div className="form-group flex flex-row justify-between items-center my-2">
       <label
+        id={labelId}
         className={`form-label ${disabled ? "text-text-default-muted cursor-not-allowed" : "cursor-pointer"}`}
-        htmlFor={children}>
+        htmlFor={inputId}>
         {children}
       </label>
-      <label className="relative inline-block w-10 h-6">
+      <div className="relative inline-block w-10 h-6">
         <input
+          ref={inputRef}
+          tabIndex={-1}
           type="checkbox"
-          id={children}
+          id={inputId}
           name={children}
           checked={checked}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           disabled={disabled}
-          aria-label={children}
-          aria-describedby={disabled ? `${children}-disabled-hint` : undefined}
+          aria-labelledby={labelId}
+          aria-describedby={descriptionId}
+          aria-checked={checked}
+          aria-disabled={disabled}
+          role="switch"
           title={
             disabled ? "This input is disabled during generation" : undefined
           }
           className="sr-only"
         />
         <span
+          onClick={handleSpanClick}
+          onKeyDown={handleSpanKeyDown}
+          tabIndex={disabled ? -1 : 0}
+          role="presentation"
+          aria-hidden="true"
           className={`
-            absolute cursor-pointer top-0 left-0 right-0 bottom-0 shadow-default-lg
+          absolute top-0 left-0 right-0 bottom-0 shadow-default-lg
             rounded-full transition-colors duration-300 ease-in-out p-1
             ${
               checked
@@ -50,16 +103,22 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
                   : "bg-default-300"
             }
             ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
-          `}>
+            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}>
           <span
             className={`
               absolute top-0.5 left-0.5 w-5 h-5 bg-default-light-300 rounded-full 
-              transition-transform duration-300 ease-in-out
+              transition-transform duration-300 ease-in-out shadow-sm
               ${checked ? "transform translate-x-4" : ""}
             `}
           />
         </span>
-      </label>
+        {/* Hidden description for screen readers */}
+        <span id={descriptionId} className="sr-only">
+          {disabled
+            ? "This toggle is disabled during generation"
+            : `Press Space or Enter to toggle. Current state: ${checked ? "On" : "Off"}`}
+        </span>
+      </div>
     </div>
   );
 };
