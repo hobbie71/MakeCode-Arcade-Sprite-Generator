@@ -6,19 +6,8 @@ import ToolIcon from "./components/ToolIcon";
 import ZoomIcons from "./components/ZoomIcons";
 
 // Type imports
-import { EditorTools } from "../../../types/tools";
 import { STROKE_SIZES } from "../../../types/pixel";
-
-const TOOL_ICONS: Array<{ tool: EditorTools; icon: string }> = [
-  { tool: EditorTools.Pencil, icon: "PencilReply" },
-  { tool: EditorTools.Eraser, icon: "EraseTool" },
-  { tool: EditorTools.Rectangle, icon: "RectangleShape" },
-  { tool: EditorTools.Fill, icon: "BucketColor" },
-  { tool: EditorTools.Circle, icon: "CircleRing" },
-  { tool: EditorTools.Line, icon: "Line" },
-  { tool: EditorTools.Select, icon: "SelectAll" },
-  { tool: EditorTools.Pan, icon: "HandsFree" },
-];
+import { TOOL_ICONS } from "../../../types/tools";
 
 // Old toolback background color: bg-[#333333]
 

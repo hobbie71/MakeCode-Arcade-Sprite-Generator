@@ -87,7 +87,7 @@
   }
 
   .toolbox {
-    @apply w-auto max-w-24 p-2 flex-shrink-0 overflow-y-auto hidden sm:block;
+    @apply w-auto max-w-24 p-2 flex-shrink-0 hidden sm:block;
   }
 
   .popup {
@@ -237,8 +237,7 @@
   }
 
   .tool-button {
-    @apply flex w-8 h-8 text-white bg-default-300 shadow-default-md items-center justify-center rounded
-    focus:outline-none;
+    @apply flex w-8 h-8 text-white bg-default-300 hover:bg-default-400 shadow-default-md items-center justify-center rounded;
 
     &.active {
       @apply border border-solid border-white;
