@@ -13,6 +13,30 @@ interface Props {
 const StrokeIcon = ({ strokeSize }: Props) => {
   const { strokeSize: currentStrokeSize, setStrokeSize } = useStrokeSize();
   const [isSelected, setIsSelected] = useState<boolean>(false);
+  const [isHover, setIsHover] = useState<boolean>(false);
+
+  const handleMouseEnter = () => {
+    setIsHover(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHover(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const key = e.key;
+
+    if (
+      key === "Enter" ||
+      key === " " ||
+      key === "Spacebar" ||
+      key === "Space"
+    ) {
+      // Prevent page from scrolling when Space is pressed
+      e.preventDefault();
+      setStrokeSize(strokeSize);
+    }
+  };
 
   useEffect(
     () =>
@@ -24,18 +48,20 @@ const StrokeIcon = ({ strokeSize }: Props) => {
 
   return (
     <div
-      className="stroke-icon-container hover:opacity-60 transition-opacity"
+      className="stroke-icon-container"
       onClick={() => setStrokeSize(strokeSize)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       style={{
         padding: Math.max(8 - strokeSize, 0),
       }}>
       <div
-        className="rounded-sm bg-white shadow-default-lg "
+        className={`rounded-sm  shadow-default-lg transition-color ${isHover || isSelected ? "bg-white" : "bg-text-default-100"}`}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
         style={{
-          backgroundColor: "#adadad",
           width: 8 + (strokeSize - 1) * 2,
           height: 8 + (strokeSize - 1) * 2,
-          opacity: `${isSelected ? 0.6 : 1}`,
         }}
       />
     </div>
