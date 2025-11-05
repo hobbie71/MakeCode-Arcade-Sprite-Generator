@@ -169,18 +169,22 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
       onMouseMove={handlePanMove}
       onMouseUp={handlePanUp}
       onMouseLeave={handlePanLeave}
+      role="application"
+      aria-label="Sprite Editor Canvas"
       tabIndex={0}>
       <canvas
         ref={canvasRef}
         width={width * pixelSize}
         height={height * pixelSize}
         className="absolute"
-        tabIndex={0}
+        tabIndex={-1}
         onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
+        aria-label={`Sprite canvas ${width} by ${height} pixels, currently using ${tool} tool at ${Math.round(zoom * 100)}% zoom`}
+        role="img"
         style={{
           transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
           transformOrigin: "50% 50%",

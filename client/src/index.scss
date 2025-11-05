@@ -254,12 +254,7 @@
 
   /* Canvas Components */
   .canvas-container {
-    @apply flex-1 overflow-hidden relative h-screen sm:h-auto;
-
-    &:focus {
-      outline: none;
-      box-shadow: none;
-    }
+    @apply flex-1 overflow-hidden relative h-screen sm:h-auto rounded-lg;
   }
 
   .canvas-wrapper {
