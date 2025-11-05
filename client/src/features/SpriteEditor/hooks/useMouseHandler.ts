@@ -100,6 +100,7 @@ export const useMouseHandler = () => {
 
       isMouseDownRef.current = true;
       isDrawing.current = true;
+      clearPreview();
 
       const coordinates = getCanvasCoordinates(canvas, e, zoom);
       startCoordinates.current = coordinates;
@@ -130,6 +131,7 @@ export const useMouseHandler = () => {
       handleRectangleDown,
       handleCircleDown,
       // handleSelectDown,
+      clearPreview,
     ]
   );
 
