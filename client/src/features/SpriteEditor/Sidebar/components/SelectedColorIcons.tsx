@@ -2,6 +2,8 @@ import { useColorSelected } from "../../../../features/SpriteEditor/contexts/Col
 import { MakeCodeColor } from "../../../../types/color";
 import { getHexFromMakeCodeColor } from "../../../../utils/colors/getColorFromMakeCodeColor";
 import Tooltip from "../../../../components/Tooltip";
+import { useKeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
+import type { KeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
 
 const ICON_SIZE = 32; // px
 
@@ -14,6 +16,9 @@ const SelectedColorIcons = () => {
     setColor(alternateColor);
     setAlternateColor(prevColor);
   };
+
+  const shortcut: KeyboardShortcut[] = [{ key: "x", callback: swapColors }];
+  useKeyboardShortcut(shortcut);
 
   const getColorName = (makeCodeColor: MakeCodeColor): string => {
     // Find the key name from the enum value
