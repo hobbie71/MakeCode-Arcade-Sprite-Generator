@@ -2,12 +2,11 @@
 import ColorIcons from "./components/ColorIcons";
 import StrokeIcon from "./components/StrokeIcon";
 import SelectedColorIcons from "./components/SelectedColorIcons";
-import ToolIcon from "./components/ToolIcon";
+import ToolIcons from "./components/ToolIcons";
 import ZoomIcons from "./components/ZoomIcons";
 
 // Type imports
 import { STROKE_SIZES } from "../../../types/pixel";
-import { ALL_EDITOR_TOOLS } from "../../../types/tools";
 
 // Old toolback background color: bg-[#333333]
 
@@ -20,9 +19,7 @@ const SideBar = () => {
         ))}
       </div>
       <div className="tool-grid my-2 ">
-        {ALL_EDITOR_TOOLS.map(({ tool, icon }, i) => (
-          <ToolIcon key={i} tool={tool} icon={icon} />
-        ))}
+        <ToolIcons />
       </div>
       <div className="my-2">
         <SelectedColorIcons />
