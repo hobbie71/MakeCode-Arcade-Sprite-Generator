@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { useToolSelected } from "../../../../features/SpriteEditor/contexts/ToolSelectedContext/useToolSelected";
-import { EditorTools, TOOL_ICONS } from "../../../../types/tools";
+import { EditorTools, ALL_EDITOR_TOOLS } from "../../../../types/tools";
 import Tooltip from "../../../../components/Tooltip";
 
 interface Props {
@@ -12,8 +12,8 @@ const ToolIcon = memo(({ tool, icon }: Props) => {
   const { tool: selectedTool, setTool } = useToolSelected();
   const isSelected = tool === selectedTool;
 
-  // Get tool info from TOOL_ICONS
-  const toolInfo = TOOL_ICONS.find((t) => t.tool === tool);
+  // Get tool info from ALL_EDITOR_TOOLS
+  const toolInfo = ALL_EDITOR_TOOLS.find((t) => t.tool === tool);
   const toolName = toolInfo?.name || tool;
   const shortcut = toolInfo?.shortcut || "";
 

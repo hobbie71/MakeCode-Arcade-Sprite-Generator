@@ -7,7 +7,7 @@ import ZoomIcons from "./components/ZoomIcons";
 
 // Type imports
 import { STROKE_SIZES } from "../../../types/pixel";
-import { TOOL_ICONS } from "../../../types/tools";
+import { ALL_EDITOR_TOOLS } from "../../../types/tools";
 
 // Old toolback background color: bg-[#333333]
 
@@ -20,7 +20,7 @@ const SideBar = () => {
         ))}
       </div>
       <div className="tool-grid my-2 ">
-        {TOOL_ICONS.map(({ tool, icon }, i) => (
+        {ALL_EDITOR_TOOLS.map(({ tool, icon }, i) => (
           <ToolIcon key={i} tool={tool} icon={icon} />
         ))}
       </div>

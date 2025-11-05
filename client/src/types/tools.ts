@@ -19,7 +19,7 @@ export type EditorToolType =
   | "select"
   | "pan";
 
-export const TOOL_ICONS: Array<{
+export const ALL_EDITOR_TOOLS: Array<{
   tool: EditorTools;
   icon: string;
   name: string;
@@ -59,3 +59,7 @@ export const TOOL_ICONS: Array<{
   },
   { tool: EditorTools.Pan, icon: "HandsFree", name: "Pan", shortcut: "H" },
 ];
+
+export function getEditorToolInfo(tool: EditorTools) {
+  return ALL_EDITOR_TOOLS.find((t) => t.tool === tool);
+}
