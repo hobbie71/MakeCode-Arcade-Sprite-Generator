@@ -128,7 +128,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
 
     const newZoom = getInitZoom();
     setZoom(newZoom);
-  }, [initCanvas, getInitZoom, setZoom, zoom]);
+  }, [initCanvas, getInitZoom, setZoom]);
 
   // effect: Center canvas on resize
   useEffect(() => {
@@ -155,7 +155,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   useEffect(() => {
     const newZoom = getInitZoom();
     setZoom(newZoom);
-  }, [width, height, pixelSize, setZoom, getInitZoom]);
+  }, [width, height, setZoom, getInitZoom]);
 
   return (
     <div
