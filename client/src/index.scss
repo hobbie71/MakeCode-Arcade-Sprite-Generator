@@ -233,7 +233,7 @@
 
   /* Tool Components */
   .tool-grid {
-    @apply grid grid-cols-2 gap-2;
+    @apply flex flex-row flex-wrap justify-center gap-1.5;
   }
 
   .tool-button {
@@ -245,15 +245,11 @@
   }
 
   .color-palette {
-    @apply flex flex-row flex-wrap justify-center gap-2;
+    @apply flex flex-row flex-wrap justify-center gap-1.5;
   }
 
   .color-swatch {
     @apply w-8 h-8 rounded shadow-default-lg cursor-pointer hover:scale-110 transition-transform;
-
-    &.active {
-      @apply border-default-200 scale-110;
-    }
   }
 
   /* Canvas Components */

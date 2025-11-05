@@ -1,4 +1,4 @@
-import { memo, useState, useRef, useId } from "react";
+import { memo } from "react";
 
 // Context imports
 import { useColorSelected } from "../../contexts/ColorSelectedContext/useColorSelected";
@@ -10,6 +10,9 @@ import type { MakeCodePalette } from "../../../../types/color";
 // Util imports
 import { getHexFromMakeCodeColor } from "../../../../utils/colors/getColorFromMakeCodeColor";
 
+// Component imports
+import Tooltip from "../../../../components/Tooltip";
+
 interface Props {
   color: MakeCodeColor;
   palette: MakeCodePalette;
@@ -17,10 +20,6 @@ interface Props {
 
 const ColorIcon = memo(({ color, palette }: Props) => {
   const { setColor, color: currentColor } = useColorSelected();
-  const [showTooltip, setShowTooltip] = useState<boolean>(false);
-  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const tooltipId = useId();
-  const buttonId = useId();
 
   const getColorName = (makeCodeColor: MakeCodeColor): string => {
     // Find the key name from the enum value
@@ -45,25 +44,6 @@ const ColorIcon = memo(({ color, palette }: Props) => {
       ? "Transparent"
       : `${colorName} (${hexColor})`;
 
-  const handleMouseEnter = () => {
-    // Clear any existing timeout
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-    // Show tooltip after 500ms delay
-    hoverTimeoutRef.current = setTimeout(() => {
-      setShowTooltip(true);
-    }, 500);
-  };
-
-  const handleMouseLeave = () => {
-    // Clear timeout and hide tooltip
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-    setShowTooltip(false);
-  };
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     switch (e.key) {
       case "Enter":
@@ -77,17 +57,13 @@ const ColorIcon = memo(({ color, palette }: Props) => {
   };
 
   return (
-    <div className="color-container relative">
+    <Tooltip text={colorLabel}>
       <button
-        id={buttonId}
         className={`color-swatch ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
         onClick={() => setColor(color)}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         onKeyDown={handleKeyDown}
         aria-label={`Select ${colorLabel}`}
         aria-pressed={currentColor === color}
-        aria-describedby={showTooltip ? tooltipId : undefined}
         role="button"
         type="button"
         tabIndex={0}
@@ -95,19 +71,7 @@ const ColorIcon = memo(({ color, palette }: Props) => {
           backgroundColor: hexColor,
         }}
       />
-      {/* Tooltip */}
-      {showTooltip && (
-        <div
-          id={tooltipId}
-          role="tooltip"
-          className="absolute top-full left-1/2 -translate-x-1/2 mt-1 z-50
-                     px-1.5 py-0.5 text-[10px] font-normal text-text-default-300 bg-default-200 
-                     shadow-default-lg rounded pointer-events-none whitespace-nowrap"
-          aria-hidden="false">
-          <span>{colorLabel}</span>
-        </div>
-      )}
-    </div>
+    </Tooltip>
   );
 });
 
