@@ -39,10 +39,9 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
 
   const handleSpanClick = () => {
     // Allow clicking on the visual toggle to focus and toggle the input
-    if (!disabled && inputRef.current) {
-      inputRef.current.focus();
-      onChange(!checked);
-    }
+    if (disabled && !inputRef.current) return;
+
+    onChange(!checked);
   };
 
   const handleSpanKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
@@ -84,6 +83,7 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
           }
           className="sr-only"
         />
+        {/* Background Oval */}
         <span
           onClick={handleSpanClick}
           onKeyDown={handleSpanKeyDown}
@@ -91,7 +91,7 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
           role="presentation"
           aria-hidden="true"
           className={`
-          absolute top-0 left-0 right-0 bottom-0 shadow-default-lg
+            absolute top-0 left-0 right-0 bottom-0 shadow-default-lg
             rounded-full transition-colors duration-300 ease-in-out p-1
             ${
               checked
@@ -102,8 +102,8 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
                   ? "bg-default-300"
                   : "bg-default-300"
             }
-            ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
-            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}>
+            ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}>
+          {/* White circle */}
           <span
             className={`
               absolute top-0.5 left-0.5 w-5 h-5 bg-default-light-300 rounded-full 
