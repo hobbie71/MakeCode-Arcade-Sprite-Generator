@@ -6,6 +6,7 @@ import { useColorSelected } from "../../contexts/ColorSelectedContext/useColorSe
 // Type imports
 import { MakeCodeColor } from "../../../../types/color";
 import type { MakeCodePalette } from "../../../../types/color";
+import { getColorName } from "../../../../types/color";
 
 // Util imports
 import { getHexFromMakeCodeColor } from "../../../../utils/colors/getColorFromMakeCodeColor";
@@ -20,22 +21,6 @@ interface Props {
 
 const ColorIcon = memo(({ color, palette }: Props) => {
   const { setColor, color: currentColor } = useColorSelected();
-
-  const getColorName = (makeCodeColor: MakeCodeColor): string => {
-    // Find the key name from the enum value
-    const colorKey = Object.keys(MakeCodeColor).find(
-      (key) =>
-        MakeCodeColor[key as keyof typeof MakeCodeColor] === makeCodeColor
-    );
-
-    if (!colorKey) return "Unknown";
-
-    // Convert enum key to readable name (e.g., "LIGHT_BLUE" -> "Light Blue")
-    return colorKey
-      .toLowerCase()
-      .replace(/_/g, " ")
-      .replace(/\b\w/g, (char: string) => char.toUpperCase());
-  };
 
   const colorName = getColorName(color);
   const hexColor = getHexFromMakeCodeColor(color, palette);

@@ -18,6 +18,29 @@ export enum MakeCodeColor {
   BLACK = "f",
 }
 
+const colorName = new Map<MakeCodeColor, string>([
+  [MakeCodeColor.TRANSPARENT, "Transparent"],
+  [MakeCodeColor.WHITE, "White"],
+  [MakeCodeColor.RED, "Red"],
+  [MakeCodeColor.PINK, "Pink"],
+  [MakeCodeColor.ORANGE, "Orange"],
+  [MakeCodeColor.YELLOW, "Yellow"],
+  [MakeCodeColor.TEAL, "Teal"],
+  [MakeCodeColor.GREEN, "Green"],
+  [MakeCodeColor.BLUE, "Blue"],
+  [MakeCodeColor.LIGHT_BLUE, "Light Blue"],
+  [MakeCodeColor.PURPLE, "Purple"],
+  [MakeCodeColor.LIGHT_PURPLE, "Light Purple"],
+  [MakeCodeColor.DARK_PURPLE, "Dark Purple"],
+  [MakeCodeColor.TAN, "Tan"],
+  [MakeCodeColor.BROWN, "Brown"],
+  [MakeCodeColor.BLACK, "Black"],
+]);
+
+export const getColorName = (color: MakeCodeColor): string => {
+  return colorName.get(color) || "Unknown";
+};
+
 export const ColorOrder: MakeCodeColor[] = [
   MakeCodeColor.TRANSPARENT,
   MakeCodeColor.WHITE,

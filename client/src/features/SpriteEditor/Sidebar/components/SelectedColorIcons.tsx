@@ -4,6 +4,7 @@ import { getHexFromMakeCodeColor } from "../../../../utils/colors/getColorFromMa
 import Tooltip from "../../../../components/Tooltip";
 import { useKeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
 import type { KeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
+import { getColorName } from "../../../../types/color";
 
 const ICON_SIZE = 32; // px
 
@@ -19,22 +20,6 @@ const SelectedColorIcons = () => {
 
   const shortcut: KeyboardShortcut[] = [{ key: "x", callback: swapColors }];
   useKeyboardShortcut(shortcut);
-
-  const getColorName = (makeCodeColor: MakeCodeColor): string => {
-    // Find the key name from the enum value
-    const colorKey = Object.keys(MakeCodeColor).find(
-      (key) =>
-        MakeCodeColor[key as keyof typeof MakeCodeColor] === makeCodeColor
-    );
-
-    if (!colorKey) return "Unknown";
-
-    // Convert enum key to readable name (e.g., "LIGHT_BLUE" -> "Light Blue")
-    return colorKey
-      .toLowerCase()
-      .replace(/_/g, " ")
-      .replace(/\b\w/g, (char: string) => char.toUpperCase());
-  };
 
   const primaryColorName = getColorName(color);
   const secondaryColorName = getColorName(alternateColor);
