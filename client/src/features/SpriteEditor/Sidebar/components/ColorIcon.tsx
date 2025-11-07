@@ -7,6 +7,10 @@ import { useColorSelected } from "../../contexts/ColorSelectedContext/useColorSe
 import { MakeCodeColor } from "../../../../types/color";
 import type { MakeCodePalette } from "../../../../types/color";
 import { getColorName } from "../../../../types/color";
+import type { KeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
+
+// Hook imports
+import { useKeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
 
 // Util imports
 import { getHexFromMakeCodeColor } from "../../../../utils/colors/getColorFromMakeCodeColor";
@@ -21,6 +25,19 @@ interface Props {
 
 const ColorIcon = memo(({ color, palette }: Props) => {
   const { setColor, color: currentColor } = useColorSelected();
+
+  // Check if the color key is a letter (a-f) to determine if shift is needed
+  const isLetter = /[a-f]/i.test(color);
+
+  const shortcut: KeyboardShortcut[] = [
+    {
+      key: color,
+      shift: isLetter,
+      callback: () => setColor(color),
+    },
+  ];
+
+  useKeyboardShortcut(shortcut);
 
   const colorName = getColorName(color);
   const hexColor = getHexFromMakeCodeColor(color, palette);
@@ -41,8 +58,10 @@ const ColorIcon = memo(({ color, palette }: Props) => {
     }
   };
 
+  const hotkeyDisplay = isLetter ? `Shift+${color.toUpperCase()}` : color;
+
   return (
-    <Tooltip text={colorLabel}>
+    <Tooltip text={colorLabel} hotkey={hotkeyDisplay}>
       <button
         className={`color-swatch ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
         onClick={() => setColor(color)}
