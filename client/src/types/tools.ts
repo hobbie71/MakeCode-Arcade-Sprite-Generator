@@ -9,6 +9,16 @@ export enum EditorTools {
   Pan = "pan",
 }
 
+const strokeHotkeys: Map<number, string> = new Map([
+  [1, "["],
+  [3, "]"],
+  [5, "\\"],
+]);
+
+export const getStrokeHotkey = (strokeSize: number): string => {
+  return strokeHotkeys.get(strokeSize) || "Unknown";
+};
+
 export type EditorToolType =
   | "pencil"
   | "eraser"

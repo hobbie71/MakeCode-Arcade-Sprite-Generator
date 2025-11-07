@@ -5,6 +5,11 @@ import { useStrokeSize } from "../../contexts/StrokeSizeContext/useStrokeSize";
 
 // Type imports
 import type { StrokeSize } from "../../../../types/pixel";
+import type { KeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
+import { getStrokeHotkey } from "../../../../types/tools";
+
+// Hook imports
+import { useKeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
 
 // Component imports
 import Tooltip from "../../../../components/Tooltip";
@@ -19,6 +24,15 @@ const StrokeIcon = ({ strokeSize }: Props) => {
   const [isHover, setIsHover] = useState<boolean>(false);
 
   const strokeLabel = `${strokeSize}px stroke`;
+  const hotkey = getStrokeHotkey(strokeSize);
+
+  const shortcut: KeyboardShortcut[] = [
+    {
+      key: hotkey,
+      callback: () => setStrokeSize(strokeSize),
+    },
+  ];
+  useKeyboardShortcut(shortcut);
 
   const handleMouseDown = () => {
     setStrokeSize(strokeSize);
@@ -53,7 +67,7 @@ const StrokeIcon = ({ strokeSize }: Props) => {
   );
 
   return (
-    <Tooltip text={strokeLabel}>
+    <Tooltip text={strokeLabel} hotkey={hotkey}>
       <div
         className="flex items-center justify-center cursor-pointer"
         onMouseDown={handleMouseDown}
