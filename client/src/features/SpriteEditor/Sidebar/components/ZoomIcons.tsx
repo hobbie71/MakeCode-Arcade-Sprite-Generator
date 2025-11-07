@@ -7,6 +7,12 @@ import { MAX_ZOOM, MIN_ZOOM, ZOOM_AMOUNT } from "../../constants/canvas";
 // Component imports
 import Tooltip from "../../../../components/Tooltip";
 
+// Hook imports
+import { useKeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
+
+// Type imports
+import type { KeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
+
 const ZoomIcons = () => {
   const { setZoom, zoom } = useZoom();
 
@@ -25,6 +31,18 @@ const ZoomIcons = () => {
       return newZoom;
     });
   };
+
+  const shortcut: KeyboardShortcut[] = [
+    {
+      key: "=",
+      callback: handleZoomIn,
+    },
+    {
+      key: "-",
+      callback: handleZoomOut,
+    },
+  ];
+  useKeyboardShortcut(shortcut);
 
   const handleZoomInKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     switch (e.key) {
@@ -55,7 +73,7 @@ const ZoomIcons = () => {
 
   return (
     <>
-      <Tooltip text="Zoom out">
+      <Tooltip text="Zoom out" hotkey="-">
         <button
           className="tool-button"
           onClick={handleZoomOut}
@@ -69,7 +87,7 @@ const ZoomIcons = () => {
         </button>
       </Tooltip>
 
-      <Tooltip text="Zoom in">
+      <Tooltip text="Zoom in" hotkey="+">
         <button
           className="tool-button"
           onClick={handleZoomIn}

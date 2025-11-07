@@ -54,7 +54,7 @@ const SelectedColorIcons = () => {
   };
 
   return (
-    <Tooltip text={tooltipText}>
+    <Tooltip text={tooltipText} hotkey="x">
       <button
         className="relative w-full my-2 rounded"
         style={{ height: ICON_SIZE + 8 }} // +8 for overlap
