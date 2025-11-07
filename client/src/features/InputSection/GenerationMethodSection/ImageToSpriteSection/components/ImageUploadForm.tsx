@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useId } from "react";
 
 // Hooks
 import { useImageFileHandler } from "../../../hooks/useImageFileHandler";
@@ -7,21 +7,31 @@ const ImageUploadForm = () => {
   // Hooks
   const { importImageManually } = useImageFileHandler();
 
+  // Generate unique IDs for accessibility
+  const instructionsId = useId();
+  const errorId = useId();
+  const liveRegionId = useId();
+
   // States
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [liveMessage, setLiveMessage] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDragging(true);
+    if (!isDragging) {
+      setIsDragging(true);
+      setLiveMessage("Drop zone active. Release to upload image.");
+    }
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
+    setLiveMessage("");
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -29,22 +39,30 @@ const ImageUploadForm = () => {
     e.stopPropagation();
     setIsDragging(false);
     setError(null);
+    setLiveMessage("");
 
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
       importImageManually(file);
+      setLiveMessage(`Image ${file.name} uploaded successfully.`);
     } else {
-      setError("Please upload a valid image file.");
+      const errorMsg = "Please upload a valid image file.";
+      setError(errorMsg);
+      setLiveMessage(errorMsg);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
+    setLiveMessage("");
     const file = e.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
       importImageManually(file);
+      setLiveMessage(`Image ${file.name} uploaded successfully.`);
     } else {
-      setError("Please upload a valid image file.");
+      const errorMsg = "Please upload a valid image file.";
+      setError(errorMsg);
+      setLiveMessage(errorMsg);
     }
   };
 
@@ -52,47 +70,94 @@ const ImageUploadForm = () => {
     inputRef.current?.click();
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Handle Enter and Space keys for accessibility (similar to MUI Button)
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      inputRef.current?.click();
+    }
+  };
+
+  // Build aria-describedby dynamically
+  const ariaDescribedBy = [instructionsId, error ? errorId : null]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div
-      className={`card card-body border-2 border-dashed transition-colors duration-200 cursor-pointer flex flex-col items-center justify-center text-center ${
-        isDragging
-          ? "border-blue-400 bg-blue-800"
-          : "border-white bg-transparent"
-      }`}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      onClick={handleClick}
-      tabIndex={0}
-      role="button"
-      aria-label="Upload image">
-      <svg
-        className="w-10 h-10 mb-23 text-white"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M8 12l4-4m0 0l4 4m-4-4v12"
-        />
-      </svg>
-      <div className="paragraph text-center text-white">
-        <p className="">Drag and Drop an Image Here</p>
-        <p className="">or</p>
-        <p className="">Click to Browse Files</p>
+    <>
+      {/* Live region for screen reader announcements */}
+      <div
+        id={liveRegionId}
+        className="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true">
+        {liveMessage}
       </div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleInputChange}
-        tabIndex={-1}
-      />
-      {error && <p className="text-error mt-2">{error}</p>}
-    </div>
+
+      <div
+        className={`card card-body border-2 border-dashed transition-colors duration-200 cursor-pointer flex flex-col items-center justify-center text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
+          isDragging
+            ? "border-blue-400 bg-blue-800"
+            : "border-white bg-transparent"
+        }`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="button"
+        aria-label="Upload image file"
+        aria-describedby={ariaDescribedBy}
+        aria-invalid={error ? "true" : "false"}>
+        {/* Decorative icon - hidden from screen readers */}
+        <svg
+          className="w-10 h-10 mb-3 text-white"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M8 12l4-4m0 0l4 4m-4-4v12"
+          />
+        </svg>
+
+        {/* Instructions - referenced by aria-describedby */}
+        <div id={instructionsId} className="paragraph text-center text-white">
+          <p>Drag and Drop an Image Here</p>
+          <p>or</p>
+          <p>Click to Browse Files</p>
+        </div>
+
+        {/* Hidden file input */}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleInputChange}
+          tabIndex={-1}
+          aria-hidden="true"
+          id="image-upload-input"
+        />
+      </div>
+
+      {/* Error message - referenced by aria-describedby when present */}
+      {error && (
+        <p
+          id={errorId}
+          className="text-error mt-2"
+          role="alert"
+          aria-live="assertive">
+          {error}
+        </p>
+      )}
+    </>
   );
 };
 
