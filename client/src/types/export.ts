@@ -40,11 +40,11 @@ export const ALL_CODE_EXPORT_FORMATS = [
 
 /** Types of assets that can be generated in MakeCode Arcade */
 export enum AssetType {
-  Sprite = "Sprite",
-  Background = "Background",
-  Tile = "Tile",
-  Tilemap = "Tilemap",
-  Animation = "Animation",
+  Sprite = "sprite",
+  Background = "background",
+  Tile = "tile",
+  Tilemap = "tilemap",
+  Animation = "animation",
 }
 
 /** Available asset types for generation */
