@@ -56,7 +56,7 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
         id="ai-prompt-input"
         className={`min-w-full min-h-24 mt-2 p-2 rounded-lg bg-default-300 text-text-default-300 shadow-default-lg placeholder-text-default-muted ${
           disabled
-            ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
+            ? "opacity-50 cursor-not-allowed"
             : ""
         }`}
         name="prompt"

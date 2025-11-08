@@ -120,7 +120,7 @@ const DefaultDropDown = <T,>({
         id={selectId}
         className={`form-select ${
           disabled
-            ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
+            ? "opacity-50 cursor-not-allowed"
             : ""
         } ${className}`}
         value={value}

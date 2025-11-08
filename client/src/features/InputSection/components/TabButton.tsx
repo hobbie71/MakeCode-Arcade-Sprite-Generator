@@ -20,9 +20,7 @@ const TabButton = ({
 
   return (
     <Button
-      className={`tab-button ${isSelected ? "active" : ""} ${
-        disabled ? "cursor-not-allowed text-text-default-muted" : ""
-      }`}
+      className={`tab-button ${isSelected ? "active" : ""}`}
       onClick={handleClick}
       disabled={disabled}>
       {children}

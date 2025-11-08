@@ -58,7 +58,7 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
     <div className="form-group flex flex-row justify-between items-center my-2">
       <label
         id={labelId}
-        className={`form-label ${disabled ? "text-text-default-muted cursor-not-allowed" : "cursor-pointer"}`}
+        className={`form-label cursor-pointer`}
         htmlFor={inputId}>
         {children}
       </label>
@@ -91,18 +91,14 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
           role="presentation"
           aria-hidden="true"
           className={`
-            absolute top-0 left-0 right-0 bottom-0 shadow-default-lg
+            absolute top-0 left-0 right-0 bottom-0
             rounded-full transition-colors duration-300 ease-in-out p-1
             ${
               checked
-                ? disabled
-                  ? "bg-default-300"
-                  : "bg-primary-600"
-                : disabled
-                  ? "bg-default-300"
-                  : "bg-default-300"
+                ? "bg-primary-600"
+                : "bg-default-300"
             }
-            ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}>
+            ${disabled ? "opacity-50 cursor-not-allowed" : "shadow-default-lg cursor-pointer"}`}>
           {/* White circle */}
           <span
             className={`

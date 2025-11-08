@@ -1,5 +1,6 @@
 // Context imports
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+import { useLoading } from "../../../context/LoadingContext/useLoading";
 
 // Type import
 import { ALL_PALETTES } from "../../../types/color";
@@ -7,6 +8,7 @@ import type { MakeCodePalette } from "../../../types/color";
 
 const PaletteSelection = () => {
   const { palette, setPalette } = usePaletteSelected();
+  const { isGenerating } = useLoading();
 
   const getPaletteFromIndex = (index: number): MakeCodePalette => {
     return ALL_PALETTES[index].palette;
@@ -19,11 +21,12 @@ const PaletteSelection = () => {
       </p>
       <div>
         <select
-          className="form-select"
+          className={`form-select ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
           value={ALL_PALETTES.findIndex((pal) => pal.palette === palette)}
           onChange={(e) =>
             setPalette(getPaletteFromIndex(parseInt(e.target.value)))
           }
+          disabled={isGenerating}
           aria-labelledby="palette-selection-label"
           aria-describedby="palette-selection-description">
           {ALL_PALETTES.map((pal, index) => (

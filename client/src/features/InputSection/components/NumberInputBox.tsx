@@ -120,7 +120,7 @@ const NumberInputBox = ({
       <input
         ref={inputRef}
         className={`form-input input-no-arrows min-w-4 text-center ${
-          disabled ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""
+          disabled ? "opacity-50 cursor-not-allowed" : ""
         }`}
         type="number"
         id={label}

@@ -31,7 +31,6 @@ export const Button = ({
       className={`${getButtonClass()} ${className}`}
       disabled={isLoading || disabled}
       {...props}>
-      {isLoading && <div className="loading-spinner mr-2" />}
       {children}
     </button>
   );

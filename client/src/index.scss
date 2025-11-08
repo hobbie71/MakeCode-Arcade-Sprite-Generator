@@ -147,8 +147,7 @@
   }
 
   .btn:disabled {
-    @apply opacity-60 cursor-not-allowed;
-    box-shadow: none;
+    @apply opacity-50 cursor-not-allowed;
   }
 
   .btn-sm {
@@ -203,7 +202,7 @@
   }
 
   .tab-button {
-    @apply px-4 py-2 text-sm font-medium rounded-lg bg-default-300 text-text-default-200 hover:text-text-default-300;
+    @apply px-4 py-2 text-sm font-medium rounded-lg bg-default-300 text-text-default-300 hover:text-text-default-300 shadow-default-lg;
 
     &.active {
       @apply bg-primary-500 text-text-default-300;
