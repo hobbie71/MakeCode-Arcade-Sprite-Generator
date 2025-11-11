@@ -26,6 +26,7 @@ const AssetOptionsSelection = () => {
           <TabButton
             key={type}
             isSelected={selectedAsset === type}
+            isLoading={isGenerating}
             onClick={() => handleAssetSelect(type)}>
             {type.charAt(0).toUpperCase() + type.slice(1)}
           </TabButton>

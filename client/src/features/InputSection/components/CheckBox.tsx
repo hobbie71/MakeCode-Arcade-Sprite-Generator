@@ -93,11 +93,7 @@ const CheckBox = ({ children, onChange, checked, disabled = false }: Props) => {
           className={`
             absolute top-0 left-0 right-0 bottom-0
             rounded-full transition-colors duration-300 ease-in-out p-1
-            ${
-              checked
-                ? "bg-primary-600"
-                : "bg-default-300"
-            }
+            ${checked ? "bg-primary-600" : "bg-default-300"}
             ${disabled ? "opacity-50 cursor-not-allowed" : "shadow-default-lg cursor-pointer"}`}>
           {/* White circle */}
           <span

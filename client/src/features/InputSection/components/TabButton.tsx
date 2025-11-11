@@ -5,6 +5,7 @@ interface Props {
   onClick: () => void;
   children: React.ReactNode;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
 const TabButton = ({
@@ -12,6 +13,7 @@ const TabButton = ({
   onClick,
   children,
   disabled = false,
+  isLoading = false,
 }: Props) => {
   const handleClick = () => {
     if (disabled) return;
@@ -22,12 +24,10 @@ const TabButton = ({
     <Button
       className={`tab-button ${isSelected ? "active" : ""}`}
       onClick={handleClick}
-      disabled={disabled}>
+      disabled={disabled || isLoading}>
       {children}
     </Button>
   );
 };
-
-// border-[#058b9b]
 
 export default TabButton;

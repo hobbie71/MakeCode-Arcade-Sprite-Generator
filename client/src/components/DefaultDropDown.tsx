@@ -119,9 +119,7 @@ const DefaultDropDown = <T,>({
         ref={selectRef}
         id={selectId}
         className={`form-select ${
-          disabled
-            ? "opacity-50 cursor-not-allowed"
-            : ""
+          disabled ? "opacity-50 cursor-not-allowed" : ""
         } ${className}`}
         value={value}
         onChange={handleChange}

@@ -5,12 +5,14 @@ import TextToSpriteSection from "./TextToSpriteSection/TextToSpriteSection";
 
 // Context imports
 import { useGenerationMethod } from "../../../context/GenerationMethodContext/useGenerationMethod";
+import { useLoading } from "../../../context/LoadingContext/useLoading";
 
 // Type imports
 import { GenerationMethod, generationMethods } from "../../../types/export";
 
 const GenerationMethodSection = () => {
   const { selectedMethod, setSelectedMethod } = useGenerationMethod();
+  const { isGenerating } = useLoading();
 
   return (
     <div className="form-group">
@@ -20,6 +22,7 @@ const GenerationMethodSection = () => {
           <TabButton
             key={method}
             isSelected={selectedMethod === method}
+            isLoading={isGenerating}
             onClick={() => setSelectedMethod(method)}>
             {`${method.charAt(0).toUpperCase() + method.slice(1)} to Sprite`}
           </TabButton>

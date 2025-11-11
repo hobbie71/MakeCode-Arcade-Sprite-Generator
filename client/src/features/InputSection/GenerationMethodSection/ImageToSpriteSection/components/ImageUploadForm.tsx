@@ -108,11 +108,7 @@ const ImageUploadForm = () => {
           isDragging
             ? "border-blue-400 bg-blue-800"
             : "border-white bg-transparent"
-        } ${
-          isGenerating
-            ? "opacity-50 cursor-not-allowed"
-            : "cursor-pointer"
-        }`}
+        } ${isGenerating ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
