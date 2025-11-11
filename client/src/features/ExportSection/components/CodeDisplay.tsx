@@ -41,7 +41,7 @@ const CodeDisplay = ({ children, codingLanguage = "javascript" }: Props) => {
   return (
     <div className="relative">
       <pre
-        className="card-body text-start rounded-lg bg-text-default-300 text-default-200 max-h-60 overflow-auto cursor-pointer hover:bg-neutral-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-info-500 focus:ring-offset-2"
+        className="card-body text-start rounded-lg bg-text-default-300 text-default-200 max-h-60 overflow-auto cursor-pointer hover:bg-neutral-300 transition-colors duration-200"
         onClick={handleCopy}
         onKeyDown={handleKeyDown}
         onMouseEnter={() => setShowTooltip(true)}

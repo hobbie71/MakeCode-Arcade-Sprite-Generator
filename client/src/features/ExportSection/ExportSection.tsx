@@ -109,7 +109,9 @@ const ExportSection = () => {
         {(!showCodeExport ||
           showCodeExport === CodeExportFormats.SPRITE_EDITOR) && (
           <div className="export-card">
-            <h5 className="heading-5">Sprite Editor Code</h5>
+            <h5 className="heading-5 text-text-default-300">
+              Sprite Editor Code
+            </h5>
             <CodeDisplay>{getImgCode()}</CodeDisplay>
           </div>
         )}
@@ -117,14 +119,14 @@ const ExportSection = () => {
         {(!showCodeExport ||
           showCodeExport === CodeExportFormats.JAVASCRIPT) && (
           <div className="export-card">
-            <h5 className="heading-5">Javascript Code</h5>
+            <h5 className="heading-5 text-text-default-300">Javascript Code</h5>
             <CodeDisplay>{getJavaScriptCode()}</CodeDisplay>
           </div>
         )}
 
         {(!showCodeExport || showCodeExport === CodeExportFormats.PYTHON) && (
           <div className="export-card">
-            <h5 className="heading-5">Python Code</h5>
+            <h5 className="heading-5 text-text-default-300">Python Code</h5>
             <CodeDisplay codingLanguage="python">{getPythonCode()}</CodeDisplay>
           </div>
         )}
