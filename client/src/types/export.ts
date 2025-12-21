@@ -67,7 +67,7 @@ export enum AiModel {
 /** AI model options with display names */
 export const ALL_AI_MODELS = [
   { name: "PixelLab", model: AiModel.PixelLab },
-  { name: "GPTImage1", model: AiModel.GPTImage1 },
+  { name: "GPTImage1-5", model: AiModel.GPTImage1 },
 ];
 
 // =============================================================================

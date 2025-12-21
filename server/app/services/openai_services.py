@@ -42,7 +42,7 @@ class OpenAIServices:
       
       # Prepare parameters for OpenAI API
       params = {
-        "model": "gpt-image-1",
+        "model": "gpt-image-1.5",
         "prompt": get_sprite_generation_prompt(settings, intended_size, palette),
         "n": 1,
         "size": final_size.value,
