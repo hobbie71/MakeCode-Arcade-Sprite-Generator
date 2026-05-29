@@ -23,4 +23,6 @@ ENV HOST=0.0.0.0
 ENV PORT=8000
 EXPOSE 8000
 WORKDIR /app/server
+# Run as the non-root user provided by the base image.
+USER bun
 CMD ["bun", "src/index.ts"]
