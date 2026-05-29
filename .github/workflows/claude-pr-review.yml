@@ -1,0 +1,32 @@
+name: Claude PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          # Uses your Max plan via the OAuth token (NOT an API key).
+          # Generate with `claude setup-token`, then add it to the repo as a
+          # secret named CLAUDE_CODE_OAUTH_TOKEN. Do not also set ANTHROPIC_API_KEY,
+          # or it will take precedence and bill per-token.
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Review this pull request for bugs, logic errors, security issues,
+            and anything likely to break. Leave concise inline comments on the
+            specific lines where you find real problems. Skip pure style nits.
+            If the PR looks solid, say so briefly.
