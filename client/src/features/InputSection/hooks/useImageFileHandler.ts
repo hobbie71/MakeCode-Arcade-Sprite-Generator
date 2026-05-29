@@ -6,7 +6,6 @@ import { useImageImports } from "../../../context/ImageImportContext/useImageImp
 import { useLoading } from "../../../context/LoadingContext/useLoading";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useAiModel } from "../../../context/AiModelContext/useAiModel";
-import { usePixelLabSettings } from "../../../context/PixelLabSettingsContext/usePixelLabSettings";
 import { useOpenAISettings } from "../../../context/OpenAISettingsContext/useOpenAISettings";
 import { usePostProcessing } from "../../../context/PostProcessingContext/usePostProcessing";
 import { useError } from "../../../context/ErrorContext/useError";
@@ -29,10 +28,7 @@ import {
 import { validatePrompt } from "../utils/promptModeration";
 
 // API imports
-import {
-  generateOpenAiImage,
-  generatePixelLabImage,
-} from "../../../api/generateImageApi";
+import { generateOpenAiImage } from "../../../api/generateImageApi";
 
 // Type imports
 import { AiModel, Crop } from "../../../types/export";
@@ -45,7 +41,6 @@ export const useImageFileHandler = () => {
   const { pasteCanvas } = usePasteData();
   const { mapCanvasToMakeCodeColors } = useMakeCodeColorConverter();
   const { selectedModel } = useAiModel();
-  const { settings: pixelLabSettings } = usePixelLabSettings();
   const { settings: openAISettings } = useOpenAISettings();
   const { settings: postProcessingSettings } = usePostProcessing();
   const { palette } = usePaletteSelected();
@@ -139,21 +134,7 @@ export const useImageFileHandler = () => {
       startGeneration("Validating Prompt");
 
       let response;
-      if (selectedModel === AiModel.PixelLab) {
-        const prompt = pixelLabSettings.prompt;
-
-        const isValid = await validatePrompt(prompt, setError);
-
-        if (!isValid) return;
-
-        setGenerationMessage("Generating AI Image");
-
-        response = await generatePixelLabImage(
-          pixelLabSettings,
-          { width, height },
-          palette
-        );
-      } else if (selectedModel === AiModel.GPTImage1) {
+      if (selectedModel === AiModel.GPTImage1) {
         const prompt = openAISettings.prompt;
 
         const isValid = await validatePrompt(prompt, setError);
@@ -201,7 +182,6 @@ export const useImageFileHandler = () => {
     stopGeneration,
     setImportedImage,
     selectedModel,
-    pixelLabSettings,
     openAISettings,
     width,
     height,

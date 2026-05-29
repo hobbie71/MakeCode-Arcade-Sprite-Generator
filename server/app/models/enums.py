@@ -17,38 +17,6 @@ class Style(Enum):
   Modern = "modern"
   Anime = "anime"
 
-class GenerationView(Enum):
-  Auto = ""
-  Side = "side"
-  HighTopDown = "high top-down"
-  LowTopDown = "low top-down"
-
-class GenerationDirection(Enum):
-  Auto = ""
-  North = "north"
-  NorthEast = "north-east"
-  East = "east"
-  SouthEast = "south-east"
-  South = "south"
-  SouthWest = "south-west"
-  West = "west"
-  NorthWest = "north-west"
-
-class GenerationOutline(Enum):
-  Auto = ""
-  Lineless = "lineless"
-  SelectiveOutline = "selective outline"
-  BlackOutline = "single color black outline"
-  ColorOutline = "single color outline"
-
-# PIXEL LAB SPECIFIC MODELS
-
-class PixelLabQuality(Enum):
-  Auto = ""
-  Low = "low detail"
-  Medium = "medium detailed"
-  High = "highly detailed"
-
 # OPENAI SPECIFIC MODELS
 
 class OpenAIQuality(Enum):
