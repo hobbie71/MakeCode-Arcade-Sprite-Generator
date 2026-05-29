@@ -1,0 +1,44 @@
+# Render blueprint (Infrastructure as Code) for the two decoupled Docker services
+# (ADR-0004, ADR-0005). This mirrors docker-compose.yml; keep them in sync.
+#
+# NOTE: secrets (`sync: false`) must be filled in the Render dashboard. The
+# client's VITE_* values are needed at BUILD time — Render exposes a service's
+# env vars to its Docker build, so they are inlined into the static bundle. Set
+# VITE_API_URL to the API service's public URL once it exists.
+services:
+  - type: web
+    name: makespritecode-api
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: PIXELLAB_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: '["https://makespritecode.com"]'
+      - key: ENVIRONMENT
+        value: production
+      # Render injects PORT automatically.
+
+  - type: web
+    name: makespritecode-client
+    runtime: docker
+    dockerfilePath: ./client/Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /
+    envVars:
+      - key: VITE_API_URL
+        sync: false # set to the makespritecode-api public URL
+      - key: VITE_GOOGLE_AD_CLIENT_ID
+        sync: false
+      - key: VITE_VERTICAL_AD_SLOT_ID
+        sync: false
+      - key: VITE_HORIZONTAL_AD_SLOT_ID
+        sync: false
+      - key: VITE_SQUARE_AD_SLOT_ID
+        sync: false

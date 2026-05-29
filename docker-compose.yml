@@ -1,0 +1,37 @@
+# Local orchestration only — `docker compose up` brings up the API and the
+# client together (ADR-0005). Render builds each Dockerfile independently from
+# render.yaml; keep the two service definitions in sync.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    ports:
+      - "8000:8000"
+    # OPENAI_API_KEY / PIXELLAB_API_KEY (and CORS_ORIGINS, which already lists
+    # http://localhost:3000) come from server/.env.
+    env_file:
+      - server/.env
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - CORS_ORIGINS=["http://localhost:3100","http://localhost:3000"]
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+      args:
+        # The browser (on the host) calls the API at this URL, so it must be a
+        # host-reachable address, not the in-network service name.
+        VITE_API_URL: "http://localhost:8000"
+        VITE_GOOGLE_AD_CLIENT_ID: "${VITE_GOOGLE_AD_CLIENT_ID:-}"
+        VITE_VERTICAL_AD_SLOT_ID: "${VITE_VERTICAL_AD_SLOT_ID:-}"
+        VITE_HORIZONTAL_AD_SLOT_ID: "${VITE_HORIZONTAL_AD_SLOT_ID:-}"
+        VITE_SQUARE_AD_SLOT_ID: "${VITE_SQUARE_AD_SLOT_ID:-}"
+    # Host port 3100 (3000 is a common local dev port); the container still
+    # listens on 3000. CORS on the API allows this origin.
+    ports:
+      - "3100:3000"
+    depends_on:
+      - api
