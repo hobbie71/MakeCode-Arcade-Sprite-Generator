@@ -5,8 +5,8 @@
 [![React](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4.3-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009639?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Python](https://img.shields.io/badge/Python-3.11+-3776ab?logo=python&logoColor=white)](https://python.org/)
+[![Bun](https://img.shields.io/badge/Bun-1.3-000000?logo=bun&logoColor=white)](https://bun.com/)
+[![Hono](https://img.shields.io/badge/Hono-4-E36002?logo=hono&logoColor=white)](https://hono.dev/)
 
 A powerful, AI-enhanced sprite generation and editing tool specifically designed for MakeCode Arcade development. Transform images and text prompts into pixel-perfect sprites with multiple export options.
 
@@ -38,22 +38,39 @@ Visit [makespritecode.com](https://makespritecode.com) to use the application di
 
 ### Production Deployment (Render.com)
 
-This project is deployed on [Render.com](https://render.com) with separate services for the FastAPI backend and React frontend.
+The client and API deploy as two separate Docker services on [Render.com](https://render.com),
+defined as code in `render.yaml` (see `docs/adr/0004` and `0005`). Both run on Bun.
 
 #### Environment Variables
 
-**Required environment variables:**
+**API service:**
 
-- `OPENAI_API_TOKEN` - Your OpenAI API key
+- `OPENAI_API_KEY` - Your OpenAI API key
+- `PIXELLAB_API_KEY` - Your PixelLab API key
 - `CORS_ORIGINS` - Allowed origins (e.g., `["https://makespritecode.com"]`)
 - `ENVIRONMENT` - Set to `production`
+- `PORT` - Port the API listens on (Render provides this)
 
-#### Deployment Commands
+**Client service (build-time, inlined into the static bundle):**
 
-- **Frontend Build**: `npm run build` (builds the React client)
-- **Backend Start**: `python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- `VITE_API_URL` - URL of the API service
+- `VITE_GOOGLE_AD_CLIENT_ID`, `VITE_VERTICAL_AD_SLOT_ID`, `VITE_HORIZONTAL_AD_SLOT_ID`, `VITE_SQUARE_AD_SLOT_ID` - AdSense IDs
 
-The FastAPI server serves the API endpoints while the React frontend is served as static files.
+#### Build / Start
+
+- **Client**: `bun run --filter client build` → serve `client/dist` (static)
+- **API**: `bun run --filter server start`
+
+Both services are containerized (`client/Dockerfile`, `server/Dockerfile`) and can
+be brought up together locally with `docker compose up`.
+
+#### Cutting over from the legacy Python API
+
+The backend was migrated from FastAPI/Python to Hono/Bun. To cut over safely in
+production: deploy the Bun API as a **new** Render service, smoke-test it, then
+flip the client's `VITE_API_URL` to the new API and redeploy the client. Keep the
+old Python service running until the Bun API is proven stable — rollback is simply
+re-pointing `VITE_API_URL` — then decommission it.
 
 ## 🎨 Usage
 
@@ -154,10 +171,11 @@ img`
 
 ## 🏗️ Architecture
 
-- **Frontend**: React 19 with TypeScript and Tailwind CSS
-- **Backend**: FastAPI (Python) with async support
-- **AI Integration**: OpenAI GPT image models
-- **Deployment**: Render.com (separate frontend/backend services)
+- **Frontend**: React 19 with TypeScript and Tailwind CSS, bundled with Bun
+- **Backend**: Hono on Bun (TypeScript)
+- **Shared types**: Zod schemas in `@makespritecode/shared` (one wire contract)
+- **AI Integration**: OpenAI GPT models and PixelLab API
+- **Deployment**: Render.com (two decoupled Docker services)
 
 ## 🤝 Contributing
 
