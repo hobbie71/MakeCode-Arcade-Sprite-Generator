@@ -1,0 +1,14 @@
+{
+  "_note": "Captured from the Python server (gpt-image-1.5). image_data is non-deterministic; oracle is the SHAPE: a data:image/png;base64 URL + width/height. Decoded sample at fixtures/samples/openai-dragon.png.",
+  "shape": {
+    "image_data": "string (data:image/png;base64,<...>)",
+    "width": "number",
+    "height": "number"
+  },
+  "observed": {
+    "image_data_prefix": "data:image/png;base64,iVBORw0K",
+    "image_data_base64_bytes": 1565605,
+    "width": 1024,
+    "height": 1024
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "_note": "PixelLab account returned 402 Payment Required (no credits) at capture time, so a success body could not be recorded. The integration itself is correct.",
+  "upstream_endpoint": "POST https://api.pixellab.ai/v1/generate-image-pixflux",
+  "upstream_error_observed": "402 Client Error: Payment Required",
+  "server_error_envelope": {
+    "success": false,
+    "error": "Internal server error"
+  },
+  "expected_success_shape": {
+    "image_data": "string (data:image/png;base64,<...>)",
+    "width": "number",
+    "height": "number"
+  }
+}

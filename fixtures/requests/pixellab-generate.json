@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "prompt": "a cute green dragon",
+    "assetType": "sprite",
+    "style": "retro",
+    "addBackground": false,
+    "fitFullCanvasSize": false,
+    "quality": "",
+    "view": "",
+    "direction": "",
+    "outline": ""
+  },
+  "size": { "width": 16, "height": 16 },
+  "palette": {
+    ".": "rgba(0,0,0,0)",
+    "1": "#FFFFFF",
+    "2": "#FF2121",
+    "3": "#FF93C4",
+    "4": "#FF8135",
+    "5": "#FFF609",
+    "6": "#249CA3",
+    "7": "#78DC52",
+    "8": "#003FAD",
+    "9": "#87F2FF",
+    "a": "#8E2EC4",
+    "b": "#A4839F",
+    "c": "#5C406C",
+    "d": "#E5CDC4",
+    "e": "#91463D",
+    "f": "#000000"
+  }
+}
