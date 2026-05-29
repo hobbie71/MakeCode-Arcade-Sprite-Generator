@@ -1,0 +1,6 @@
+# Inline VITE_* env vars into literal `process.env.X` reads in the dev server,
+# mirroring Vite's import.meta.env behavior. The production build does the same
+# via `bun build --env='VITE_*'` (see package.json "build" script).
+[serve.static]
+env = "VITE_*"
+plugins = ["./external-public.plugin.ts"]

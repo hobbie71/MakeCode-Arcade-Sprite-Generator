@@ -105,19 +105,19 @@
   /* Button Components */
   .btn {
     @apply text-text-default-300 font-medium rounded-lg px-3 py-2 my-2 flex items-center justify-center border-none;
+  }
 
-    &:hover:not(:disabled) {
-      @apply bg-primary-600;
-    }
+  .btn:hover:not(:disabled) {
+    @apply bg-primary-600;
+  }
 
-    &:active:not(:disabled) {
-      @apply translate-y-0.5;
-      box-shadow: none;
-    }
+  .btn:active:not(:disabled) {
+    @apply translate-y-0.5;
+    box-shadow: none;
+  }
 
-    &:disabled {
-      @apply opacity-50 cursor-not-allowed;
-    }
+  .btn:disabled {
+    @apply opacity-50 cursor-not-allowed;
   }
 
   .btn-primary {
@@ -177,10 +177,10 @@
 
   .tab-button {
     @apply btn px-4 py-2 text-sm font-medium bg-default-300;
+  }
 
-    &.active {
-      @apply bg-primary-500;
-    }
+  .tab-button.active {
+    @apply bg-primary-500;
   }
 
   .tab-panel {
@@ -211,10 +211,10 @@
 
   .tool-button {
     @apply flex w-8 h-8 text-white bg-default-300 hover:bg-default-400 shadow-default-md items-center justify-center rounded;
+  }
 
-    &.active {
-      @apply border border-solid border-white;
-    }
+  .tool-button.active {
+    @apply border border-solid border-white;
   }
 
   .color-palette {
@@ -280,124 +280,4 @@
   .range-input::-moz-range-thumb {
     @apply w-4 h-4 bg-primary-500 rounded-full cursor-pointer border-none;
   }
-}
-
-/* Box sizing reset */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  scroll-behavior: smooth;
-}
-
-/* Remove default margin and padding */
-html,
-body {
-  height: 100%;
-  width: 100%;
-  font-family: "Inter", Arial, sans-serif;
-  background: #171717;
-}
-
-/* Remove list styles */
-ul,
-ol {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* Default link styles */
-a {
-  color: #0078d4;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-a:hover,
-a:focus {
-  color: #005fa3;
-  text-decoration: underline;
-}
-
-/* Remove default button styles */
-button {
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
-  cursor: pointer;
-}
-
-/* Remove default image border */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  border: 0;
-}
-
-/* Set base box-sizing for all elements */
-body {
-  line-height: 1.5;
-  min-height: 100vh;
-}
-
-#root {
-  width: 100%;
-  min-height: 100vh;
-}
-
-/* Remove outline on active elements, but keep for accessibility */
-:focus {
-  outline: 2px solid #0078d4;
-  outline-offset: 2px;
-}
-
-/* Transparent Background */
-$transparent-primary-color: #aeaeae;
-$transparent-secondary-color: #dedede;
-
-.transparent {
-  background-color: $transparent-primary-color;
-  background-image:
-    linear-gradient(
-      45deg,
-      $transparent-secondary-color 25%,
-      transparent 25%,
-      transparent 75%,
-      $transparent-secondary-color 75%
-    ),
-    linear-gradient(
-      45deg,
-      $transparent-secondary-color 25%,
-      $transparent-primary-color 25%,
-      $transparent-primary-color 75%,
-      $transparent-secondary-color 75%
-    );
-  background-size: 11px 11px;
-  background-position:
-    0 0,
-    5.5px 5.5px;
-}
-
-canvas {
-  image-rendering: pixelated;
-}
-
-html,
-body {
-  background-color: #121418;
-  color: white;
-}
-
-.input-no-arrows::-webkit-inner-spin-button,
-.input-no-arrows::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.input-no-arrows {
-  -moz-appearance: textfield;
-  appearance: textfield;
 }
