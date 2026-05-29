@@ -1,7 +1,41 @@
-import type { MakeCodePalette } from "./color";
+// =============================================================================
+// WIRE CONTRACT — single source of truth in @makespritecode/shared (ADR-0002)
+// =============================================================================
+// The cross-wire enums (whose VALUES the UI catalogs below reference) and the
+// request/response types live in the shared package. They are imported here for
+// the catalogs and re-exported so existing `../types/export` imports across the
+// client keep working unchanged.
+import {
+  AssetType,
+  Style,
+  PixelLabQuality,
+  OpenAIQuality,
+  GenerationView,
+  GenerationDirection,
+  GenerationOutline,
+} from "@makespritecode/shared";
+
+export {
+  AssetType,
+  Style,
+  PixelLabQuality,
+  OpenAIQuality,
+  GenerationView,
+  GenerationDirection,
+  GenerationOutline,
+};
+export type {
+  Size,
+  BaseGenerationSettings,
+  PixelLabGenerationSettings,
+  OpenAIGenerationSettings,
+  PixelLabSpriteRequest,
+  OpenAISpriteRequest,
+  ModerationResponse,
+} from "@makespritecode/shared";
 
 // =============================================================================
-// IMAGE EXPORT FORMATS
+// IMAGE EXPORT FORMATS (UI-only)
 // =============================================================================
 
 /** Supported image export formats for sprites */
@@ -18,7 +52,7 @@ export const ALL_IMAGE_EXPORT_FORMATS = [
 ];
 
 // =============================================================================
-// CODE EXPORT FORMATS
+// CODE EXPORT FORMATS (UI-only)
 // =============================================================================
 
 /** Supported code export formats for sprites */
@@ -35,17 +69,8 @@ export const ALL_CODE_EXPORT_FORMATS = [
 ];
 
 // =============================================================================
-// ASSET TYPES
+// ASSET TYPES — UI selection catalog (AssetType enum from shared)
 // =============================================================================
-
-/** Types of assets that can be generated in MakeCode Arcade */
-export enum AssetType {
-  Sprite = "sprite",
-  Background = "background",
-  Tile = "tile",
-  Tilemap = "tilemap",
-  Animation = "animation",
-}
 
 /** Available asset types for generation */
 export const ALL_ASSETS_TYPE: AssetType[] = [
@@ -55,7 +80,7 @@ export const ALL_ASSETS_TYPE: AssetType[] = [
 ];
 
 // =============================================================================
-// AI MODELS
+// AI MODELS (UI-only)
 // =============================================================================
 
 /** Available AI models for sprite generation */
@@ -69,14 +94,20 @@ export const ALL_AI_MODELS = [
 ];
 
 // =============================================================================
-// OPENAI SPECIFIC TYPES
+// PIXELLAB quality catalog (PixelLabQuality enum from shared)
 // =============================================================================
 
-/** Quality settings for OpenAI generation */
-export enum OpenAIQuality {
-  Low = "low",
-  Medium = "medium",
-}
+/** PixelLab quality options with display names */
+export const ALL_PIXELLAB_QUALITYS = [
+  { name: "Auto", quality: PixelLabQuality.Auto },
+  { name: "Low", quality: PixelLabQuality.Low },
+  { name: "Medium", quality: PixelLabQuality.Medium },
+  { name: "High", quality: PixelLabQuality.High },
+];
+
+// =============================================================================
+// OPENAI quality catalog (OpenAIQuality enum from shared)
+// =============================================================================
 
 /** OpenAI quality options with display names */
 export const ALL_OPENAI_QUALITYS = [
@@ -85,7 +116,7 @@ export const ALL_OPENAI_QUALITYS = [
 ];
 
 // =============================================================================
-// GENERATION METHODS
+// GENERATION METHODS (UI-only)
 // =============================================================================
 
 /** Methods for generating sprites */
@@ -101,18 +132,38 @@ export const generationMethods: GenerationMethod[] = [
 ];
 
 // =============================================================================
-// GENERATION SETTINGS & STYLES
+// GENERATION VIEW / DIRECTION / OUTLINE / STYLE catalogs (enums from shared)
 // =============================================================================
 
-/** Art styles for sprite generation */
-export enum Style {
-  Retro = "retro",
-  Chibi = "chibi",
-  Isometric = "isometric",
-  Minimalist = "minimalist",
-  Modern = "modern",
-  Anime = "anime",
-}
+/** Generation view options with display names */
+export const ALL_GENERATION_VIEWS = [
+  { name: "Auto", view: GenerationView.Auto },
+  { name: "Side", view: GenerationView.Side },
+  { name: "High Top Down", view: GenerationView.HighTopDown },
+  { name: "Low Top Down", view: GenerationView.LowTopDown },
+];
+
+/** Generation direction options with display names */
+export const ALL_GENERATION_DIRECTIONS = [
+  { name: "Auto", direction: GenerationDirection.Auto },
+  { name: "North", direction: GenerationDirection.North },
+  { name: "North-East", direction: GenerationDirection.NorthEast },
+  { name: "East", direction: GenerationDirection.East },
+  { name: "South-East", direction: GenerationDirection.SouthEast },
+  { name: "South", direction: GenerationDirection.South },
+  { name: "South-West", direction: GenerationDirection.SouthWest },
+  { name: "West", direction: GenerationDirection.West },
+  { name: "North-West", direction: GenerationDirection.NorthWest },
+];
+
+/** Generation outline options with display names */
+export const ALL_GENERATION_OUTLINES = [
+  { name: "Auto", outline: GenerationOutline.Auto },
+  { name: "Lineless", outline: GenerationOutline.Lineless },
+  { name: "Selective Outline", outline: GenerationOutline.SelectiveOutline },
+  { name: "Black Outline", outline: GenerationOutline.BlackOutline },
+  { name: "Color Outline", outline: GenerationOutline.ColorOutline },
+];
 
 /** Style options with display names */
 export const ALL_STYLES = [
@@ -125,7 +176,7 @@ export const ALL_STYLES = [
 ];
 
 // =============================================================================
-// POST-PROCESSING & EXPORT SETTINGS
+// POST-PROCESSING & EXPORT SETTINGS (UI-only)
 // =============================================================================
 
 /** Settings for image export processing */
@@ -164,46 +215,22 @@ export const DEFAULT_TEXT_TO_SPRITE_SETTINGS: ImageExportSettings = {
 };
 
 // =============================================================================
-// GENERATION SETTINGS TYPES
+// LEGACY TEXT EXPORT SETTINGS (UI-only; references shared enums as types)
 // =============================================================================
 
-/** Base settings shared by all AI models */
-export type BaseGenerationSettings = {
+/** Legacy text export settings (for backwards compatibility) */
+export type TextExportSettings = {
+  AiModel: string;
+  quality: string;
   prompt: string;
+  removeBackground: boolean;
+  cropEdges: boolean;
+  tolerance: number;
   assetType: AssetType;
   style: Style;
+  addBackground: boolean;
+  fitFullCanvasSize: boolean;
+  view: GenerationView;
+  direction: GenerationDirection;
+  outline: GenerationOutline;
 };
-
-/** OpenAI specific generation settings */
-export type OpenAIGenerationSettings = BaseGenerationSettings & {
-  quality: OpenAIQuality;
-};
-
-// =============================================================================
-// REQUEST TYPES
-// =============================================================================
-
-/** Canvas size for sprite generation */
-export type Size = {
-  width: number;
-  height: number;
-};
-
-/** Request payload for OpenAI sprite generation */
-export type OpenAISpriteRequest = {
-  settings: OpenAIGenerationSettings;
-  size: Size;
-  palette: MakeCodePalette;
-};
-
-// =============================================================================
-// MODERATION RESPONSE
-// =============================================================================
-
-/** Response from content moderation API */
-export interface ModerationResponse {
-  is_appropriate: boolean;
-  flagged: boolean;
-  categories: Record<string, boolean>;
-  category_scores: Record<string, number>;
-}

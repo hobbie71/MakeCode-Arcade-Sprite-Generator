@@ -1,3 +1,10 @@
+import type { MakeCodePalette } from "@makespritecode/shared";
+
+// MakeCodePalette (the wire type, Record<string,string>) is sourced from the
+// shared package (ADR-0002); the MakeCodeColor enum and concrete palettes below
+// stay client-side.
+export type { MakeCodePalette };
+
 // MakeCode Arcade color palette
 export enum MakeCodeColor {
   TRANSPARENT = ".",
@@ -59,8 +66,6 @@ export const ColorOrder: MakeCodeColor[] = [
   MakeCodeColor.BROWN,
   MakeCodeColor.BLACK,
 ];
-
-export type MakeCodePalette = Record<MakeCodeColor, string>;
 
 export const ArcadePalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",

@@ -12,6 +12,7 @@
     "start": "serve -s dist"
   },
   "dependencies": {
+    "@makespritecode/shared": "workspace:*",
     "bad-words": "^4.0.0",
     "prismjs": "^1.30.0",
     "react": "^19.1.1",
