@@ -7,7 +7,6 @@ import { AssetTypeProvider } from "../context/AssetTypeContext/AssetTypeContext"
 import { GenerationMethodProvider } from "../context/GenerationMethodContext/GenerationMethodContext";
 import { AiModelProvider } from "../context/AiModelContext/AiModelContext";
 import { LoadingProvider } from "../context/LoadingContext/LoadingContext";
-import { PixelLabSettingsProvider } from "../context/PixelLabSettingsContext/PixelLabSettingsContext";
 import { OpenAISettingsProvider } from "../context/OpenAISettingsContext/OpenAISettingsContext";
 import { PostProcessingProvider } from "../context/PostProcessingContext/PostProcessingContext";
 import { ErrorProvider } from "../context/ErrorContext/ErrorContext";
@@ -24,19 +23,17 @@ const AppProviders = ({ children }: { children: React.ReactNode }) => {
               <CanvasSizeProvider>
                 <LoadingProvider>
                   <AiModelProvider>
-                    <PixelLabSettingsProvider>
-                      <OpenAISettingsProvider>
-                        <ImageImportProvider>
-                          <PostProcessingProvider>
-                            <PreviewCanvasProvider>
-                              <StrokeSizeProvider>
-                                <ErrorProvider>{children}</ErrorProvider>
-                              </StrokeSizeProvider>
-                            </PreviewCanvasProvider>
-                          </PostProcessingProvider>
-                        </ImageImportProvider>
-                      </OpenAISettingsProvider>
-                    </PixelLabSettingsProvider>
+                    <OpenAISettingsProvider>
+                      <ImageImportProvider>
+                        <PostProcessingProvider>
+                          <PreviewCanvasProvider>
+                            <StrokeSizeProvider>
+                              <ErrorProvider>{children}</ErrorProvider>
+                            </StrokeSizeProvider>
+                          </PreviewCanvasProvider>
+                        </PostProcessingProvider>
+                      </ImageImportProvider>
+                    </OpenAISettingsProvider>
                   </AiModelProvider>
                 </LoadingProvider>
               </CanvasSizeProvider>

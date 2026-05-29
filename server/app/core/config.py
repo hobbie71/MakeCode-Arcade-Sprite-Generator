@@ -10,7 +10,6 @@ load_dotenv(str(PROJECT_ROOT / ".env"))
 
 class Settings(BaseSettings):
   # API Keys
-  PIXELLAB_API_KEY: str = ""
   OPENAI_API_KEY: str = ""
   CORS_ORIGINS: list[str] = []
 

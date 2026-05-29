@@ -44,7 +44,6 @@ This project is deployed on [Render.com](https://render.com) with separate servi
 
 **Required environment variables:**
 
-- `PIXELLAB_API_TOKEN` - Your PixelLab API token
 - `OPENAI_API_TOKEN` - Your OpenAI API key
 - `CORS_ORIGINS` - Allowed origins (e.g., `["https://makespritecode.com"]`)
 - `ENVIRONMENT` - Set to `production`
@@ -157,7 +156,7 @@ img`
 
 - **Frontend**: React 19 with TypeScript and Tailwind CSS
 - **Backend**: FastAPI (Python) with async support
-- **AI Integration**: OpenAI GPT models and PixelLab API
+- **AI Integration**: OpenAI GPT image models
 - **Deployment**: Render.com (separate frontend/backend services)
 
 ## 🤝 Contributing

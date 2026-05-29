@@ -1,11 +1,7 @@
 from pydantic import BaseModel, RootModel
 from app.models.enums import (
-    AssetType, 
-    Style, 
-    PixelLabQuality, 
-    GenerationView, 
-    GenerationDirection, 
-    GenerationOutline,
+    AssetType,
+    Style,
     OpenAIQuality
 )
 
@@ -21,21 +17,8 @@ class BaseGenerationSettings(BaseModel):
     assetType: AssetType
     style: Style
 
-class PixelLabGenerationSettings(BaseGenerationSettings):
-    addBackground: bool
-    fitFullCanvasSize: bool
-    quality: PixelLabQuality = PixelLabQuality.Auto
-    view: GenerationView = GenerationView.Auto
-    direction: GenerationDirection = GenerationDirection.Auto
-    outline: GenerationOutline = GenerationOutline.Auto
-
 class OpenAIGenerationSettings(BaseGenerationSettings):
     quality: OpenAIQuality = OpenAIQuality.Medium
-
-class PixelLabSpriteGenerationRequest(BaseModel):
-    settings: PixelLabGenerationSettings
-    size: Size
-    palette: MakeCodePalette
 
 class OpenAISpriteGenerationRequest(BaseModel):
     settings: OpenAIGenerationSettings

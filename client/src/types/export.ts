@@ -60,34 +60,12 @@ export const ALL_ASSETS_TYPE: AssetType[] = [
 
 /** Available AI models for sprite generation */
 export enum AiModel {
-  PixelLab = "pixellab",
   GPTImage1 = "gpt-image-1",
 }
 
 /** AI model options with display names */
 export const ALL_AI_MODELS = [
-  { name: "PixelLab", model: AiModel.PixelLab },
   { name: "GPTImage1-5", model: AiModel.GPTImage1 },
-];
-
-// =============================================================================
-// PIXELLAB SPECIFIC TYPES
-// =============================================================================
-
-/** Quality settings for PixelLab generation */
-export enum PixelLabQuality {
-  Auto = "",
-  Low = "low detail",
-  Medium = "medium detailed",
-  High = "highly detailed",
-}
-
-/** PixelLab quality options with display names */
-export const ALL_PIXELLAB_QUALITYS = [
-  { name: "Auto", quality: PixelLabQuality.Auto },
-  { name: "Low", quality: PixelLabQuality.Low },
-  { name: "Medium", quality: PixelLabQuality.Medium },
-  { name: "High", quality: PixelLabQuality.High },
 ];
 
 // =============================================================================
@@ -125,66 +103,6 @@ export const generationMethods: GenerationMethod[] = [
 // =============================================================================
 // GENERATION SETTINGS & STYLES
 // =============================================================================
-
-/** Viewing perspectives for sprite generation */
-export enum GenerationView {
-  Auto = "",
-  Side = "side",
-  HighTopDown = "high top-down",
-  LowTopDown = "low top-down",
-}
-
-/** Generation view options with display names */
-export const ALL_GENERATION_VIEWS = [
-  { name: "Auto", view: GenerationView.Auto },
-  { name: "Side", view: GenerationView.Side },
-  { name: "High Top Down", view: GenerationView.HighTopDown },
-  { name: "Low Top Down", view: GenerationView.LowTopDown },
-];
-
-/** Cardinal and intercardinal directions for sprite generation */
-export enum GenerationDirection {
-  Auto = "",
-  North = "north",
-  NorthEast = "north-east",
-  East = "east",
-  SouthEast = "south-east",
-  South = "south",
-  SouthWest = "south-west",
-  West = "west",
-  NorthWest = "north-west",
-}
-
-/** Generation direction options with display names */
-export const ALL_GENERATION_DIRECTIONS = [
-  { name: "Auto", direction: GenerationDirection.Auto },
-  { name: "North", direction: GenerationDirection.North },
-  { name: "North-East", direction: GenerationDirection.NorthEast },
-  { name: "East", direction: GenerationDirection.East },
-  { name: "South-East", direction: GenerationDirection.SouthEast },
-  { name: "South", direction: GenerationDirection.South },
-  { name: "South-West", direction: GenerationDirection.SouthWest },
-  { name: "West", direction: GenerationDirection.West },
-  { name: "North-West", direction: GenerationDirection.NorthWest },
-];
-
-/** Outline styles for sprite generation */
-export enum GenerationOutline {
-  Auto = "",
-  Lineless = "lineless",
-  SelectiveOutline = "selective outline",
-  BlackOutline = "single color black outline",
-  ColorOutline = "single color outline",
-}
-
-/** Generation outline options with display names */
-export const ALL_GENERATION_OUTLINES = [
-  { name: "Auto", outline: GenerationOutline.Auto },
-  { name: "Lineless", outline: GenerationOutline.Lineless },
-  { name: "Selective Outline", outline: GenerationOutline.SelectiveOutline },
-  { name: "Black Outline", outline: GenerationOutline.BlackOutline },
-  { name: "Color Outline", outline: GenerationOutline.ColorOutline },
-];
 
 /** Art styles for sprite generation */
 export enum Style {
@@ -256,16 +174,6 @@ export type BaseGenerationSettings = {
   style: Style;
 };
 
-/** PixelLab specific generation settings */
-export type PixelLabGenerationSettings = BaseGenerationSettings & {
-  addBackground: boolean;
-  fitFullCanvasSize: boolean;
-  quality: PixelLabQuality;
-  view: GenerationView;
-  direction: GenerationDirection;
-  outline: GenerationOutline;
-};
-
 /** OpenAI specific generation settings */
 export type OpenAIGenerationSettings = BaseGenerationSettings & {
   quality: OpenAIQuality;
@@ -281,35 +189,11 @@ export type Size = {
   height: number;
 };
 
-/** Request payload for PixelLab sprite generation */
-export type PixelLabSpriteRequest = {
-  settings: PixelLabGenerationSettings;
-  size: Size;
-  palette: MakeCodePalette;
-};
-
 /** Request payload for OpenAI sprite generation */
 export type OpenAISpriteRequest = {
   settings: OpenAIGenerationSettings;
   size: Size;
   palette: MakeCodePalette;
-};
-
-/** Legacy text export settings (for backwards compatibility) */
-export type TextExportSettings = {
-  AiModel: string;
-  quality: string;
-  prompt: string;
-  removeBackground: boolean;
-  cropEdges: boolean;
-  tolerance: number;
-  assetType: AssetType;
-  style: Style;
-  addBackground: boolean;
-  fitFullCanvasSize: boolean;
-  view: GenerationView;
-  direction: GenerationDirection;
-  outline: GenerationOutline;
 };
 
 // =============================================================================

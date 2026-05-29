@@ -1,12 +1,10 @@
-import React, { createContext, useState, useCallback } from "react";
+import React, { createContext, useState } from "react";
 import type { ReactNode } from "react";
-import { AiModel, AssetType } from "../../types/export";
-import { getDefaultAiModelSettings } from "./getDefaultSettings";
+import { AiModel } from "../../types/export";
 
 type AiModelContextType = {
   selectedModel: AiModel;
   setSelectedModel: (model: AiModel) => void;
-  setDefaultModel: (assetType: AssetType) => void;
 };
 
 const AiModelContext = createContext<AiModelContextType | undefined>(undefined);
@@ -18,16 +16,13 @@ interface AiModelProviderProps {
 export const AiModelProvider: React.FC<AiModelProviderProps> = ({
   children,
 }) => {
-  const [selectedModel, setSelectedModel] = useState<AiModel>(AiModel.PixelLab);
-
-  const setDefaultModel = useCallback((assetType: AssetType) => {
-    setSelectedModel(getDefaultAiModelSettings(assetType));
-  }, []);
+  const [selectedModel, setSelectedModel] = useState<AiModel>(
+    AiModel.GPTImage1
+  );
 
   const value = {
     selectedModel,
     setSelectedModel,
-    setDefaultModel,
   };
 
   return (

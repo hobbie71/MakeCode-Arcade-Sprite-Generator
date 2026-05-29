@@ -1,8 +1,5 @@
-import { useEffect } from "react";
-
 // Component imports
 import DefaultDropDown from "../../../../components/DefaultDropDown";
-import PixelLabSettingsSection from "./components/PixelLabSettingsSection";
 import OpenAISettingsSection from "./components/OpenAISettingsSection";
 import PostProcessingSection from "../../components/PostProcessingSection";
 import Button from "../../../../components/Button";
@@ -13,24 +10,18 @@ import { useImageFileHandler } from "../../hooks/useImageFileHandler";
 
 // Context imports
 import { useAiModel } from "../../../../context/AiModelContext/useAiModel";
-import { useAssetType } from "../../../../context/AssetTypeContext/useAssetType";
 
 // Type imports
 import { ALL_AI_MODELS, AiModel } from "../../../../types/export";
 
 const TextToSpriteSection = () => {
-  const { selectedModel, setSelectedModel, setDefaultModel } = useAiModel();
+  const { selectedModel, setSelectedModel } = useAiModel();
   const { isGenerating } = useLoading();
-  const { selectedAsset } = useAssetType();
   const {
     importedImage,
     generateAIImageAndConvertToSprite,
     processImageToSprite,
   } = useImageFileHandler();
-
-  useEffect(() => {
-    setDefaultModel(selectedAsset);
-  }, [selectedAsset, setDefaultModel]);
 
   return (
     <div className="">
@@ -47,12 +38,11 @@ const TextToSpriteSection = () => {
         value={ALL_AI_MODELS.findIndex(
           (aiModel) => selectedModel === aiModel.model
         )}
-        disabled={isGenerating}>
+        disabled>
         AI Model
       </DefaultDropDown>
 
       {/* Render appropriate settings based on selected model */}
-      {selectedModel === AiModel.PixelLab && <PixelLabSettingsSection />}
       {selectedModel === AiModel.GPTImage1 && <OpenAISettingsSection />}
 
       {importedImage ? (
