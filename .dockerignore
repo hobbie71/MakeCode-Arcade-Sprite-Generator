@@ -1,0 +1,21 @@
+# Dependencies and build artifacts (re-created inside the image)
+node_modules
+**/node_modules
+dist
+**/dist
+client/src/tailwind.gen.css
+
+# Secrets and local env
+.env
+**/.env
+
+# Python backend (legacy; not part of the Bun images)
+**/.venv
+**/__pycache__
+**/*.pyc
+
+# VCS / tooling / local
+.git
+.claude
+**/.DS_Store
+fixtures/samples

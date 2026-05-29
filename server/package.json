@@ -1,7 +1,21 @@
 {
   "name": "server",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "poetry run uvicorn app.main:app --host 0.0.0.0 --port 62274"
+    "dev": "PORT=62274 bun --watch src/index.ts",
+    "start": "bun src/index.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@makespritecode/shared": "workspace:*",
+    "hono": "^4.12.23",
+    "openai": "^6.39.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.8",
+    "typescript": "~5.8.3"
   }
 }
