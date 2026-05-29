@@ -33,8 +33,8 @@ Visit [makespritecode.com](https://makespritecode.com) to use the application di
 
 1. Clone the repository
 2. Copy `.env.example` to `.env` and configure your API keys
-3. Install dependencies: `npm run setup`
-4. Start development server: `npm run dev`
+3. Install dependencies: `bun install`
+4. Start development server: `bun run dev` (runs the client and server together)
 
 ### Production Deployment (Render.com)
 

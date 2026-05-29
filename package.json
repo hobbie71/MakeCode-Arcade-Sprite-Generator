@@ -1,7 +1,14 @@
 {
+  "name": "makecode-arcade-sprite-generator",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
   "scripts": {
-    "dev:client": "cd client && npm run dev",
-    "dev:server": "cd server && poetry run uvicorn app.main:app --host 0.0.0.0 --port 62274",
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\""
+    "dev": "bun run --filter '*' --if-present dev",
+    "dev:client": "bun run --filter client dev",
+    "dev:server": "bun run --filter server dev"
   }
 }
