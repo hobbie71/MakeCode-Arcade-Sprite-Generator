@@ -1,10 +1,8 @@
 import type { MakeCodePalette, Size } from "@makespritecode/shared";
 
-// Ported from app/prompts/{openai,pixellab}_sprite_prompt.py. The two Python
-// templates were byte-identical except the OpenAI one adds
-// "minimum 128 x 128 pixels" to the sizing line (with NO trailing space, so it
-// runs directly into the next line), while PixelLab omits it (and keeps a
-// trailing space). Both are reproduced here exactly, typo ("seperate") included.
+// Ported from app/prompts/openai_sprite_prompt.py (OpenAI-only). Reproduced
+// exactly, including the "minimum 128 x 128 pixels" clause (which has NO trailing
+// space, so it runs straight into the next line) and the original typo ("seperate").
 
 interface PromptSettings {
   prompt: string;
@@ -31,23 +29,18 @@ export function getSpriteGenerationPrompt(
   settings: PromptSettings,
   intendedSize: Size,
   palette: MakeCodePalette,
-  includeMin128: boolean,
 ): string {
   const assetType = settings.assetType;
   const style = settings.style;
   const aspectRatio = pythonFloat(intendedSize.width / intendedSize.height);
   const paletteLegend = buildPaletteLegend(palette);
 
-  const sizingLine = includeMin128
-    ? `- Create the ${assetType} at an aspect ratio of ${aspectRatio} minimum 128 x 128 pixels`
-    : `- Create the ${assetType} at an aspect ratio of ${aspectRatio} `;
-
   return (
     `You are generating pixel-art ${assetType} in a ${style} video game style. ` +
     `- Cartoon proportions, clean outlines, transparent background. ` +
     `- No photorealism, no painterly shading. ` +
     `Follow these rules for sizing and positioning: ` +
-    sizingLine +
+    `- Create the ${assetType} at an aspect ratio of ${aspectRatio} minimum 128 x 128 pixels` +
     `- Use cartoon proportions to get as close as you can to the aspect ratio of ${aspectRatio} ` +
     `- We are working with a very limited palette, so seperate items with different colors ` +
     `- Try to only use these colors : ` +

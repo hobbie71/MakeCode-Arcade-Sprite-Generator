@@ -1,7 +1,6 @@
 import { test, expect, describe } from "bun:test";
 import { buildPaletteLegend, getSpriteGenerationPrompt, pythonFloat } from "./prompt";
 import openaiReq from "../../fixtures/requests/openai-generate.json";
-import pixellabReq from "../../fixtures/requests/pixellab-generate.json";
 
 describe("pythonFloat", () => {
   test("integer ratios get a trailing .0", () => {
@@ -23,8 +22,8 @@ describe("buildPaletteLegend", () => {
 });
 
 describe("getSpriteGenerationPrompt", () => {
-  test("OpenAI variant includes min128 with NO space before '- Use'", () => {
-    const p = getSpriteGenerationPrompt(openaiReq.settings, openaiReq.size, openaiReq.palette, true);
+  test("includes min128 with NO space before '- Use', and the exact framing", () => {
+    const p = getSpriteGenerationPrompt(openaiReq.settings, openaiReq.size, openaiReq.palette);
     expect(p).toContain("minimum 128 x 128 pixels- Use cartoon proportions");
     expect(p).toContain("aspect ratio of 1.0 ");
     expect(p).toContain("so seperate items with different colors");
@@ -32,11 +31,5 @@ describe("getSpriteGenerationPrompt", () => {
     expect(p.endsWith("- Prompt: a cute green dragon ")).toBe(true);
     // palette legend runs directly into "Now, create" with no separator
     expect(p).toContain("#000000Now, create the following sprite:");
-  });
-
-  test("PixelLab variant omits min128 (space before '- Use')", () => {
-    const p = getSpriteGenerationPrompt(pixellabReq.settings, pixellabReq.size, pixellabReq.palette, false);
-    expect(p).toContain("aspect ratio of 1.0 - Use cartoon proportions");
-    expect(p).not.toContain("minimum 128 x 128");
   });
 });

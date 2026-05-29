@@ -29,7 +29,7 @@ export async function generateOpenAISprite(
 
   const params: OpenAI.Images.ImageGenerateParams = {
     model: "gpt-image-1.5",
-    prompt: getSpriteGenerationPrompt(settings, intendedSize, palette, true),
+    prompt: getSpriteGenerationPrompt(settings, intendedSize, palette),
     n: 1,
     size: finalSize,
   };

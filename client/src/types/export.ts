@@ -1,35 +1,16 @@
 // =============================================================================
 // WIRE CONTRACT — single source of truth in @makespritecode/shared (ADR-0002)
 // =============================================================================
-// The cross-wire enums (whose VALUES the UI catalogs below reference) and the
-// request/response types live in the shared package. They are imported here for
-// the catalogs and re-exported so existing `../types/export` imports across the
-// client keep working unchanged.
-import {
-  AssetType,
-  Style,
-  PixelLabQuality,
-  OpenAIQuality,
-  GenerationView,
-  GenerationDirection,
-  GenerationOutline,
-} from "@makespritecode/shared";
+// OpenAI-only. The cross-wire enums + request/response types live in the shared
+// package and are re-exported here so existing `../types/export` imports across
+// the client keep working unchanged.
+import { AssetType, Style, OpenAIQuality } from "@makespritecode/shared";
 
-export {
-  AssetType,
-  Style,
-  PixelLabQuality,
-  OpenAIQuality,
-  GenerationView,
-  GenerationDirection,
-  GenerationOutline,
-};
+export { AssetType, Style, OpenAIQuality };
 export type {
   Size,
   BaseGenerationSettings,
-  PixelLabGenerationSettings,
   OpenAIGenerationSettings,
-  PixelLabSpriteRequest,
   OpenAISpriteRequest,
   ModerationResponse,
 } from "@makespritecode/shared";
@@ -80,7 +61,7 @@ export const ALL_ASSETS_TYPE: AssetType[] = [
 ];
 
 // =============================================================================
-// AI MODELS (UI-only)
+// AI MODELS (UI-only; OpenAI-only)
 // =============================================================================
 
 /** Available AI models for sprite generation */
@@ -89,21 +70,7 @@ export enum AiModel {
 }
 
 /** AI model options with display names */
-export const ALL_AI_MODELS = [
-  { name: "GPTImage1-5", model: AiModel.GPTImage1 },
-];
-
-// =============================================================================
-// PIXELLAB quality catalog (PixelLabQuality enum from shared)
-// =============================================================================
-
-/** PixelLab quality options with display names */
-export const ALL_PIXELLAB_QUALITYS = [
-  { name: "Auto", quality: PixelLabQuality.Auto },
-  { name: "Low", quality: PixelLabQuality.Low },
-  { name: "Medium", quality: PixelLabQuality.Medium },
-  { name: "High", quality: PixelLabQuality.High },
-];
+export const ALL_AI_MODELS = [{ name: "GPTImage1-5", model: AiModel.GPTImage1 }];
 
 // =============================================================================
 // OPENAI quality catalog (OpenAIQuality enum from shared)
@@ -132,38 +99,8 @@ export const generationMethods: GenerationMethod[] = [
 ];
 
 // =============================================================================
-// GENERATION VIEW / DIRECTION / OUTLINE / STYLE catalogs (enums from shared)
+// STYLE catalog (Style enum from shared)
 // =============================================================================
-
-/** Generation view options with display names */
-export const ALL_GENERATION_VIEWS = [
-  { name: "Auto", view: GenerationView.Auto },
-  { name: "Side", view: GenerationView.Side },
-  { name: "High Top Down", view: GenerationView.HighTopDown },
-  { name: "Low Top Down", view: GenerationView.LowTopDown },
-];
-
-/** Generation direction options with display names */
-export const ALL_GENERATION_DIRECTIONS = [
-  { name: "Auto", direction: GenerationDirection.Auto },
-  { name: "North", direction: GenerationDirection.North },
-  { name: "North-East", direction: GenerationDirection.NorthEast },
-  { name: "East", direction: GenerationDirection.East },
-  { name: "South-East", direction: GenerationDirection.SouthEast },
-  { name: "South", direction: GenerationDirection.South },
-  { name: "South-West", direction: GenerationDirection.SouthWest },
-  { name: "West", direction: GenerationDirection.West },
-  { name: "North-West", direction: GenerationDirection.NorthWest },
-];
-
-/** Generation outline options with display names */
-export const ALL_GENERATION_OUTLINES = [
-  { name: "Auto", outline: GenerationOutline.Auto },
-  { name: "Lineless", outline: GenerationOutline.Lineless },
-  { name: "Selective Outline", outline: GenerationOutline.SelectiveOutline },
-  { name: "Black Outline", outline: GenerationOutline.BlackOutline },
-  { name: "Color Outline", outline: GenerationOutline.ColorOutline },
-];
 
 /** Style options with display names */
 export const ALL_STYLES = [
@@ -212,25 +149,4 @@ export const DEFAULT_TEXT_TO_SPRITE_SETTINGS: ImageExportSettings = {
   removeBackground: false,
   cropEdges: false,
   tolerance: 30,
-};
-
-// =============================================================================
-// LEGACY TEXT EXPORT SETTINGS (UI-only; references shared enums as types)
-// =============================================================================
-
-/** Legacy text export settings (for backwards compatibility) */
-export type TextExportSettings = {
-  AiModel: string;
-  quality: string;
-  prompt: string;
-  removeBackground: boolean;
-  cropEdges: boolean;
-  tolerance: number;
-  assetType: AssetType;
-  style: Style;
-  addBackground: boolean;
-  fitFullCanvasSize: boolean;
-  view: GenerationView;
-  direction: GenerationDirection;
-  outline: GenerationOutline;
 };

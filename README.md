@@ -46,7 +46,6 @@ defined as code in `render.yaml` (see `docs/adr/0004` and `0005`). Both run on B
 **API service:**
 
 - `OPENAI_API_KEY` - Your OpenAI API key
-- `PIXELLAB_API_KEY` - Your PixelLab API key
 - `CORS_ORIGINS` - Allowed origins (e.g., `["https://makespritecode.com"]`)
 - `ENVIRONMENT` - Set to `production`
 - `PORT` - Port the API listens on (Render provides this)
@@ -174,7 +173,7 @@ img`
 - **Frontend**: React 19 with TypeScript and Tailwind CSS, bundled with Bun
 - **Backend**: Hono on Bun (TypeScript)
 - **Shared types**: Zod schemas in `@makespritecode/shared` (one wire contract)
-- **AI Integration**: OpenAI GPT models and PixelLab API
+- **AI Integration**: OpenAI GPT image models
 - **Deployment**: Render.com (two decoupled Docker services)
 
 ## 🤝 Contributing

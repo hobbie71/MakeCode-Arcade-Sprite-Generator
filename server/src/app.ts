@@ -3,11 +3,9 @@ import { cors } from "hono/cors";
 import {
   ModerationRequestSchema,
   OpenAISpriteRequestSchema,
-  PixelLabSpriteRequestSchema,
 } from "@makespritecode/shared";
 import { config } from "./config";
 import { generateOpenAISprite, moderatePrompt } from "./openai";
-import { generatePixelLabSprite } from "./pixellab";
 import { applyModerationOverride } from "./moderation-logic";
 
 export const app = new Hono();
@@ -33,16 +31,6 @@ app.use("*", async (c, next) => {
 app.get("/", (c) =>
   c.json({ message: "MakeCode Arcade Sprite Generator API", version: "0.1.0" }),
 );
-
-app.post("/generate-image/pixellab", async (c) => {
-  const parsed = PixelLabSpriteRequestSchema.safeParse(await c.req.json().catch(() => null));
-  if (!parsed.success) {
-    return c.json({ success: false, error: "Invalid request", detail: parsed.error.issues }, 422);
-  }
-  const { settings, size, palette } = parsed.data;
-  const result = await generatePixelLabSprite(settings, size, palette);
-  return c.json(result);
-});
 
 app.post("/generate-image/openai", async (c) => {
   const parsed = OpenAISpriteRequestSchema.safeParse(await c.req.json().catch(() => null));

@@ -1,7 +1,7 @@
 import { test, expect, describe } from "bun:test";
 import { app } from "./app";
 
-// These exercise routing + validation only; they never reach OpenAI/PixelLab
+// These exercise routing + validation only; they never reach the OpenAI API
 // (validation rejects before the upstream call), so no billable calls are made.
 
 describe("routing", () => {
@@ -27,19 +27,6 @@ describe("request validation (422 before any upstream call)", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ settings: { prompt: "x" }, size: { width: 16, height: 16 }, palette: {} }),
-    });
-    expect(res.status).toBe(422);
-  });
-
-  test("pixellab: missing required booleans", async () => {
-    const res = await app.request("/generate-image/pixellab", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        settings: { prompt: "x", assetType: "sprite", style: "retro" },
-        size: { width: 16, height: 16 },
-        palette: {},
-      }),
     });
     expect(res.status).toBe(422);
   });

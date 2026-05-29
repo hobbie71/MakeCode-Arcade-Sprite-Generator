@@ -16,8 +16,6 @@ services:
     envVars:
       - key: OPENAI_API_KEY
         sync: false
-      - key: PIXELLAB_API_KEY
-        sync: false
       - key: CORS_ORIGINS
         value: '["https://makespritecode.com"]'
       - key: ENVIRONMENT
