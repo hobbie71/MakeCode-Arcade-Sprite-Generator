@@ -4,3 +4,9 @@
 [serve.static]
 env = "VITE_*"
 plugins = ["./external-public.plugin.ts"]
+
+[test]
+# happydom.ts registers the DOM globals; test-setup.ts wires up RTL's
+# afterEach(cleanup) (Bun's runner doesn't trigger RTL's auto-registration).
+# Order matters: the DOM must exist before RTL is imported.
+preload = ["./happydom.ts", "./test-setup.ts"]

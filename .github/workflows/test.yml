@@ -1,0 +1,57 @@
+name: Tests
+
+# Runs the workspace test suites on every pull request (and on pushes to main as
+# a safety net). The repo is Bun-only: `bun install` then `bun run test`, which
+# fans out to each workspace's own `test` script (client runs under happy-dom,
+# server + shared run plain bun:test).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same ref so a fresh push doesn't pile up jobs.
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.8
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run tests (client + server + shared)
+        run: bun run test
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.8
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build client CSS (required before tsc -b)
+        run: bun run --filter client css:build
+
+      - name: Typecheck all workspaces
+        run: bun run typecheck
