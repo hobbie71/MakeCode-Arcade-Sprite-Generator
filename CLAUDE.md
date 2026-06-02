@@ -32,12 +32,18 @@ bun run --filter server typecheck    # tsc --noEmit
 # Client (cd client, or use --filter client)
 bun run --filter client build        # css:build + tsc -b + build.ts + copy public/ → dist/
 bun run --filter client lint         # eslint
+bun run --filter client test         # bun:test under happy-dom + React Testing Library
+bun run --filter client typecheck    # tsc -b
 bun run --filter client start        # serve the built dist/ statically
+
+# All workspaces at once (this is what CI runs)
+bun run test                         # fans out to every workspace's test script
+bun run typecheck                    # client tsc -b + server tsc --noEmit
 
 docker compose up                    # bring up both containerized services locally
 ```
 
-Tests live next to source as `*.test.ts` (**server only**): `app.test.ts`, `moderation-logic.test.ts`, `prompt.test.ts`, `size.test.ts`. There is no client test suite.
+Tests live next to source as `*.test.ts` / `*.test.tsx` across **all three workspaces**. Server and shared run plain `bun:test`; the client runs `bun:test` under **happy-dom + React Testing Library** — DOM globals are registered by `client/happydom.ts` and RTL's `afterEach(cleanup)` by `client/test-setup.ts`, both wired through `client/bunfig.toml`'s `[test].preload`; shared render helpers (`renderWithProviders`, `renderHookWithProviders`) live in `client/src/test/test-utils.tsx`. Client test files are **excluded from the production `tsc -b` build** (see the `exclude` in `client/tsconfig.app.json`) — `bun test` transpiles them at run time. GitHub Actions runs the full suite + typecheck on every pull request (`.github/workflows/test.yml`).
 
 ## Architecture — the big picture
 
