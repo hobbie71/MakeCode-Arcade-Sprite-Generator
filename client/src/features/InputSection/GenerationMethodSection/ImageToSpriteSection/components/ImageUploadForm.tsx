@@ -104,10 +104,10 @@ const ImageUploadForm = () => {
       </div>
 
       <div
-        className={`card card-body border-2 border-dashed transition-colors duration-200 flex flex-col items-center justify-center text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
+        className={`flex flex-col items-center justify-center rounded-card border-2 border-dashed p-6 text-center transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-accent-ring focus:ring-offset-2 ${
           isDragging
-            ? "border-blue-400 bg-blue-800"
-            : "border-white bg-transparent"
+            ? "border-accent bg-accent-soft"
+            : "border-line bg-surface hover:bg-surface-hover"
         } ${isGenerating ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -122,7 +122,7 @@ const ImageUploadForm = () => {
         aria-disabled={isGenerating}>
         {/* Decorative icon - hidden from screen readers */}
         <svg
-          className="w-10 h-10 mb-3 text-white"
+          className="w-10 h-10 mb-3 text-ink-subtle"
           fill="none"
           stroke="currentColor"
           strokeWidth={2}
@@ -137,10 +137,14 @@ const ImageUploadForm = () => {
         </svg>
 
         {/* Instructions - referenced by aria-describedby */}
-        <div id={instructionsId} className="paragraph text-center text-white">
-          <p>Drag and Drop an Image Here</p>
-          <p>or</p>
-          <p>Click to Browse Files</p>
+        <div
+          id={instructionsId}
+          className="text-center text-sm text-ink-muted">
+          <p className="font-medium text-ink">Drag &amp; drop an image</p>
+          <p className="mt-0.5">
+            or <span className="font-medium text-accent">browse files</span> ·
+            PNG, JPG, WEBP
+          </p>
         </div>
 
         {/* Hidden file input */}

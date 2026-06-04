@@ -90,6 +90,8 @@ export const ALL_OPENAI_QUALITYS = [
 export enum GenerationMethod {
   ImageToSprite = "image",
   TextToSprite = "text",
+  /** Start from an empty canvas at the chosen size (no AI, no upload). */
+  BlankCanvas = "blank",
 }
 
 /** Available generation methods */

@@ -13,6 +13,7 @@ import { useModal } from "../../components/Modal/useModal";
 import Button from "../../components/Button";
 import ResizeProcessModal from "./modals/ResizeProcessModal";
 import ExportModal from "./modals/ExportModal";
+import GenerateModal from "./modals/GenerateModal";
 
 /**
  * The studio (editor) route.
@@ -28,6 +29,7 @@ export default function StudioPage() {
     useState(false);
   const mobileSidebar = useSidebar();
   const { markVisited } = useHasVisited();
+  const generateModal = useModal();
   const resizeModal = useModal();
   const exportModal = useModal();
 
@@ -66,14 +68,21 @@ export default function StudioPage() {
 
       {/* TRANSITIONAL action row — replaced by the FloatingActionLayer in Phase 7. */}
       <div className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-pill border border-line bg-surface-raised px-3 py-1.5 shadow-lg">
+        <Button variant="primary" onClick={generateModal.open}>
+          ✦ Generate
+        </Button>
         <Button variant="secondary" onClick={resizeModal.open}>
           Resize &amp; Process
         </Button>
-        <Button variant="primary" onClick={exportModal.open}>
+        <Button variant="secondary" onClick={exportModal.open}>
           Export
         </Button>
       </div>
 
+      <GenerateModal
+        isOpen={generateModal.isOpen}
+        onClose={generateModal.close}
+      />
       <ResizeProcessModal
         isOpen={resizeModal.isOpen}
         onClose={resizeModal.close}
