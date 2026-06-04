@@ -35,7 +35,8 @@ import { AiModel, Crop } from "../../../types/export";
 
 export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();
-  const { setImportedImage, importedImage } = useImageImports();
+  const { setImportedImage, importedImage, sourceImage, setSourceImage } =
+    useImageImports();
   const { startGeneration, stopGeneration, setGenerationMessage } =
     useLoading();
   const { pasteCanvas } = usePasteData();
@@ -169,7 +170,9 @@ export const useImageFileHandler = () => {
         type: mimeString,
       });
 
+      // Cache the original generated image so re-processing (resize) is free.
       setImportedImage(file);
+      setSourceImage(file);
       await processImageToSprite(file);
     } catch (error) {
       setError("Error generating AI sprite: " + error);
@@ -181,6 +184,7 @@ export const useImageFileHandler = () => {
     startGeneration,
     stopGeneration,
     setImportedImage,
+    setSourceImage,
     selectedModel,
     openAISettings,
     width,
@@ -196,16 +200,20 @@ export const useImageFileHandler = () => {
    */
   const importImageManually = useCallback(
     async (file: File) => {
+      // Cache the original uploaded image so re-processing (resize) is free.
       setImportedImage(file);
+      setSourceImage(file);
       await processImageToSprite(file);
     },
-    [setImportedImage, processImageToSprite]
+    [setImportedImage, setSourceImage, processImageToSprite]
   );
 
   return {
     importImageManually,
     generateAIImageAndConvertToSprite,
     importedImage,
+    sourceImage,
+    setSourceImage,
     processImageToSprite,
   };
 };
