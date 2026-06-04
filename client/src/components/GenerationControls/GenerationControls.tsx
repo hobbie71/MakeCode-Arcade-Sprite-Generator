@@ -3,7 +3,6 @@ import Button from "../Button";
 import OpenAISettingsSection from "../../features/InputSection/GenerationMethodSection/TextToSpriteSection/components/OpenAISettingsSection";
 import ImageUploadForm from "../../features/InputSection/GenerationMethodSection/ImageToSpriteSection/components/ImageUploadForm";
 import AssetOptionsSelection from "../../features/InputSection/components/AssetOptionsSelection";
-import PaletteSelection from "../../features/InputSection/components/PaletteSelection";
 import { useGenerationMethod } from "../../context/GenerationMethodContext/useGenerationMethod";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useError } from "../../context/ErrorContext/useError";
@@ -135,9 +134,8 @@ export default function GenerationControls({ onSuccess }: Props) {
         </p>
       )}
 
-      {/* Common: asset type + size, palette */}
+      {/* Common: asset type + size (palette lives in the studio dock per mockup) */}
       <AssetOptionsSelection />
-      <PaletteSelection />
 
       {/* Token indicator (AI only) */}
       {selectedMethod === GenerationMethod.TextToSprite && (
