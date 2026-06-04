@@ -48,9 +48,7 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
 
   return (
     <div className="mt-4">
-      <label
-        htmlFor="ai-prompt-input"
-        className="text-sm font-medium text-ink-muted">
+      <label htmlFor="ai-prompt-input" className="sr-only">
         AI Image Generation Prompt
       </label>
       <textarea
@@ -61,7 +59,9 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
         }`}
         name="prompt"
         placeholder={
-          disabled ? "Loading..." : "Create a scary dragon that spits fire!"
+          disabled
+            ? "Loading..."
+            : 'Describe your sprite in detail — subject, pose, colors, outfit, expression and view. e.g. "a cheerful blue ninja with a dark hood and a raised steel katana, facing forward, bold black outline, retro 8-bit"'
         }
         onKeyDown={handleKeyDown}
         onBlur={() => handleUserSubmit()}
