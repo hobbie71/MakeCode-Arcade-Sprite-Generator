@@ -62,7 +62,7 @@ export default function ExportModal({ isOpen, onClose }: Props) {
       {/* Primary: Copy for MakeCode */}
       <div className="rounded-card border border-accent-border bg-accent-soft p-4">
         <span className="text-2xs font-semibold uppercase tracking-wide text-accent">
-          Recommended
+          ✦ Recommended
         </span>
         <div className="mt-2 flex items-center gap-4">
           <div className="transparent shrink-0 rounded-md border border-line p-1">
@@ -97,19 +97,42 @@ export default function ExportModal({ isOpen, onClose }: Props) {
 
       {/* How to paste */}
       <div className="mt-5">
-        <h4 className="text-sm font-semibold text-ink">
+        <h4 className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+          <span aria-hidden className="text-ink-subtle">
+            ⓘ
+          </span>
           How to paste into MakeCode Arcade
         </h4>
-        <ol className="mt-2 space-y-2">
-          {PASTE_STEPS.map((step, i) => (
-            <li key={i} className="flex gap-3 text-sm text-ink-muted">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-soft-2 text-2xs font-semibold text-accent">
-                {i + 1}
-              </span>
-              {step}
-            </li>
-          ))}
-        </ol>
+        <div className="mt-2 grid items-start gap-4 sm:grid-cols-[1fr_auto]">
+          <ol className="space-y-2">
+            {PASTE_STEPS.map((step, i) => (
+              <li key={i} className="flex gap-3 text-sm text-ink-muted">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-soft-2 text-2xs font-semibold text-accent">
+                  {i + 1}
+                </span>
+                {step}
+              </li>
+            ))}
+          </ol>
+          {/* Paste-demo placeholder (desktop only — decorative, matches mockup). */}
+          <div
+            aria-hidden
+            className="hidden h-32 w-40 flex-col items-center justify-center gap-1 rounded-card border border-dashed border-line bg-surface text-ink-subtle sm:flex">
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <span className="text-2xs">Drop paste-demo GIF</span>
+          </div>
+        </div>
       </div>
 
       {/* Download as image */}

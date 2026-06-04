@@ -67,6 +67,26 @@ export const getSquareCoordinates = (
   return uniqueCoordinates;
 };
 
+export const getFilledSquareCoordinates = (
+  start: Coordinates,
+  end: Coordinates
+): Coordinates[] => {
+  const coordinates: Coordinates[] = [];
+
+  const minX = Math.min(start.x, end.x);
+  const maxX = Math.max(start.x, end.x);
+  const minY = Math.min(start.y, end.y);
+  const maxY = Math.max(start.y, end.y);
+
+  for (let y = minY; y <= maxY; y++) {
+    for (let x = minX; x <= maxX; x++) {
+      coordinates.push({ x, y });
+    }
+  }
+
+  return coordinates;
+};
+
 export const getCircleCoordinates = (
   start: Coordinates,
   end: Coordinates
@@ -118,4 +138,37 @@ export const getCircleCoordinates = (
   );
 
   return uniqueCoordinates;
+};
+
+export const getFilledCircleCoordinates = (
+  start: Coordinates,
+  end: Coordinates
+): Coordinates[] => {
+  const coordinates: Coordinates[] = [];
+
+  const centerX = start.x;
+  const centerY = start.y;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const radius = Math.round(Math.sqrt(dx * dx + dy * dy));
+
+  if (radius === 0) {
+    coordinates.push({ x: centerX, y: centerY });
+    return coordinates;
+  }
+
+  // Fill the disc: every cell whose center falls within the radius. The +0.5
+  // bias matches the rounded look of the outline algorithm above.
+  const r2 = (radius + 0.5) * (radius + 0.5);
+  for (let y = centerY - radius; y <= centerY + radius; y++) {
+    for (let x = centerX - radius; x <= centerX + radius; x++) {
+      const ddx = x - centerX;
+      const ddy = y - centerY;
+      if (ddx * ddx + ddy * ddy <= r2) {
+        coordinates.push({ x, y });
+      }
+    }
+  }
+
+  return coordinates;
 };

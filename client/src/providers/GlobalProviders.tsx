@@ -13,6 +13,9 @@ import { ErrorProvider } from "../context/ErrorContext/ErrorContext";
 import { PreviewCanvasProvider } from "../context/PreviewCanvasContext/PreviewCanvasContext";
 import { TokenProvider } from "../context/TokenContext/TokenContext";
 import { StrokeSizeProvider } from "../features/SpriteEditor/contexts/StrokeSizeContext/StrokeSizeContext";
+// Global (not editor-local): undo/redo history wraps the global spriteData and is
+// also touched by usePasteData inside the Generate/Resize modals + hero widget.
+import { HistoryProvider } from "../features/SpriteEditor/contexts/HistoryContext/HistoryContext";
 
 /**
  * App-wide state that must survive hero → studio navigation (and back). All of
@@ -29,6 +32,7 @@ const GlobalProviders = ({ children }: { children: React.ReactNode }) => {
       <AssetTypeProvider>
         <GenerationMethodProvider>
           <SpriteProvider>
+            <HistoryProvider>
             <PaletteSelectedProvider>
               <CanvasProvider>
                 <CanvasSizeProvider>
@@ -50,6 +54,7 @@ const GlobalProviders = ({ children }: { children: React.ReactNode }) => {
                 </CanvasSizeProvider>
               </CanvasProvider>
             </PaletteSelectedProvider>
+            </HistoryProvider>
           </SpriteProvider>
         </GenerationMethodProvider>
       </AssetTypeProvider>

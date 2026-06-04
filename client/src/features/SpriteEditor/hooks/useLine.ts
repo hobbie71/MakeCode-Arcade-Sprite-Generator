@@ -16,6 +16,7 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
+import { useHistory } from "../contexts/HistoryContext/useHistory";
 
 // Type imports
 import { type Coordinates } from "../../../types/pixel";
@@ -26,8 +27,10 @@ export const useLine = () => {
   const { color } = useColorSelected();
   const { palette } = usePaletteSelected();
   const { drawLinePreview, drawDotPreview } = useCanvasPreview();
-  const { setSpriteDataCoordinates, commitSpriteData } = useSpriteData();
+  const { setSpriteDataCoordinates, commitSpriteData, getCurrentSpriteData } =
+    useSpriteData();
   const { strokeSize } = useStrokeSize();
+  const { pushSnapshot } = useHistory();
 
   const startCoordinates = useRef<Coordinates | null>(null);
 
@@ -74,6 +77,7 @@ export const useLine = () => {
 
       setSpriteDataCoordinates(allStrokeCoordinates, color);
       commitSpriteData();
+      pushSnapshot(getCurrentSpriteData());
     },
     [
       canvasRef,
@@ -82,6 +86,8 @@ export const useLine = () => {
       setSpriteDataCoordinates,
       commitSpriteData,
       strokeSize,
+      pushSnapshot,
+      getCurrentSpriteData,
     ]
   );
   return { handlePointerDown, handlePointerMove, handlePointerUp };

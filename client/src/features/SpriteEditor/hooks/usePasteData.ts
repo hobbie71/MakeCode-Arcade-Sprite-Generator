@@ -5,6 +5,7 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useSprite } from "../../../context/SpriteContext/useSprite";
+import { useHistory } from "../contexts/HistoryContext/useHistory";
 
 // Lib imports
 import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
@@ -20,6 +21,7 @@ export const usePasteData = () => {
   const { palette } = usePaletteSelected();
   const { setSpriteData } = useSprite();
   const { getSpriteDataFromCanvas } = useMakeCodeColorConverter();
+  const { pushSnapshot } = useHistory();
 
   const pasteSpriteData = useCallback(
     (spriteData: MakeCodeColor[][]) => {
@@ -37,8 +39,9 @@ export const usePasteData = () => {
       }
 
       setSpriteData(spriteData);
+      pushSnapshot(spriteData);
     },
-    [canvasRef, height, width, setSpriteData, palette]
+    [canvasRef, height, width, setSpriteData, palette, pushSnapshot]
   );
 
   const pasteCanvas = useCallback(

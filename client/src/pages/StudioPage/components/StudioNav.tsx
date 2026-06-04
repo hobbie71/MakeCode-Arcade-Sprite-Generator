@@ -11,22 +11,24 @@ export default function StudioNav({ onOpenExport }: Props) {
   const { balance } = useToken();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-line bg-surface-raised px-4">
-      <Link to="/" className="flex items-center gap-2">
-        <span className="grid h-7 w-7 place-items-center rounded-md bg-accent font-pixel text-[10px] text-on-accent">
-          M
-        </span>
+    <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-line bg-surface-raised px-4 sm:px-6">
+      <Link to="/" className="flex shrink-0 items-center gap-2.5">
+        <img
+          src="/favicon.svg"
+          alt="MakeSpriteCode logo"
+          className="h-7 w-7 rounded-md"
+        />
         <span className="text-lg font-bold text-ink">
           MakeSprite<span className="text-accent">Code</span>
         </span>
       </Link>
 
-      <div className="hidden items-center gap-1.5 text-sm sm:flex">
-        <span className="text-ink">Untitled sprite</span>
-        <span className="text-ink-subtle">· saved locally</span>
+      <div className="hidden min-w-0 items-center gap-1.5 text-sm sm:flex">
+        <span className="truncate text-ink">Untitled sprite</span>
+        <span className="shrink-0 text-ink-subtle">· saved locally</span>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <span
           className="flex items-center gap-1 rounded-pill border border-line px-2.5 py-1 text-sm font-medium text-ink"
           title="Token balance (display only)">

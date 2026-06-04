@@ -103,7 +103,7 @@ export default function GenerationControls({ onSuccess }: Props) {
   return (
     <div className="space-y-4">
       {/* Tabs */}
-      <div className="flex gap-1 rounded-pill border border-line bg-surface p-1">
+      <div className="flex gap-1 rounded-chip border border-line bg-surface p-1">
         {TABS.map(({ method, label }) => {
           const active = selectedMethod === method;
           return (
@@ -112,7 +112,7 @@ export default function GenerationControls({ onSuccess }: Props) {
               type="button"
               disabled={isGenerating}
               onClick={() => setSelectedMethod(method)}
-              className={`flex-1 rounded-pill px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
+              className={`flex-1 whitespace-nowrap rounded-[10px] px-2 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 sm:px-3 ${
                 active
                   ? "bg-surface-raised text-accent shadow-sm"
                   : "text-ink-muted hover:text-ink"
@@ -141,9 +141,14 @@ export default function GenerationControls({ onSuccess }: Props) {
 
       {/* Token indicator (AI only) */}
       {selectedMethod === GenerationMethod.TextToSprite && (
-        <div className="flex items-center justify-between text-xs text-ink-muted">
-          <span>★ {balance} tokens</span>
-          <span>this costs 1 · powered by GPT-Image</span>
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-ink-muted">
+          <span className="whitespace-nowrap">
+            <span className="text-accent">★</span> {balance} tokens · this costs
+            1
+          </span>
+          <span className="whitespace-nowrap text-ink-subtle">
+            powered by GPT-Image
+          </span>
         </div>
       )}
 

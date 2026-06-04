@@ -5,6 +5,9 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
 import { useZoom } from "../contexts/ZoomContext/useZoom";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
+import { useSprite } from "../../../context/SpriteContext/useSprite";
+import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+import { useGrid } from "../contexts/GridContext/useGrid";
 
 // Utility imports
 import {
@@ -38,6 +41,9 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   const { tool } = useToolSelected();
   const { zoom, setZoom } = useZoom();
   const { width, height } = useCanvasSize();
+  const { spriteData } = useSprite();
+  const { palette } = usePaletteSelected();
+  const { showGrid } = useGrid();
 
   // States
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -46,7 +52,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Hooks
-  const { initCanvas } = useSpriteEditorCanvas(width, height);
+  const { initCanvas, redrawCanvas } = useSpriteEditorCanvas(width, height);
   const { pasteSpriteData } = usePasteData();
 
   const {
@@ -127,6 +133,14 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     const newZoom = getInitZoom();
     setZoom(newZoom);
   }, [initCanvas, getInitZoom, setZoom]);
+
+  // Repaint when the committed sprite data, palette, or grid visibility changes.
+  // Tools paint imperatively during a drag and only update spriteData on commit,
+  // so this fires after each committed edit (and on undo/redo, paste, palette
+  // swap, and grid toggle) — re-rendering the pixels and the grid overlay on top.
+  useEffect(() => {
+    redrawCanvas();
+  }, [redrawCanvas, spriteData, showGrid, palette]);
 
   // effect: Center canvas on resize
   useEffect(() => {
@@ -214,7 +228,13 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
         zoom={zoom}
       />
       <ImportPreview />
-      <SelectionOverlay />
+      <SelectionOverlay
+        width={width}
+        height={height}
+        pixelSize={pixelSize}
+        offset={offset}
+        zoom={zoom}
+      />
     </div>
   );
 });

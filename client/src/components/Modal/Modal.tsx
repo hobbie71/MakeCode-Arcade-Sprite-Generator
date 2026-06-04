@@ -101,7 +101,7 @@ export default function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 backdrop-blur-sm sm:p-4"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget && dismissable) onClose();
       }}
@@ -132,7 +132,7 @@ export default function Modal({
         </button>
 
         {(title || subtitle) && (
-          <div className="px-6 pt-6 pr-14">
+          <div className="px-5 pr-12 pt-5 sm:px-6 sm:pr-14 sm:pt-6">
             {title && (
               <h2 className="text-h3 font-bold leading-tight text-ink">
                 {title}
@@ -144,10 +144,12 @@ export default function Modal({
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
+        <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+          {children}
+        </div>
 
         {footer && (
-          <div className="flex items-center justify-end gap-3 border-t border-line bg-surface px-6 py-4">
+          <div className="flex items-center justify-end gap-3 border-t border-line bg-surface px-5 py-4 sm:px-6">
             {footer}
           </div>
         )}

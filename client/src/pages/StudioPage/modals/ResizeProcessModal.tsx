@@ -130,7 +130,7 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
                     key={label}
                     type="button"
                     onClick={() => updateSetting("crop", value)}
-                    className={`flex-1 rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                    className={`flex-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-sm transition-colors sm:px-3 ${
                       active
                         ? "border-accent bg-accent-soft text-accent"
                         : "border-line text-ink-muted hover:bg-surface-hover"

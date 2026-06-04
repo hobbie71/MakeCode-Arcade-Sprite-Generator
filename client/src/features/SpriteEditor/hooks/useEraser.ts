@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
+import { useHistory } from "../contexts/HistoryContext/useHistory";
 
 // Hook imports
 import { useSpriteData } from "./useSpriteData";
@@ -23,9 +24,11 @@ import { PIXEL_SIZE } from "../constants/canvas";
 
 export const useEraser = () => {
   const { canvasRef } = useCanvas();
-  const { setSpriteDataCoordinates, commitSpriteData } = useSpriteData();
+  const { setSpriteDataCoordinates, commitSpriteData, getCurrentSpriteData } =
+    useSpriteData();
   const { palette } = usePaletteSelected();
   const { strokeSize } = useStrokeSize();
+  const { pushSnapshot } = useHistory();
 
   const handlePointerDown = useCallback(
     (coordinates: Coordinates) => {
@@ -69,7 +72,8 @@ export const useEraser = () => {
 
   const handlePointerUp = useCallback(() => {
     commitSpriteData();
-  }, [commitSpriteData]);
+    pushSnapshot(getCurrentSpriteData());
+  }, [commitSpriteData, pushSnapshot, getCurrentSpriteData]);
 
   return { handlePointerDown, handlePointerMove, handlePointerUp };
 };

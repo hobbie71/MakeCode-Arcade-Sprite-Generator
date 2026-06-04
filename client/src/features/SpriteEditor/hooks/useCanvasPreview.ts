@@ -5,6 +5,7 @@ import { usePreviewCanvas } from "../../../context/PreviewCanvasContext/usePrevi
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
+import { useShapeMode } from "../contexts/ShapeModeContext/useShapeMode";
 
 // Lib imports
 import {
@@ -15,6 +16,8 @@ import {
   getLineCoordinates,
   getCircleCoordinates,
   getSquareCoordinates,
+  getFilledCircleCoordinates,
+  getFilledSquareCoordinates,
 } from "../libs/getShapeCoordinates";
 
 // Type imports
@@ -29,6 +32,7 @@ export const useCanvasPreview = () => {
   const { color } = useColorSelected();
   const { palette } = usePaletteSelected();
   const { strokeSize } = useStrokeSize();
+  const { shapeMode } = useShapeMode();
 
   const clearPreview = useCallback(() => {
     const canvas = previewCanvasRef.current;
@@ -86,10 +90,10 @@ export const useCanvasPreview = () => {
 
       clearPreview();
 
-      const coordinates = getSquareCoordinates(
-        startCoordinates,
-        endCoordinates
-      );
+      const coordinates =
+        shapeMode === "fill"
+          ? getFilledSquareCoordinates(startCoordinates, endCoordinates)
+          : getSquareCoordinates(startCoordinates, endCoordinates);
       drawPixelsOnCanvas(
         canvas,
         coordinates,
@@ -99,7 +103,7 @@ export const useCanvasPreview = () => {
         strokeSize
       );
     },
-    [clearPreview, color, palette, previewCanvasRef, strokeSize]
+    [clearPreview, color, palette, previewCanvasRef, strokeSize, shapeMode]
   );
 
   const drawCirclePreview = useCallback(
@@ -109,10 +113,10 @@ export const useCanvasPreview = () => {
 
       clearPreview();
 
-      const coordinates = getCircleCoordinates(
-        startCoordinates,
-        endCoordinates
-      );
+      const coordinates =
+        shapeMode === "fill"
+          ? getFilledCircleCoordinates(startCoordinates, endCoordinates)
+          : getCircleCoordinates(startCoordinates, endCoordinates);
       drawPixelsOnCanvas(
         canvas,
         coordinates,
@@ -122,7 +126,7 @@ export const useCanvasPreview = () => {
         strokeSize
       );
     },
-    [clearPreview, color, palette, previewCanvasRef, strokeSize]
+    [clearPreview, color, palette, previewCanvasRef, strokeSize, shapeMode]
   );
 
   return {

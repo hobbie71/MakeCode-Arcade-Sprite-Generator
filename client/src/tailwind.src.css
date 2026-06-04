@@ -104,7 +104,7 @@
 
   /* Button Components */
   .btn {
-    @apply text-ink font-medium rounded-lg px-3 py-2 my-2 flex items-center justify-center border-none transition-colors;
+    @apply text-ink font-medium rounded-chip px-3 py-2 flex items-center justify-center border-none transition-colors;
   }
 
   .btn:active:not(:disabled) {

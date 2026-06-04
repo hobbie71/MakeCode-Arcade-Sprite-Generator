@@ -5,7 +5,10 @@ import { useCanvasPreview } from "./useCanvasPreview";
 import { useSpriteData } from "./useSpriteData";
 
 // Lib imports
-import { getSquareCoordinates } from "../libs/getShapeCoordinates";
+import {
+  getSquareCoordinates,
+  getFilledSquareCoordinates,
+} from "../libs/getShapeCoordinates";
 import { drawPixelsOnCanvas } from "../libs/drawPixelOnCanvas";
 
 // Utils imports
@@ -16,6 +19,8 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
+import { useShapeMode } from "../contexts/ShapeModeContext/useShapeMode";
+import { useHistory } from "../contexts/HistoryContext/useHistory";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
@@ -26,8 +31,11 @@ export const useRectangle = () => {
   const { color } = useColorSelected();
   const { palette } = usePaletteSelected();
   const { drawSquarePreview, drawDotPreview } = useCanvasPreview();
-  const { setSpriteDataCoordinates, commitSpriteData } = useSpriteData();
+  const { setSpriteDataCoordinates, commitSpriteData, getCurrentSpriteData } =
+    useSpriteData();
   const { strokeSize } = useStrokeSize();
+  const { shapeMode } = useShapeMode();
+  const { pushSnapshot } = useHistory();
 
   const startCoordinates = useRef<Coordinates | null>(null);
 
@@ -55,7 +63,10 @@ export const useRectangle = () => {
 
       if (!startCoordinates.current) return;
 
-      const coordinates = getSquareCoordinates(startCoordinates.current, end);
+      const coordinates =
+        shapeMode === "fill"
+          ? getFilledSquareCoordinates(startCoordinates.current, end)
+          : getSquareCoordinates(startCoordinates.current, end);
       drawPixelsOnCanvas(
         canvas,
         coordinates,
@@ -74,6 +85,7 @@ export const useRectangle = () => {
 
       setSpriteDataCoordinates(allStrokeCoordinates, color);
       commitSpriteData();
+      pushSnapshot(getCurrentSpriteData());
     },
     [
       canvasRef,
@@ -82,6 +94,9 @@ export const useRectangle = () => {
       setSpriteDataCoordinates,
       commitSpriteData,
       strokeSize,
+      shapeMode,
+      pushSnapshot,
+      getCurrentSpriteData,
     ]
   );
 

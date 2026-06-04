@@ -3,6 +3,13 @@ import { ToolSelectedProvider } from "../contexts/ToolSelectedContext/ToolSelect
 import { ZoomProvider } from "../contexts/ZoomContext/ZoomContext";
 import { SelectionAreaProvider } from "../contexts/SelectionArea/SelectionAreaContext";
 import { MouseCoordinatesProvider } from "../contexts/MouseCoordinatesContext/MouseCoordinatesContext";
+import { GridProvider } from "../contexts/GridContext/GridContext";
+import { ShapeModeProvider } from "../contexts/ShapeModeContext/ShapeModeContext";
+import { FillOptionsProvider } from "../contexts/FillOptionsContext/FillOptionsContext";
+import { PixelPerfectProvider } from "../contexts/PixelPerfectContext/PixelPerfectContext";
+// NOTE: HistoryProvider lives in GlobalProviders (not here) because usePasteData
+// → useImageFileHandler → useHistory runs inside the Generate/Resize modals and
+// the hero widget, which render OUTSIDE this editor-local provider tree.
 
 const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -10,7 +17,15 @@ const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
       <ToolSelectedProvider>
         <SelectionAreaProvider>
           <MouseCoordinatesProvider>
-            <ZoomProvider>{children}</ZoomProvider>
+            <ZoomProvider>
+              <GridProvider>
+                <ShapeModeProvider>
+                  <FillOptionsProvider>
+                    <PixelPerfectProvider>{children}</PixelPerfectProvider>
+                  </FillOptionsProvider>
+                </ShapeModeProvider>
+              </GridProvider>
+            </ZoomProvider>
           </MouseCoordinatesProvider>
         </SelectionAreaProvider>
       </ToolSelectedProvider>

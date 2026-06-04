@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useShapeMode } from "../contexts/ShapeModeContext/useShapeMode";
 
 /**
- * STUB option: shape fill vs. outline for Rectangle/Circle. Renders the control
- * (demonstrating the contextual-options pattern) but is not yet wired into the
- * drawing hooks — local state only. Promote to a ShapeMode context when the
- * rectangle/circle tools support filled shapes.
+ * Shape fill vs. outline for Rectangle/Circle. Wired to ShapeModeContext, which
+ * the rectangle/circle tools (and their previews) read to draw filled vs. outline
+ * shapes.
  */
 export default function ShapeModeOption() {
-  const [mode, setMode] = useState<"outline" | "fill">("outline");
+  const { shapeMode, setShapeMode } = useShapeMode();
   return (
     <div className="flex items-center gap-1">
       <span className="mr-1 text-xs text-ink-subtle">Shape</span>
@@ -15,10 +14,10 @@ export default function ShapeModeOption() {
         <button
           key={m}
           type="button"
-          onClick={() => setMode(m)}
-          aria-pressed={mode === m}
+          onClick={() => setShapeMode(m)}
+          aria-pressed={shapeMode === m}
           className={`rounded-md px-2 py-1 text-xs font-medium capitalize transition-colors ${
-            mode === m
+            shapeMode === m
               ? "bg-accent text-on-accent"
               : "text-ink-muted hover:bg-surface-hover"
           }`}>

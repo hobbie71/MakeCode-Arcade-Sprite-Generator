@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 // Context imports
 import { useSelectionArea } from "../contexts/SelectionArea/useSelectionArea";
@@ -7,26 +7,23 @@ import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected
 // Type imports
 import { PIXEL_SIZE } from "../constants/canvas";
 
-const SelectionOverlay = () => {
+interface Props {
+  width: number;
+  height: number;
+  pixelSize?: number;
+  offset: { x: number; y: number };
+  zoom: number;
+}
+
+const SelectionOverlay = ({
+  width,
+  height,
+  pixelSize = PIXEL_SIZE,
+  offset,
+  zoom,
+}: Props) => {
   const { selectionArea, setSelectionArea } = useSelectionArea();
   const { tool } = useToolSelected();
-  const [isAdjustingSize, setIsAdjustingSize] = useState<boolean>(false);
-  const [isMoving, setIsMoving] = useState<boolean>(false);
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    setIsMoving(true);
-  };
-
-  useEffect(() => {
-    if (!isAdjustingSize) return;
-
-    // TODO: Handle pixel reizing
-  }, [isAdjustingSize]);
-
-  useEffect(() => {
-    if (!isMoving) return;
-  }, [isMoving]);
 
   // Clear selection when tool changes
   useEffect(() => {
@@ -44,42 +41,39 @@ const SelectionOverlay = () => {
   const minY = Math.min(start.y, end.y);
   const maxY = Math.max(start.y, end.y);
 
-  const left = minX * PIXEL_SIZE;
-  const top = minY * PIXEL_SIZE;
-  const width = (maxX - minX + 1) * PIXEL_SIZE;
-  const height = (maxY - minY + 1) * PIXEL_SIZE;
+  // Coordinates are in the canvas's own (untransformed) pixel space. The wrapper
+  // below applies the SAME transform as the <canvas> (and PreviewCanvas), so the
+  // rectangle tracks zoom/pan instead of being pinned to raw minX*PIXEL_SIZE.
+  const left = minX * pixelSize;
+  const top = minY * pixelSize;
+  const boxWidth = (maxX - minX + 1) * pixelSize;
+  const boxHeight = (maxY - minY + 1) * pixelSize;
 
   return (
     <div
-      className="absolute border-2 border-dashed border-black cursor-grab "
-      onMouseDown={handleMouseDown}
-      onMouseUp={() => setIsMoving(false)}
+      className="absolute z-20"
       style={{
-        top,
-        left,
-        width,
-        height,
+        width: width * pixelSize,
+        height: height * pixelSize,
+        transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
+        transformOrigin: "50% 50%",
+        pointerEvents: "none",
       }}>
+      {/* Visual marquee only — pointer-events stay off so the drag-to-select
+          gesture reaches the canvas underneath. */}
       <div
-        className="absolute w-3 h-3 bg-white border-2 border-black -top-3 -left-3 pointer-events-auto cursor-nw-resize"
-        onMouseDown={() => setIsAdjustingSize(true)}
-        onMouseUp={() => setIsAdjustingSize(false)}
-      />
-      <div
-        className="absolute w-3 h-3 bg-white border-2 border-black -top-3 -right-3 pointer-events-auto cursor-ne-resize"
-        onMouseDown={() => setIsAdjustingSize(true)}
-        onMouseUp={() => setIsAdjustingSize(false)}
-      />
-      <div
-        className="absolute w-3 h-3 bg-white border-2 border-black -bottom-3 -left-3 pointer-events-auto cursor-sw-resize"
-        onMouseDown={() => setIsAdjustingSize(true)}
-        onMouseUp={() => setIsAdjustingSize(false)}
-      />
-      <div
-        className="absolute w-3 h-3 bg-white border-2 border-black -bottom-3 -right-3 pointer-events-auto cursor-se-resize"
-        onMouseDown={() => setIsAdjustingSize(true)}
-        onMouseUp={() => setIsAdjustingSize(false)}
-      />
+        className="absolute border-2 border-dashed border-accent"
+        style={{
+          top,
+          left,
+          width: boxWidth,
+          height: boxHeight,
+        }}>
+        <span className="absolute -left-1.5 -top-1.5 h-2.5 w-2.5 border-2 border-accent bg-surface-raised" />
+        <span className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 border-2 border-accent bg-surface-raised" />
+        <span className="absolute -bottom-1.5 -left-1.5 h-2.5 w-2.5 border-2 border-accent bg-surface-raised" />
+        <span className="absolute -bottom-1.5 -right-1.5 h-2.5 w-2.5 border-2 border-accent bg-surface-raised" />
+      </div>
     </div>
   );
 };

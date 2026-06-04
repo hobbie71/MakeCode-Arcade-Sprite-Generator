@@ -5,6 +5,8 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
+import { useHistory } from "../contexts/HistoryContext/useHistory";
+import { useFillOptions } from "../contexts/FillOptionsContext/useFillOptions";
 
 // Hook imports
 import { useSpriteData } from "./useSpriteData";
@@ -23,6 +25,8 @@ export const useFill = () => {
   const { width, height } = useCanvasSize();
   const { getCurrentSpriteData, setSpriteDataCoordinates, commitSpriteData } =
     useSpriteData();
+  const { pushSnapshot } = useHistory();
+  const { tolerance } = useFillOptions();
 
   const floodFill = useCallback(
     (
@@ -36,6 +40,26 @@ export const useFill = () => {
       if (targetColor === replacementColor) return;
 
       const spriteData = getCurrentSpriteData();
+
+      const paint = (x: number, y: number) => {
+        drawPixelOnCanvas(canvasRef.current!, { x, y }, replacementColor, palette);
+        setSpriteDataCoordinates({ x, y }, replacementColor);
+      };
+
+      // Tolerance 100 = global: replace every matching pixel on the canvas,
+      // ignoring contiguity.
+      if (tolerance >= 100) {
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            if (spriteData[y][x] === targetColor) paint(x, y);
+          }
+        }
+        return;
+      }
+
+      // Otherwise a contiguous flood: 4-connected at tolerance 0, 8-connected
+      // (bridges diagonal gaps) for any tolerance above 0.
+      const eightWay = tolerance > 0;
       const stack: Coordinates[] = [startCoordinates];
       const visited = new Set<string>();
 
@@ -63,21 +87,25 @@ export const useFill = () => {
         visited.add(key);
 
         // Fill the current pixel
-        drawPixelOnCanvas(
-          canvasRef.current,
-          current,
-          replacementColor,
-          palette
-        );
-        setSpriteDataCoordinates(current, replacementColor);
+        paint(current.x, current.y);
 
-        // Add neighboring pixels to stack
+        // Add orthogonal neighbors
         stack.push(
           { x: current.x + 1, y: current.y }, // Right
           { x: current.x - 1, y: current.y }, // Left
           { x: current.x, y: current.y + 1 }, // Down
           { x: current.x, y: current.y - 1 } // Up
         );
+
+        // ...and diagonals when tolerance lets the fill bridge gaps
+        if (eightWay) {
+          stack.push(
+            { x: current.x + 1, y: current.y + 1 },
+            { x: current.x - 1, y: current.y + 1 },
+            { x: current.x + 1, y: current.y - 1 },
+            { x: current.x - 1, y: current.y - 1 }
+          );
+        }
       }
     },
     [
@@ -87,6 +115,7 @@ export const useFill = () => {
       height,
       getCurrentSpriteData,
       setSpriteDataCoordinates,
+      tolerance,
     ]
   );
 
@@ -113,6 +142,7 @@ export const useFill = () => {
 
       // Commit the changes
       commitSpriteData();
+      pushSnapshot(getCurrentSpriteData());
     },
     [
       canvasRef,
@@ -122,6 +152,7 @@ export const useFill = () => {
       floodFill,
       color,
       commitSpriteData,
+      pushSnapshot,
     ]
   );
 
