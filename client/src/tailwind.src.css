@@ -231,7 +231,7 @@
 
   /* Canvas Components */
   .canvas-container {
-    @apply flex-1 overflow-hidden relative h-screen sm:h-auto rounded-lg;
+    @apply flex-1 overflow-hidden relative h-full;
   }
 
   .canvas-wrapper {

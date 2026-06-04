@@ -24,11 +24,9 @@ import ImportPreview from "./ImportPreview";
 import PreviewCanvas from "./PreviewCanvas";
 
 // Const imports
-import { PIXEL_SIZE, MAX_ZOOM, MIN_ZOOM } from "../constants/canvas";
+import { PIXEL_SIZE, MAX_ZOOM, MIN_ZOOM, ZOOM_AMOUNT } from "../constants/canvas";
 
 interface Props {
-  width: number;
-  height: number;
   pixelSize?: number;
 }
 
@@ -156,6 +154,23 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     const newZoom = getInitZoom();
     setZoom(newZoom);
   }, [width, height, setZoom, getInitZoom]);
+
+  // effect: wheel-zoom. Non-passive native listener so we can preventDefault and
+  // stop the page from scrolling while zooming over the canvas (React 19's
+  // onWheel is passive by default).
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      setZoom((z) => {
+        const next = z - Math.sign(e.deltaY) * ZOOM_AMOUNT;
+        return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, next));
+      });
+    };
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheel);
+  }, [setZoom]);
 
   return (
     <div

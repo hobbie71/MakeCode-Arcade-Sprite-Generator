@@ -1,19 +1,17 @@
-// Provder imports
 import SpriteEditorProvider from "./provider/SpriteEditorProviders";
+import EditorSurface from "./EditorSurface";
 
-// Component imports
-import Canvas from "./components/Canvas";
-import SideBar from "./Sidebar/Sidebar";
-import SpriteDataResizer from "./components/SpriteDataResizer";
+interface Props {
+  onOpenGenerate: () => void;
+  onOpenResize: () => void;
+  onOpenExport: () => void;
+}
 
-const SpriteEditor = () => {
+/** The sprite editor: editor-local context providers wrapping the EditorSurface. */
+const SpriteEditor = (props: Props) => {
   return (
     <SpriteEditorProvider>
-      <div className="flex-1 flex flex-row rounded-3xl bg-default-200 shadow-default-lg">
-        <SideBar />
-        <Canvas width={16} height={16} />
-        <SpriteDataResizer />
-      </div>
+      <EditorSurface {...props} />
     </SpriteEditorProvider>
   );
 };
