@@ -19,11 +19,12 @@ export const useExportSpriteData = () => {
   const { palette } = usePaletteSelected();
   const { strokeSize } = useStrokeSize();
 
-  const exportSpriteToImage = useCallback(
-    (format: ImageExportFormats) => {
+  /** Render the current sprite to a data URL (used for previews + downloads). */
+  const getSpriteDataUrl = useCallback(
+    (format: ImageExportFormats = ImageExportFormats.PNG): string => {
       const exportCanvas = document.createElement("canvas");
       const ctx = exportCanvas.getContext("2d");
-      if (!ctx) return;
+      if (!ctx) return "";
 
       exportCanvas.width = width * PIXEL_SIZE;
       exportCanvas.height = height * PIXEL_SIZE;
@@ -42,15 +43,22 @@ export const useExportSpriteData = () => {
         }
       }
 
-      // Export in desired format
-      const url = exportCanvas.toDataURL(`image/${format}`);
+      return exportCanvas.toDataURL(`image/${format}`);
+    },
+    [height, width, spriteData, palette, strokeSize]
+  );
+
+  const exportSpriteToImage = useCallback(
+    (format: ImageExportFormats) => {
+      const url = getSpriteDataUrl(format);
+      if (!url) return;
       const link = document.createElement("a");
       link.href = url;
       link.download = "my-sprite"; // file name
       link.click();
       link.remove();
     },
-    [height, width, spriteData, palette, strokeSize]
+    [getSpriteDataUrl]
   );
 
   const getImgCode = useCallback((): string => {
@@ -72,5 +80,11 @@ export const useExportSpriteData = () => {
     return `my_sprite = arcade_sprites.create_sprite(${getImgCode().replace("img", "").replace("`", '"""').replace("`", '"""')}, sprite_kind="Player")`;
   }, [getImgCode]);
 
-  return { getImgCode, exportSpriteToImage, getJavaScriptCode, getPythonCode };
+  return {
+    getImgCode,
+    exportSpriteToImage,
+    getSpriteDataUrl,
+    getJavaScriptCode,
+    getPythonCode,
+  };
 };

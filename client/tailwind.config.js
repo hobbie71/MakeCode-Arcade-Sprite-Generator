@@ -134,6 +134,7 @@ export default {
         h3: ["var(--fs-h3)", { lineHeight: "1.2" }],
         h4: ["var(--fs-h4)", { lineHeight: "1.3" }],
         "body-lg": ["var(--fs-body-lg)", { lineHeight: "1.6" }],
+        "2xs": ["var(--fs-2xs)", { lineHeight: "1.4" }],
       },
     },
   },
