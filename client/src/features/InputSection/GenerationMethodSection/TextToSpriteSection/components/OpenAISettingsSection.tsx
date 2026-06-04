@@ -35,17 +35,6 @@ const OpenAISettingsSection = () => {
 
   return (
     <div className="form-group">
-      {/* Style */}
-      <DefaultDropDown
-        onChange={(index: number) =>
-          changeSetting("style", ALL_STYLES[index].style)
-        }
-        options={ALL_STYLES}
-        value={ALL_STYLES.findIndex((style) => settings.style === style.style)}
-        disabled={isGenerating}>
-        Style
-      </DefaultDropDown>
-
       <AiPromptInput
         onSubmit={(prompt) => changeSetting("prompt", prompt)}
         disabled={isGenerating}
@@ -59,6 +48,19 @@ const OpenAISettingsSection = () => {
 
       {isAdvanceTabOpen && (
         <>
+          {/* Style */}
+          <DefaultDropDown
+            onChange={(index: number) =>
+              changeSetting("style", ALL_STYLES[index].style)
+            }
+            options={ALL_STYLES}
+            value={ALL_STYLES.findIndex(
+              (style) => settings.style === style.style
+            )}
+            disabled={isGenerating}>
+            Style
+          </DefaultDropDown>
+
           {/* Quality */}
           <DefaultDropDown
             onChange={(index: number) =>
