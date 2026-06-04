@@ -41,7 +41,7 @@ const CodeDisplay = ({ children, codingLanguage = "javascript" }: Props) => {
   return (
     <div className="relative">
       <pre
-        className="card-body text-start rounded-lg bg-text-default-300 text-default-200 max-h-60 overflow-auto cursor-pointer hover:bg-neutral-300 transition-colors duration-200"
+        className="card-body text-start rounded-lg border border-line bg-surface-sunken text-ink max-h-60 overflow-auto cursor-pointer hover:bg-surface-hover transition-colors duration-200"
         onClick={handleCopy}
         onKeyDown={handleKeyDown}
         onMouseEnter={() => setShowTooltip(true)}
@@ -59,7 +59,7 @@ const CodeDisplay = ({ children, codingLanguage = "javascript" }: Props) => {
       {/* Tooltip */}
       {showTooltip && !copied && (
         <div
-          className="absolute-center bg-info-500 text-text-default-300 text-sm px-3 py-2 rounded-lg shadow-lg pointer-events-none"
+          className="absolute-center bg-ink text-surface-raised text-sm px-3 py-2 rounded-lg shadow-lg pointer-events-none"
           role="tooltip"
           aria-hidden="true">
           Click to copy
@@ -69,7 +69,7 @@ const CodeDisplay = ({ children, codingLanguage = "javascript" }: Props) => {
       {/* Copy confirmation animation */}
       {copied && (
         <div
-          className="absolute-center bg-success-500 text-text-default-300 text-sm px-3 py-2 rounded-lg shadow-lg animate-pulse"
+          className="absolute-center bg-success text-on-accent text-sm px-3 py-2 rounded-lg shadow-lg animate-pulse"
           role="status"
           aria-live="assertive">
           Copied!

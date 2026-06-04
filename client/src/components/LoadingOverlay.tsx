@@ -13,23 +13,23 @@ const LoadingOverlay: React.FC = () => {
       <div className="popup-content text-center max-w-md mx-auto">
         {/* Loading Spinner */}
         <div className="mb-4">
-          <div className="animate-spin rounded-[50%] h-16 w-16 border-4 border-info-500 border-t-transparent mx-auto"></div>
+          <div className="animate-spin rounded-[50%] h-16 w-16 border-4 border-accent border-t-transparent mx-auto"></div>
         </div>
 
         {/* Loading Message */}
-        <h4 className="heading-4 mb-4 text-text-default-300">
+        <h4 className="heading-4 mb-4 text-ink">
           {generationMessage || "Generating Sprite..."}
         </h4>
 
         {/* Warning Message */}
-        <div className="bg-warning-500 rounded-lg p-4 mb-4">
+        <div className="bg-warning-soft rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between">
             <ErrorSymbol />
             <div className="text-center">
-              <p className="paragraph text-text-default-300 mb-1">
+              <p className="paragraph text-ink mb-1">
                 Please wait. This can take 1 - 2 minutes
               </p>
-              <p className="paragraph-sm text-text-default-300 mb-1">
+              <p className="paragraph-sm text-ink mb-1">
                 Do not close this window or navigate away
               </p>
             </div>
@@ -43,7 +43,7 @@ const LoadingOverlay: React.FC = () => {
         </div>
 
         {/* Additional Info */}
-        <p className="text-text-default-100 text-sm">
+        <p className="text-ink-muted text-sm">
           AI image generation is processing your request...
         </p>
       </div>

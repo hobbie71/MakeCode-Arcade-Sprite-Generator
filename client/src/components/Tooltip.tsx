@@ -58,8 +58,8 @@ const Tooltip = ({ text, children, delay = 500, hotkey }: TooltipProps) => {
           id={tooltipId}
           role="tooltip"
           className="absolute top-full left-full mt-1 z-50
-                     px-1.5 py-0.5 text-[10px] font-normal text-text-default-300 bg-default-200 
-                     shadow-default-lg rounded pointer-events-none whitespace-nowrap"
+                     px-1.5 py-0.5 text-[10px] font-normal text-surface-raised bg-ink
+                     shadow-md rounded pointer-events-none whitespace-nowrap"
           aria-hidden="false">
           <span>{text}</span>
           {hotkey && <span className="ml-1 opacity-75">({hotkey})</span>}

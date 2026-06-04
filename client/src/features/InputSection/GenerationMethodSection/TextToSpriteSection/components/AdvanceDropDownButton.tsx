@@ -13,7 +13,7 @@ const AdvanceDropDownButton = ({
     <button
       type="button"
       onClick={() => setIsAdvanceTabOpen((prev) => !prev)}
-      className={`flex justify-between border rounded-lg px-3 py-2 my-4 w-full transition-colors text-text-default-300 shadow-default-lg bg-default-300 cursor-pointer hover:bg-default-400 ${
+      className={`flex justify-between border border-line rounded-lg px-3 py-2 my-4 w-full transition-colors text-ink shadow-xs bg-surface-raised cursor-pointer hover:bg-surface-hover ${
         isGenerating ? "opacity-50 cursor-not-allowed" : ""
       }`}
       aria-expanded={isAdvanceTabOpen}

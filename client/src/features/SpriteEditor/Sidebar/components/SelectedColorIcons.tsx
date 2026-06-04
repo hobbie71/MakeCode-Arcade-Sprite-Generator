@@ -50,7 +50,7 @@ const SelectedColorIcons = () => {
         type="button"
         tabIndex={0}>
         <div
-          className={`absolute border border-black rounded-lg w-4/5 top-0 left-0 z-10 shadow-default-lg pointer-events-none ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
+          className={`absolute border border-black rounded-lg w-4/5 top-0 left-0 z-10 shadow-sm pointer-events-none ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
           style={{
             height: ICON_SIZE,
             backgroundColor: getHexFromMakeCodeColor(color),
@@ -59,7 +59,7 @@ const SelectedColorIcons = () => {
           tabIndex={-1}
         />
         <div
-          className={`absolute border border-black rounded-lg w-4/5 bottom-0 right-0 z-0 shadow-default-lg pointer-events-none ${alternateColor === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
+          className={`absolute border border-black rounded-lg w-4/5 bottom-0 right-0 z-0 shadow-sm pointer-events-none ${alternateColor === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
           style={{
             height: ICON_SIZE,
             backgroundColor: getHexFromMakeCodeColor(alternateColor),

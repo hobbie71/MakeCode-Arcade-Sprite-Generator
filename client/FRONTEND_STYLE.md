@@ -75,10 +75,5 @@ Ships light only, but is fully wired: set `document.documentElement.dataset.them
 `tool-button`, `color-swatch`, …), all built on the tokens above. Prefer composing
 these (or raw token utilities) over ad-hoc styling.
 
-## Legacy aliases (transitional — remove in Phase 9)
-
-The pre-redesign color names (`default-*`, `text-default-*`, `primary-*`) are still
-defined in `tailwind.config.js`, **aliased to the new light token values** so
-not-yet-rebuilt components render correctly in the light theme. **Do not use them in
-new code** — use the semantic utilities above. They get deleted once the last legacy
-consumer is removed/migrated.
+The whole client is on the semantic token system — there are no legacy color
+aliases. Every component reads colors/shadows/radii/fonts from the tokens above.
