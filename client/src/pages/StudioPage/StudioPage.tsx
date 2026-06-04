@@ -51,15 +51,13 @@ export default function StudioPage() {
           <SpriteEditor />
           <ExportSection />
         </section>
-
-        {isExportInstructionsOpen && (
-          <section className="popup">
-            <ExportInstructions
-              closeExportInstructions={() => setIsExportInstructionsOpen(false)}
-            />
-          </section>
-        )}
       </main>
+
+      <ExportInstructions
+        isOpen={isExportInstructionsOpen}
+        onClose={() => setIsExportInstructionsOpen(false)}
+      />
+
 
       <Footer />
       <IssueReportButton highlight={highlightIssueButton} />
