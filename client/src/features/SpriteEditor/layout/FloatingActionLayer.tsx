@@ -1,7 +1,7 @@
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { useImageImports } from "../../../context/ImageImportContext/useImageImports";
 import { useLoading } from "../../../context/LoadingContext/useLoading";
-import { useZoom } from "../contexts/ZoomContext/useZoom";
+import ZoomMenu from "./ZoomMenu";
 
 interface Props {
   onOpenGenerate: () => void;
@@ -55,7 +55,6 @@ export default function FloatingActionLayer({
   const { width, height } = useCanvasSize();
   const { sourceImage } = useImageImports();
   const { isGenerating } = useLoading();
-  const { zoom } = useZoom();
 
   return (
     <>
@@ -69,7 +68,9 @@ export default function FloatingActionLayer({
         {width} × {height}
       </button>
 
-      <div className="absolute bottom-16 left-1/2 flex max-w-[calc(100%-2rem)] -translate-x-1/2 items-center gap-1.5 rounded-chip border border-line bg-surface-raised/80 p-1.5 shadow-lg backdrop-blur-sm sm:bottom-4 sm:gap-2">
+      <div
+        data-fit-obstacle="bottom"
+        className="absolute bottom-16 left-1/2 flex max-w-[calc(100%-2rem)] -translate-x-1/2 items-center gap-1.5 rounded-chip border border-line bg-surface-raised/80 p-1.5 shadow-lg backdrop-blur-sm sm:bottom-4 sm:gap-2">
         <ActionPill primary onClick={onOpenGenerate} disabled={isGenerating}>
           <span aria-hidden>✦</span>
           Generate
@@ -89,9 +90,7 @@ export default function FloatingActionLayer({
         </ActionPill>
       </div>
 
-      <div className="absolute bottom-4 right-4 whitespace-nowrap rounded-pill border border-line bg-surface-raised px-3 py-1.5 text-sm font-medium text-ink-muted shadow-md">
-        {Math.round(zoom * 100)}%
-      </div>
+      <ZoomMenu />
     </>
   );
 }

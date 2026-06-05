@@ -27,7 +27,17 @@ import ImportPreview from "./ImportPreview";
 import PreviewCanvas from "./PreviewCanvas";
 
 // Const imports
-import { PIXEL_SIZE, MAX_ZOOM, MIN_ZOOM, ZOOM_AMOUNT } from "../constants/canvas";
+import {
+  PIXEL_SIZE,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  ZOOM_AMOUNT,
+  FIT_BOTTOM_GAP,
+  FIT_BOTTOM_FALLBACK,
+} from "../constants/canvas";
+
+// Lib imports
+import { computeStageFit } from "../libs/canvasFit";
 
 interface Props {
   pixelSize?: number;
@@ -39,7 +49,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   // Context
   const { canvasRef } = useCanvas();
   const { tool } = useToolSelected();
-  const { zoom, setZoom } = useZoom();
+  const { zoom, setZoom, registerFitToScreen } = useZoom();
   const { width, height } = useCanvasSize();
   const { spriteData } = useSprite();
   const { palette } = usePaletteSelected();
@@ -84,43 +94,62 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     }
   };
 
-  const centerCanvas = () => {
+  // Measure the stage and how much of it the floating bottom action bar covers.
+  // The bar is a fixed pixel height (and sits higher on small screens), so we
+  // reserve its MEASURED size: a flat percentage clears it on tall viewports but
+  // lets the canvas slide behind it on short ones. Falls back to a constant if
+  // the bar isn't in the DOM.
+  const measureStage = useCallback(() => {
     const container = containerRef.current;
-    if (!container) return;
-
+    if (!container) return null;
     const rect = container.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    const bar = document.querySelector<HTMLElement>(
+      "[data-fit-obstacle='bottom']"
+    );
+    const bottomInset = bar
+      ? Math.max(0, rect.bottom - bar.getBoundingClientRect().top) +
+        FIT_BOTTOM_GAP
+      : FIT_BOTTOM_FALLBACK;
+    return { rect, bottomInset };
+  }, []);
 
-    setOffset({ x: centerX, y: centerY });
-  };
+  // Zoom + center offset that fit the sprite in the clear area above the bar.
+  const getStageFit = useCallback(() => {
+    const stage = measureStage();
+    if (!stage) return null;
+    return computeStageFit(
+      stage.rect.width,
+      stage.rect.height,
+      stage.bottomInset,
+      width * pixelSize,
+      height * pixelSize
+    );
+  }, [measureStage, width, height, pixelSize]);
+
+  const centerCanvas = useCallback(() => {
+    const fit = getStageFit();
+    if (fit) setOffset(fit.offset);
+  }, [getStageFit]);
 
   const getInitZoom = useCallback((): number => {
-    const container = containerRef.current;
-    if (!container) throw new Error("No container");
+    const fit = getStageFit();
+    if (!fit) throw new Error("No container");
+    return fit.zoom;
+  }, [getStageFit]);
 
-    const containerRect = container.getBoundingClientRect();
+  // Fit the canvas to the stage and re-center it. Exposed through ZoomContext so
+  // the zoom menu can trigger it without owning the container/offset state.
+  const fitToScreen = useCallback(() => {
+    const fit = getStageFit();
+    if (!fit) return;
+    setOffset(fit.offset);
+    setZoom(fit.zoom);
+  }, [getStageFit, setZoom]);
 
-    // Calculate the actual canvas dimensions (in pixels)
-    const canvasWidth = width * pixelSize;
-    const canvasHeight = height * pixelSize;
-
-    // Leave some padding around the canvas (10% of container size)
-    const padding = 0.1;
-    const availableWidth = containerRect.width * (1 - padding);
-    const availableHeight = containerRect.height * (1 - padding);
-
-    // Calculate zoom needed to fit both width and height
-    const zoomX = availableWidth / canvasWidth;
-    const zoomY = availableHeight / canvasHeight;
-
-    // Use the smaller zoom to ensure canvas fits in both dimensions
-    const optimalZoom = Math.min(zoomX, zoomY);
-
-    // Clamp zoom within allowed limits
-    const clampedZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, optimalZoom));
-    return clampedZoom;
-  }, [height, width, pixelSize]);
+  useEffect(() => {
+    registerFitToScreen(fitToScreen);
+    return () => registerFitToScreen(() => {});
+  }, [registerFitToScreen, fitToScreen]);
 
   // Init Canvas and center canvas in screen
   useEffect(() => {
@@ -132,7 +161,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
 
     const newZoom = getInitZoom();
     setZoom(newZoom);
-  }, [initCanvas, getInitZoom, setZoom]);
+  }, [initCanvas, centerCanvas, getInitZoom, setZoom]);
 
   // Repaint when the committed sprite data, palette, or grid visibility changes.
   // Tools paint imperatively during a drag and only update spriteData on commit,
@@ -161,7 +190,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [getInitZoom, setZoom]);
+  }, [centerCanvas, getInitZoom, setZoom]);
 
   // effect: Auto-adjust zoom when canvas size changes
   useEffect(() => {
