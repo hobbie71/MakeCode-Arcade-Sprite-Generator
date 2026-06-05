@@ -31,7 +31,6 @@ import {
   PIXEL_SIZE,
   MAX_ZOOM,
   MIN_ZOOM,
-  ZOOM_AMOUNT,
   FIT_BOTTOM_GAP,
   FIT_BOTTOM_FALLBACK,
 } from "../constants/canvas";
@@ -198,18 +197,27 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     setZoom(newZoom);
   }, [width, height, setZoom, getInitZoom]);
 
-  // effect: wheel-zoom. Non-passive native listener so we can preventDefault and
-  // stop the page from scrolling while zooming over the canvas (React 19's
+  // effect: trackpad/wheel input. Plain scrolling pans the stage in any direction;
+  // a pinch gesture (which the browser delivers as a wheel event with ctrlKey set)
+  // zooms, centered on the stage. Non-passive native listener so we can
+  // preventDefault and stop the page from scrolling/zooming underneath (React 19's
   // onWheel is passive by default).
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      setZoom((z) => {
-        const next = z - Math.sign(e.deltaY) * ZOOM_AMOUNT;
-        return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, next));
-      });
+      if (e.ctrlKey) {
+        // Pinch-to-zoom. Cap the per-event delta so a real mouse wheel held with
+        // Ctrl doesn't jump zoom levels; trackpad pinches send small deltas.
+        const delta = Math.max(-30, Math.min(30, e.deltaY));
+        setZoom((z) =>
+          Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z * (1 - delta * 0.01)))
+        );
+      } else {
+        // Two-finger scroll pans the canvas (up/down and left/right).
+        setOffset((o) => ({ x: o.x - e.deltaX, y: o.y - e.deltaY }));
+      }
     };
     el.addEventListener("wheel", handleWheel, { passive: false });
     return () => el.removeEventListener("wheel", handleWheel);
