@@ -1,4 +1,4 @@
-import { AssetType, OpenAIQuality, Style } from "../../types/export";
+import { AssetType, OpenAIQuality } from "../../types/export";
 import type { OpenAIGenerationSettings } from "../../types/export";
 
 // Default OpenAI settings based on asset type
@@ -9,7 +9,6 @@ export const getDefaultOpenAISettings = (
   let settings: OpenAIGenerationSettings = {
     prompt: preservePrompt || "",
     assetType,
-    style: Style.Retro,
     quality: OpenAIQuality.Low,
   };
 

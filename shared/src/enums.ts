@@ -14,17 +14,6 @@ export enum AssetType {
 }
 export const AssetTypeSchema = z.enum(AssetType);
 
-/** Art styles for sprite generation. */
-export enum Style {
-  Retro = "retro",
-  Chibi = "chibi",
-  Isometric = "isometric",
-  Minimalist = "minimalist",
-  Modern = "modern",
-  Anime = "anime",
-}
-export const StyleSchema = z.enum(Style);
-
 /** Quality settings for OpenAI generation. */
 export enum OpenAIQuality {
   Low = "low",

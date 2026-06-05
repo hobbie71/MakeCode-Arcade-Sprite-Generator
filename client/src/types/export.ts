@@ -4,9 +4,9 @@
 // OpenAI-only. The cross-wire enums + request/response types live in the shared
 // package and are re-exported here so existing `../types/export` imports across
 // the client keep working unchanged.
-import { AssetType, Style, OpenAIQuality } from "@makespritecode/shared";
+import { AssetType, OpenAIQuality } from "@makespritecode/shared";
 
-export { AssetType, Style, OpenAIQuality };
+export { AssetType, OpenAIQuality };
 export type {
   Size,
   BaseGenerationSettings,
@@ -98,20 +98,6 @@ export enum GenerationMethod {
 export const generationMethods: GenerationMethod[] = [
   GenerationMethod.TextToSprite,
   GenerationMethod.ImageToSprite,
-];
-
-// =============================================================================
-// STYLE catalog (Style enum from shared)
-// =============================================================================
-
-/** Style options with display names */
-export const ALL_STYLES = [
-  { name: "Retro", style: Style.Retro },
-  { name: "Chibi", style: Style.Chibi },
-  { name: "Isometric", style: Style.Isometric },
-  { name: "Minimalist", style: Style.Minimalist },
-  { name: "Modern", style: Style.Modern },
-  { name: "Anime", style: Style.Anime },
 ];
 
 // =============================================================================

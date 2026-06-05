@@ -27,7 +27,7 @@ describe("getSpriteGenerationPrompt", () => {
     expect(p).toContain("minimum 128 x 128 pixels- Use cartoon proportions");
     expect(p).toContain("aspect ratio of 1.0 ");
     expect(p).toContain("so seperate items with different colors");
-    expect(p.startsWith("You are generating pixel-art sprite in a retro video game style. ")).toBe(true);
+    expect(p.startsWith("You are generating pixel-art sprite in a video game style. ")).toBe(true);
     expect(p.endsWith("- Prompt: a cute green dragon ")).toBe(true);
     // palette legend runs directly into "Now, create" with no separator
     expect(p).toContain("#000000Now, create the following sprite:");

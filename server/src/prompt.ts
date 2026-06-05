@@ -7,7 +7,6 @@ import type { MakeCodePalette, Size } from "@makespritecode/shared";
 interface PromptSettings {
   prompt: string;
   assetType: string;
-  style: string;
 }
 
 /** Mirrors Python's `f"{w/h}"` (str(float)): integer-valued ratios render with a
@@ -31,12 +30,11 @@ export function getSpriteGenerationPrompt(
   palette: MakeCodePalette,
 ): string {
   const assetType = settings.assetType;
-  const style = settings.style;
   const aspectRatio = pythonFloat(intendedSize.width / intendedSize.height);
   const paletteLegend = buildPaletteLegend(palette);
 
   return (
-    `You are generating pixel-art ${assetType} in a ${style} video game style. ` +
+    `You are generating pixel-art ${assetType} in a video game style. ` +
     `- Cartoon proportions, clean outlines, transparent background. ` +
     `- No photorealism, no painterly shading. ` +
     `Follow these rules for sizing and positioning: ` +
@@ -47,7 +45,6 @@ export function getSpriteGenerationPrompt(
     `${paletteLegend}` +
     `Now, create the following sprite: ` +
     `- Type: ${assetType} ` +
-    `- Style: ${style} ` +
     `- Prompt: ${settings.prompt} `
   );
 }

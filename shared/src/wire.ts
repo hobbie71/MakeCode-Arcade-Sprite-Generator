@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AssetTypeSchema, StyleSchema, OpenAIQualitySchema, OpenAIQuality } from "./enums";
+import { AssetTypeSchema, OpenAIQualitySchema, OpenAIQuality } from "./enums";
 import { MakeCodePaletteSchema } from "./palette";
 
 /** Canvas size for sprite generation. */
@@ -13,7 +13,6 @@ export type Size = z.infer<typeof SizeSchema>;
 export const BaseGenerationSettingsSchema = z.object({
   prompt: z.string(),
   assetType: AssetTypeSchema,
-  style: StyleSchema,
 });
 export type BaseGenerationSettings = z.infer<typeof BaseGenerationSettingsSchema>;
 
