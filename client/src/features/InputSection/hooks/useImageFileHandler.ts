@@ -32,6 +32,7 @@ import { generateOpenAiImage } from "../../../api/generateImageApi";
 
 // Type imports
 import { AiModel, Crop } from "../../../types/export";
+import type { PostProcessingSettings } from "../../../types/export";
 
 export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();
@@ -48,9 +49,52 @@ export const useImageFileHandler = () => {
   const { setError } = useError();
 
   /**
-   * Converts an image file to sprite data with post-processing settings applied
+   * Runs the image → sprite processing pipeline on a source file and returns the
+   * resulting canvas WITHOUT committing it to the editor. All inputs are passed
+   * explicitly (no editor-state coupling) so callers can render a preview of
+   * *pending* settings before applying them.
+   *
+   * Shared by `processImageToSprite` (which pastes the canvas into the editor)
+   * and the Resize & Process modal's live preview (which renders it to a data
+   * URL). Pipeline:
+   *   1. Remove background  2. Snap to MakeCode palette
+   *   3. Trim / fill        4. Scale to the target size
    */
+  const processSourceToCanvas = useCallback(
+    async (
+      file: File,
+      targetWidth: number,
+      targetHeight: number,
+      settings: PostProcessingSettings
+    ): Promise<HTMLCanvasElement> => {
+      const imgElement = await fileToImageElement(file);
+      let canvas = createCanvasFromImage(imgElement);
 
+      // 1. Remove background
+      if (settings.removeBackground) {
+        canvas = removeBackground(canvas, settings.tolerance);
+      }
+
+      // 2. Convert colors to MakeCode palette (required)
+      canvas = mapCanvasToMakeCodeColors(canvas, 1);
+
+      // 3. Trim or fill
+      if (settings.crop === Crop.Edges) {
+        canvas = cropToVisibleContent(canvas);
+      } else if (settings.crop === Crop.Fill) {
+        canvas = fillToEdges(canvas, targetWidth, targetHeight);
+      }
+
+      // 4. Scale to target
+      return scaleCanvasToTarget(canvas, targetWidth, targetHeight);
+    },
+    [mapCanvasToMakeCodeColors]
+  );
+
+  /**
+   * Converts an image file to sprite data with post-processing settings applied,
+   * then commits the result to the editor canvas.
+   */
   const processImageToSprite = useCallback(
     async (file?: File) => {
       setError(null);
@@ -64,45 +108,14 @@ export const useImageFileHandler = () => {
       try {
         startGeneration("Processing Image to Sprite");
 
-        // Creates Image Element
-        const imgElement = await fileToImageElement(imageFile);
-
-        // Creates Canvas with Image Drawn
-        let canvas: HTMLCanvasElement | null =
-          createCanvasFromImage(imgElement);
-
-        /**
-         * Image Processing Pipeline
-         * 1. Remove Background
-         * 2. Convert Color to MakeCodeColors
-         * 3. Trim or Fill Canvas
-         * 4. Scale Canvas
-         */
-
-        // 1. Remove Background
-
-        if (postProcessingSettings.removeBackground) {
-          canvas = removeBackground(canvas, postProcessingSettings.tolerance);
-        }
-
-        // 2. Convert Color to MakeCodeColor (Required)
-
-        canvas = mapCanvasToMakeCodeColors(canvas, 1);
-
-        // 3. Trim or Fill Canvas
-
-        if (postProcessingSettings.crop === Crop.Edges) {
-          canvas = cropToVisibleContent(canvas);
-        } else if (postProcessingSettings.crop === Crop.Fill) {
-          canvas = fillToEdges(canvas, width, height);
-        }
-
-        // 4. Scale Canvas
-
-        canvas = scaleCanvasToTarget(canvas, width, height);
+        const canvas = await processSourceToCanvas(
+          imageFile,
+          width,
+          height,
+          postProcessingSettings
+        );
 
         // Upload Canvas to UI Sprite Editor
-
         pasteCanvas(canvas);
         stopGeneration();
       } catch (error) {
@@ -115,7 +128,7 @@ export const useImageFileHandler = () => {
       setError,
       startGeneration,
       stopGeneration,
-      mapCanvasToMakeCodeColors,
+      processSourceToCanvas,
       postProcessingSettings,
       width,
       height,
@@ -215,5 +228,6 @@ export const useImageFileHandler = () => {
     sourceImage,
     setSourceImage,
     processImageToSprite,
+    processSourceToCanvas,
   };
 };
