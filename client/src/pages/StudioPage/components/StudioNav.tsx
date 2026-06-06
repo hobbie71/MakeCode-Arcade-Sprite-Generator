@@ -6,7 +6,7 @@ interface Props {
   onOpenExport: () => void;
 }
 
-/** Studio top bar: wordmark, document title, the display-only token chip, Export. */
+/** Studio top bar: wordmark, the display-only token chip, Export. */
 export default function StudioNav({ onOpenExport }: Props) {
   const { balance } = useToken();
 
@@ -22,11 +22,6 @@ export default function StudioNav({ onOpenExport }: Props) {
           MakeSprite<span className="text-accent">Code</span>
         </span>
       </Link>
-
-      <div className="hidden min-w-0 items-center gap-1.5 text-sm sm:flex">
-        <span className="truncate text-ink">Untitled sprite</span>
-        <span className="shrink-0 text-ink-subtle">· saved locally</span>
-      </div>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <span
