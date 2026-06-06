@@ -7,7 +7,6 @@ import { useZoom } from "../contexts/ZoomContext/useZoom";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { useSprite } from "../../../context/SpriteContext/useSprite";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
-import { useGrid } from "../contexts/GridContext/useGrid";
 
 // Utility imports
 import {
@@ -25,6 +24,7 @@ import { usePasteData } from "../hooks/usePasteData";
 import SelectionOverlay from "./SelectionOverlay";
 import ImportPreview from "./ImportPreview";
 import PreviewCanvas from "./PreviewCanvas";
+import GridOverlay from "./GridOverlay";
 
 // Const imports
 import {
@@ -52,7 +52,6 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   const { width, height } = useCanvasSize();
   const { spriteData } = useSprite();
   const { palette } = usePaletteSelected();
-  const { showGrid } = useGrid();
 
   // States
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -162,13 +161,13 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     setZoom(newZoom);
   }, [initCanvas, centerCanvas, getInitZoom, setZoom]);
 
-  // Repaint when the committed sprite data, palette, or grid visibility changes.
-  // Tools paint imperatively during a drag and only update spriteData on commit,
-  // so this fires after each committed edit (and on undo/redo, paste, palette
-  // swap, and grid toggle) — re-rendering the pixels and the grid overlay on top.
+  // Repaint when the committed sprite data or palette changes. Tools paint
+  // imperatively during a drag and only update spriteData on commit, so this fires
+  // after each committed edit (and on undo/redo, paste, and palette swap). The grid
+  // is no longer painted here — it lives in GridOverlay, which tracks zoom/offset.
   useEffect(() => {
     redrawCanvas();
-  }, [redrawCanvas, spriteData, showGrid, palette]);
+  }, [redrawCanvas, spriteData, palette]);
 
   // effect: Center canvas on resize
   useEffect(() => {
@@ -255,7 +254,15 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
           transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
           transformOrigin: "50% 50%",
           outline: "none",
+          imageRendering: "pixelated",
         }}
+      />
+      <GridOverlay
+        width={width}
+        height={height}
+        pixelSize={pixelSize}
+        offset={offset}
+        zoom={zoom}
       />
       <PreviewCanvas
         width={width}

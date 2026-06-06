@@ -4,13 +4,12 @@ import { useCallback } from "react";
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useSprite } from "../../../context/SpriteContext/useSprite";
-import { useGrid } from "../contexts/GridContext/useGrid";
 
 // Hook imports
 import { useSpriteData } from "./useSpriteData";
 
 // Lib imports
-import { drawPixelOnCanvas, drawGrid } from "../libs/drawPixelOnCanvas";
+import { drawPixelOnCanvas } from "../libs/drawPixelOnCanvas";
 
 // Type imports
 import { MakeCodeColor } from "../../../types/color";
@@ -21,9 +20,9 @@ export const useSpriteEditorCanvas = (width: number, height: number) => {
   const { initCanvasOnly } = useSpriteData();
   const { spriteData } = useSprite();
   const { palette } = usePaletteSelected();
-  const { showGrid } = useGrid();
 
-  // Paint every pixel of the given grid, then (optionally) the grid lines.
+  // Paint every pixel of the sprite data. (Grid lines are drawn separately by
+  // GridOverlay, so they no longer get baked into the zoom-scaled bitmap.)
   const paint = useCallback(
     (data: MakeCodeColor[][]) => {
       const canvas = canvasRef.current;
@@ -35,12 +34,8 @@ export const useSpriteEditorCanvas = (width: number, height: number) => {
           drawPixelOnCanvas(canvas, { x, y }, color, palette);
         }
       }
-
-      if (showGrid) {
-        drawGrid(canvas, width, height);
-      }
     },
-    [canvasRef, height, width, palette, showGrid]
+    [canvasRef, height, width, palette]
   );
 
   // Initial paint: seeds/normalizes sprite data via the ref, then renders it.

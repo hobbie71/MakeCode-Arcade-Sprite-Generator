@@ -122,45 +122,6 @@ export const drawPixelsOnCanvas = (
   });
 };
 
-/**
- * Draw subtle 1px grid lines between every sprite pixel, on top of the
- * already-rendered pixels. A translucent dark line (the in-canvas transparency
- * checkerboard is always a light gray, so this reads clearly in both themes
- * without being harsh; over solid drawn pixels it all but disappears, as a
- * pixel-editor grid should).
- */
-export const drawGrid = (
-  canvas: HTMLCanvasElement,
-  width: number,
-  height: number,
-  pixelSize: number = PIXEL_SIZE
-) => {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  ctx.save();
-  ctx.strokeStyle = "rgba(0,0,0,0.3)";
-  ctx.lineWidth = 1;
-
-  // Crisp 1px lines: offset by 0.5 so the stroke lands on a device pixel.
-  for (let x = 0; x <= width; x++) {
-    const px = Math.round(x * pixelSize) + 0.5;
-    ctx.beginPath();
-    ctx.moveTo(px, 0);
-    ctx.lineTo(px, height * pixelSize);
-    ctx.stroke();
-  }
-  for (let y = 0; y <= height; y++) {
-    const py = Math.round(y * pixelSize) + 0.5;
-    ctx.beginPath();
-    ctx.moveTo(0, py);
-    ctx.lineTo(width * pixelSize, py);
-    ctx.stroke();
-  }
-
-  ctx.restore();
-};
-
 const drawCheckerboard = (
   canvas: HTMLCanvasElement,
   position: Coordinates,
