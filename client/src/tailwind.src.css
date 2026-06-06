@@ -222,11 +222,11 @@
   }
 
   .color-palette {
-    @apply flex flex-row flex-wrap justify-center gap-1.5;
+    @apply grid grid-cols-4 gap-2;
   }
 
   .color-swatch {
-    @apply w-8 h-8 rounded shadow-sm cursor-pointer hover:scale-110 transition-transform;
+    @apply w-full aspect-square rounded shadow-sm cursor-pointer hover:scale-110 transition-transform;
   }
 
   /* Canvas Components */

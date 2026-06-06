@@ -6,9 +6,17 @@ interface TooltipProps {
   children: React.ReactElement<any>;
   delay?: number;
   hotkey?: string;
+  /** Sizing classes for the wrapper span. Defaults to the 32px tool-button cap. */
+  className?: string;
 }
 
-const Tooltip = ({ text, children, delay = 500, hotkey }: TooltipProps) => {
+const Tooltip = ({
+  text,
+  children,
+  delay = 500,
+  hotkey,
+  className = "max-w-[32px] max-h-[32px]",
+}: TooltipProps) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipId = useId();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -50,7 +58,7 @@ const Tooltip = ({ text, children, delay = 500, hotkey }: TooltipProps) => {
   } as any);
 
   return (
-    <span className="relative max-w-[32px] max-h-[32px]">
+    <span className={`relative ${className}`}>
       {childWithProps}
 
       {showTooltip && (
