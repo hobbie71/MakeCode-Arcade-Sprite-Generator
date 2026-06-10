@@ -33,7 +33,7 @@ Dock section content, top to bottom:
 - **Ghost controls** — "Show on canvas" toggle + opacity slider (disabled until toggled on). Reads/writes `SourceGhostContext`.
 - **Compare** — two labeled thumbnails side by side: **Original** (same object URL) and **Sprite** (live thumbnail drawn from `spriteData` + selected palette; re-renders on committed edits, undo/redo, palette swap).
 - **Actions row** — **Re-process** (calls the `onOpenResize` handler that opens the existing Resize & Process modal) and **Download** (anchor download of the source file, named from `sourceImage.name` — generated images are already `File("generated-sprite.png")`).
-- **Empty state** (when `sourceImage == null`, e.g. blank canvas or pasted sprite): short hint + "Generate with AI" button via `onOpenGenerate`.
+- **Empty state** (when `sourceImage == null`, e.g. blank canvas or pasted sprite): short hint + "✦ Generate" button via `onOpenGenerate` (label matches the floating Generate pill).
 
 Props: `{ onOpenGenerate, onOpenResize }` passed from `EditorSurface` (which already receives them).
 
@@ -57,7 +57,7 @@ Append `{ id: "source", label: "Source", content: <SourcePanel … /> }` to the 
 
 ## Data flow
 
-`ImageImportContext.sourceImage` (File) → object URL (created/revoked in an effect) → panel `<img>`, compare Original thumb, and `SourceOverlay` bitmap. Ghost state flows `SourcePanel` ↔ `SourceGhostContext` → `SourceOverlay`.
+`ImageImportContext.sourceImage` (File) → object URL (created/revoked in an effect) → panel `<img>` and compare Original thumb; `SourceOverlay` decodes the File directly via `createImageBitmap` (no URL). Ghost state flows `SourcePanel` ↔ `SourceGhostContext` → `SourceOverlay`.
 
 ## Edge cases
 
