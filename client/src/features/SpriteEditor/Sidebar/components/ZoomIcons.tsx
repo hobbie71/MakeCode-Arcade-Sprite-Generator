@@ -5,6 +5,7 @@ import { useZoom } from "../../contexts/ZoomContext/useZoom";
 import { MAX_ZOOM, MIN_ZOOM, ZOOM_AMOUNT } from "../../constants/canvas";
 
 // Component imports
+import IconButton from "../../../../components/IconButton";
 import Tooltip from "../../../../components/Tooltip";
 
 // Hook imports
@@ -44,61 +45,27 @@ const ZoomIcons = () => {
   ];
   useKeyboardShortcut(shortcut);
 
-  const handleZoomInKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    switch (e.key) {
-      case "Enter":
-      case " ":
-        e.preventDefault();
-        handleZoomIn();
-        break;
-      default:
-        break;
-    }
-  };
-
-  const handleZoomOutKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    switch (e.key) {
-      case "Enter":
-      case " ":
-        e.preventDefault();
-        handleZoomOut();
-        break;
-      default:
-        break;
-    }
-  };
-
   const isZoomOutDisabled = zoom <= MIN_ZOOM;
   const isZoomInDisabled = zoom >= MAX_ZOOM;
 
   return (
     <>
       <Tooltip text="Zoom out" hotkey="-">
-        <button
-          className="tool-button"
+        <IconButton
           onClick={handleZoomOut}
-          onKeyDown={handleZoomOutKeyDown}
           aria-label="Zoom out"
-          disabled={isZoomOutDisabled}
-          role="button"
-          type="button"
-          tabIndex={0}>
+          disabled={isZoomOutDisabled}>
           <i className={`ms-Icon ms-Icon--ZoomOut`} aria-hidden="true" />
-        </button>
+        </IconButton>
       </Tooltip>
 
       <Tooltip text="Zoom in" hotkey="+">
-        <button
-          className="tool-button"
+        <IconButton
           onClick={handleZoomIn}
-          onKeyDown={handleZoomInKeyDown}
           aria-label="Zoom in"
-          disabled={isZoomInDisabled}
-          role="button"
-          type="button"
-          tabIndex={0}>
+          disabled={isZoomInDisabled}>
           <i className={`ms-Icon ms-Icon--ZoomIn`} aria-hidden="true" />
-        </button>
+        </IconButton>
       </Tooltip>
     </>
   );

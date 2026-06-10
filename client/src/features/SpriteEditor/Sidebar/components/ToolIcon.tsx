@@ -1,7 +1,9 @@
 import { memo } from "react";
 import { useToolSelected } from "../../../../features/SpriteEditor/contexts/ToolSelectedContext/useToolSelected";
 import { EditorTools, ALL_EDITOR_TOOLS } from "../../../../types/tools";
+import IconButton from "../../../../components/IconButton";
 import Tooltip from "../../../../components/Tooltip";
+import LineToolIcon from "./LineToolIcon";
 
 interface Props {
   tool: EditorTools;
@@ -21,6 +23,8 @@ const ToolIcon = memo(({ tool, icon }: Props) => {
     setTool(tool);
   };
 
+  // Activation is mousedown-based (not click), so the native button's
+  // Enter/Space-fires-click path never runs — handle keys explicitly.
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     switch (e.key) {
       case "Enter":
@@ -35,17 +39,17 @@ const ToolIcon = memo(({ tool, icon }: Props) => {
 
   return (
     <Tooltip text={toolName} hotkey={shortcut || undefined}>
-      <button
-        className={`tool-button ${isSelected ? "active" : ""}`}
+      <IconButton
+        pressed={isSelected}
         onMouseDown={handleMouseDown}
         onKeyDown={handleKeyDown}
-        aria-label={`${toolName}${shortcut ? `, shortcut: ${shortcut}` : ""}`}
-        aria-pressed={isSelected}
-        role="button"
-        type="button"
-        tabIndex={0}>
-        <i className={`ms-Icon ms-Icon--${icon}`} aria-hidden="true" />
-      </button>
+        aria-label={`${toolName}${shortcut ? `, shortcut: ${shortcut}` : ""}`}>
+        {tool === EditorTools.Line ? (
+          <LineToolIcon className={isSelected ? "" : "text-ink-muted"} />
+        ) : (
+          <i className={`ms-Icon ms-Icon--${icon}`} aria-hidden="true" />
+        )}
+      </IconButton>
     </Tooltip>
   );
 });
