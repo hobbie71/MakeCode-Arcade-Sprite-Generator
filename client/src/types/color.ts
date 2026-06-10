@@ -268,3 +268,19 @@ export const ALL_PALETTES = [
   { name: "StillLife", palette: StillLifePalette },
   { name: "SteamPunk", palette: SteamPunkPalette },
 ];
+
+// The opaque colours of a palette, in canonical order — used to render the
+// little colour-preview mosaic in the palette dropdowns (Transparent dropped).
+const OPAQUE_COLOR_ORDER = ColorOrder.filter(
+  (color) => color !== MakeCodeColor.TRANSPARENT
+);
+
+export const getPaletteSwatches = (palette: MakeCodePalette): string[] =>
+  OPAQUE_COLOR_ORDER.map((color) => palette[color]);
+
+/** ALL_PALETTES decorated with swatch previews, ready for the dropdown. */
+export const PALETTE_OPTIONS = ALL_PALETTES.map((entry) => ({
+  name: entry.name,
+  palette: entry.palette,
+  swatches: getPaletteSwatches(entry.palette),
+}));
