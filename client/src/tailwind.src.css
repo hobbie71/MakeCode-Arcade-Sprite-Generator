@@ -2,7 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tooltip entrance: a quick fade + subtle scale so the bubble feels like it
+   pops out of the trigger rather than blinking in. */
+@keyframes tooltip-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @layer components {
+  .tooltip-pop {
+    animation: tooltip-pop 120ms var(--ease-out);
+  }
+
   /* Typography Components */
   .heading-1 {
     @apply text-3xl lg:text-4xl font-bold text-ink mb-4 leading-tight;
@@ -136,12 +153,63 @@
     @apply btn bg-danger text-on-accent shadow-sm;
   }
 
+  /* Outline variant: transparent fill, accent border + text. NOTE: the base
+     .btn sets border-style:none, so we must re-assert `border-solid` here or
+     the outline won't render (border-width alone stays invisible). */
+  .btn-outline {
+    @apply btn border border-solid border-accent bg-transparent text-accent;
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    @apply bg-accent-soft;
+  }
+
   .btn-sm {
-    @apply px-2 py-1 text-sm;
+    @apply px-4 py-2 text-sm;
   }
 
   .btn-lg {
-    @apply px-4 py-3 text-lg;
+    @apply px-6 py-3 text-base;
+  }
+
+  /* Chip: small toggle/preset pill. Like .btn-outline, `border-solid` must be
+     re-asserted because the base .btn sets border-style:none. The :not(.active)
+     hover guards keep the hover fill from washing out the pressed state. */
+  .btn-chip {
+    @apply btn border border-solid border-line bg-transparent px-2.5 py-1 text-sm text-ink-muted shadow-none;
+  }
+
+  .btn-chip:hover:not(:disabled):not(.active) {
+    @apply bg-surface-hover text-ink;
+  }
+
+  .btn-chip.active {
+    @apply border-accent bg-accent-soft text-accent;
+  }
+
+  /* Ghost square icon button (IconButton component). */
+  .icon-btn {
+    @apply flex shrink-0 items-center justify-center rounded text-ink transition-colors;
+  }
+
+  .icon-btn:hover:not(:disabled):not(.active) {
+    @apply bg-surface-hover;
+  }
+
+  .icon-btn:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .icon-btn-md {
+    @apply h-8 w-8;
+  }
+
+  .icon-btn-sm {
+    @apply rounded-md p-1;
+  }
+
+  .icon-btn.active {
+    @apply bg-accent text-on-accent;
   }
 
   /* Form Components */
@@ -214,7 +282,7 @@
   }
 
   .tool-button {
-    @apply flex w-8 h-8 text-ink bg-surface hover:bg-surface-hover shadow-sm items-center justify-center rounded;
+    @apply flex w-8 h-8 text-ink hover:bg-surface-hover items-center justify-center rounded transition-colors;
   }
 
   .tool-button.active {
@@ -230,8 +298,12 @@
   }
 
   /* Canvas Components */
+  /* `isolate` makes this its own stacking context so the canvas overlays'
+     z-indexes (preview/grid/import/selection) stay contained and don't paint
+     over the floating stage widgets (color badge, history, action bar) that are
+     its siblings in CanvasStage. */
   .canvas-container {
-    @apply flex-1 overflow-hidden relative h-full;
+    @apply isolate flex-1 overflow-hidden relative h-full;
   }
 
   .canvas-wrapper {
