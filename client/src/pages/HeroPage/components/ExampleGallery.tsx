@@ -1,3 +1,5 @@
+import Button from "../../../components/Button";
+
 // Placeholder showcase tiles. Swap for real generated-sprite assets later;
 // these stand-ins keep the layout honest without faking pixel art. The label +
 // size-badge row mirrors the locked mockup (01-hero) so the swap is drop-in.
@@ -27,12 +29,9 @@ export default function ExampleGallery({
         <h2 className="text-h2 font-bold text-ink">
           A gallery of generated sprites
         </h2>
-        <button
-          type="button"
-          onClick={onExplore}
-          className="btn-secondary px-4 py-2 text-sm">
+        <Button variant="secondary" size="sm" onClick={onExplore}>
           Explore the showcase →
-        </button>
+        </Button>
       </div>
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
         {EXAMPLES.map(({ label, color, size }) => (
