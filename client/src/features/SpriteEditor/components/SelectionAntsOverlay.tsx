@@ -28,13 +28,20 @@ const DASH_CSS_PX = 4;
  */
 const SelectionAntsOverlay = ({ width, height, offset, zoom }: Props) => {
   const { canvasRef } = useCanvas();
-  const { phase, mask, draft } = useSelection();
+  const { phase, mask, draft, floating, floatingPixels } = useSelection();
   const antsRef = useRef<HTMLCanvasElement>(null);
   const tickRef = useRef(0);
 
   const maskOutline = useMemo(
     () => (mask ? buildMaskOutline(mask) : null),
     [mask]
+  );
+
+  // The float's outline is built in its local space and translated by the
+  // rect at draw time, so dragging only re-strokes — never re-extracts.
+  const floatingOutline = useMemo(
+    () => (floatingPixels ? buildMaskOutline(floatingPixels.mask) : null),
+    [floatingPixels]
   );
 
   // In-flight draft outline (rect for now; the lasso adds a polyline kind).
@@ -73,7 +80,7 @@ const SelectionAntsOverlay = ({ width, height, offset, zoom }: Props) => {
     if (!ctx) return;
     ctx.clearRect(0, 0, ants.width, ants.height);
 
-    const path = draftPath ?? maskOutline;
+    const path = draftPath ?? floatingOutline ?? maskOutline;
     if (!path) return;
 
     // Sprite box in this overlay's device pixels (same scheme as GridOverlay).
@@ -86,6 +93,9 @@ const SelectionAntsOverlay = ({ width, height, offset, zoom }: Props) => {
     ctx.save();
     ctx.translate(left, top);
     ctx.scale(cell, (mr.height * dpr) / height);
+    if (path === floatingOutline && floating) {
+      ctx.translate(floating.rect.x, floating.rect.y);
+    }
 
     // Stroke metrics are wanted in device px; the context is in sprite units,
     // so divide by the cell scale to keep them screen-constant at any zoom.
@@ -103,7 +113,7 @@ const SelectionAntsOverlay = ({ width, height, offset, zoom }: Props) => {
     ctx.lineDashOffset = -((tickRef.current % 8) / 4) * dash;
     ctx.stroke(path);
     ctx.restore();
-  }, [canvasRef, width, height, draftPath, maskOutline]);
+  }, [canvasRef, width, height, draftPath, maskOutline, floatingOutline, floating]);
 
   // Redraw on selection, pan, and zoom changes (geometry is re-measured).
   useEffect(() => {

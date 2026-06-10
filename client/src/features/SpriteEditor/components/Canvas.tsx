@@ -23,6 +23,7 @@ import { useSelectTool } from "../hooks/useSelectTool";
 
 // Component imports
 import SelectionAntsOverlay from "./SelectionAntsOverlay";
+import FloatingSelectionCanvas from "./FloatingSelectionCanvas";
 import SourceOverlay from "./SourceOverlay";
 import PreviewCanvas from "./PreviewCanvas";
 import GridOverlay from "./GridOverlay";
@@ -287,6 +288,13 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
         zoom={zoom}
       />
       <PreviewCanvas
+        width={width}
+        height={height}
+        pixelSize={pixelSize}
+        offset={offset}
+        zoom={zoom}
+      />
+      <FloatingSelectionCanvas
         width={width}
         height={height}
         pixelSize={pixelSize}

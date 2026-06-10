@@ -63,7 +63,8 @@ export const useMouseHandler = () => {
     handlePointerMove: handleCircleMove,
     handlePointerUp: handleCircleUp,
   } = useCircle();
-  const { handlePointerDown: handleSelectDown } = useSelectTool();
+  const { handlePointerDown: handleSelectDown, updateHoverCursor } =
+    useSelectTool();
 
   // Helper to ensure we ignore coordinates that fall outside the sprite bounds
   const isInsideBounds = useCallback(
@@ -200,12 +201,21 @@ export const useMouseHandler = () => {
         return;
       }
 
+      // Select draws no dot preview; hovering only updates cursor feedback
+      // (move over the selection, crosshair elsewhere). Gestures themselves
+      // run on window listeners owned by useSelectTool.
+      if (tool === EditorTools.Select) {
+        updateHoverCursor(coordinates);
+        updateMousePosition(coordinates);
+        return;
+      }
+
       // Draw dot preview if Left Mouse Button not down AND tool is not fill
+      // (Select already returned above.)
       if (
         !isMouseDownRef.current &&
         !isDrawing.current &&
         tool !== EditorTools.Fill &&
-        tool !== EditorTools.Select &&
         tool !== EditorTools.Pan
       ) {
         // if eraser draw clear preview
@@ -239,6 +249,7 @@ export const useMouseHandler = () => {
       mouseCoordinates,
       drawDotPreview,
       updateMousePosition,
+      updateHoverCursor,
       handlePencilMove,
       handleEraserMove,
       handleLineMove,

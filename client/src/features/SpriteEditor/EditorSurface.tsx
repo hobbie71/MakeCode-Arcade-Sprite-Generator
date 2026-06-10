@@ -1,4 +1,5 @@
 import SpriteDataResizer from "./components/SpriteDataResizer";
+import SelectionShortcuts from "./components/SelectionShortcuts";
 import ToolOptionsStrip from "./layout/ToolOptionsStrip";
 import LeftRail from "./layout/LeftRail";
 import CanvasStage from "./layout/CanvasStage";
@@ -56,6 +57,8 @@ export default function EditorSurface({
       </div>
       {/* Logic-only: keeps spriteData in sync with the canvas size. */}
       <SpriteDataResizer />
+      {/* Logic-only: selection keyboard bindings (Esc/Enter/Delete/arrows). */}
+      <SelectionShortcuts />
     </div>
   );
 }

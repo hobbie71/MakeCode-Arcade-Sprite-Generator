@@ -1,11 +1,13 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import SpriteEditor from "../../features/SpriteEditor/SpriteEditor";
 import StudioNav from "./components/StudioNav";
 import GenerateModal from "./modals/GenerateModal";
 import ResizeProcessModal from "./modals/ResizeProcessModal";
 import ExportModal from "./modals/ExportModal";
+import TokenModal from "./modals/TokenModal";
 import { useModal } from "../../components/Modal/useModal";
 import { useHasVisited } from "../../hooks/useHasVisited";
+import { interruptSelection } from "../../features/SpriteEditor/libs/selectionInterrupt";
 
 /**
  * The studio (editor) route: the new shell — StudioNav top bar + the EditorSurface
@@ -18,21 +20,39 @@ export default function StudioPage() {
   const generateModal = useModal();
   const resizeModal = useModal();
   const exportModal = useModal();
+  const tokenModal = useModal();
 
   useEffect(() => {
     // Reaching the studio makes you a returning visitor (skip the hero next time).
     markVisited();
   }, [markVisited]);
 
+  // Opening a sprite-reading flow mid-move cancels the floating selection
+  // (pixels snap home) so every modal sees the whole, unmoved sprite — see
+  // ADR-0007 decision 6. Wrapped here because the nav lives outside the
+  // editor's provider tree.
+  const openGenerate = useCallback(() => {
+    interruptSelection();
+    generateModal.open();
+  }, [generateModal]);
+  const openResize = useCallback(() => {
+    interruptSelection();
+    resizeModal.open();
+  }, [resizeModal]);
+  const openExport = useCallback(() => {
+    interruptSelection();
+    exportModal.open();
+  }, [exportModal]);
+
   return (
     <div className="flex h-screen flex-col bg-surface">
-      <StudioNav onOpenExport={exportModal.open} />
+      <StudioNav onOpenExport={openExport} onOpenTokens={tokenModal.open} />
 
       <div className="min-h-0 flex-1">
         <SpriteEditor
-          onOpenGenerate={generateModal.open}
-          onOpenResize={resizeModal.open}
-          onOpenExport={exportModal.open}
+          onOpenGenerate={openGenerate}
+          onOpenResize={openResize}
+          onOpenExport={openExport}
         />
       </div>
 
@@ -45,6 +65,7 @@ export default function StudioPage() {
         onClose={resizeModal.close}
       />
       <ExportModal isOpen={exportModal.isOpen} onClose={exportModal.close} />
+      <TokenModal isOpen={tokenModal.isOpen} onClose={tokenModal.close} />
     </div>
   );
 }
