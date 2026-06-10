@@ -18,7 +18,7 @@ import { useFill } from "./useFill";
 import { useLine } from "./useLine";
 import { useRectangle } from "./useRectangle";
 import { useCircle } from "./useCircle";
-import { useSelect } from "./useSelect";
+import { useSelectTool } from "./useSelectTool";
 import { EditorTools } from "../../../types/tools";
 import { useCanvasPreview } from "./useCanvasPreview";
 import { MakeCodeColor } from "../../../types/color";
@@ -63,11 +63,7 @@ export const useMouseHandler = () => {
     handlePointerMove: handleCircleMove,
     handlePointerUp: handleCircleUp,
   } = useCircle();
-  const {
-    handlePointerDown: handleSelectDown,
-    handlePointerMove: handleSelectMove,
-    handlePointerUp: handleSelectUp,
-  } = useSelect();
+  const { handlePointerDown: handleSelectDown } = useSelectTool();
 
   // Helper to ensure we ignore coordinates that fall outside the sprite bounds
   const isInsideBounds = useCallback(
@@ -98,6 +94,13 @@ export const useMouseHandler = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
+      // Select owns its whole gesture via window listeners (drags must keep
+      // tracking outside the sprite) — don't enter the canvas-element flow.
+      if (tool === EditorTools.Select) {
+        handleSelectDown(e);
+        return;
+      }
+
       isMouseDownRef.current = true;
       isDrawing.current = true;
       clearPreview();
@@ -116,8 +119,6 @@ export const useMouseHandler = () => {
         handleRectangleDown(coordinates);
       } else if (tool === EditorTools.Circle) {
         handleCircleDown(coordinates);
-      } else if (tool === EditorTools.Select) {
-        handleSelectDown(coordinates);
       }
     },
     [
@@ -155,8 +156,6 @@ export const useMouseHandler = () => {
       } else if (tool === EditorTools.Circle) {
         if (coordinates && isInsideBounds(coordinates))
           handleCircleUp(coordinates);
-      } else if (tool === EditorTools.Select) {
-        if (coordinates) handleSelectUp(coordinates);
       }
     },
     [
@@ -166,7 +165,6 @@ export const useMouseHandler = () => {
       handleLineUp,
       handleRectangleUp,
       handleCircleUp,
-      handleSelectUp,
       isInsideBounds,
     ]
   );
@@ -232,8 +230,6 @@ export const useMouseHandler = () => {
         handleRectangleMove(coordinates);
       } else if (tool === EditorTools.Circle) {
         handleCircleMove(coordinates);
-      } else if (tool === EditorTools.Select) {
-        handleSelectMove(coordinates);
       }
     },
     [
@@ -249,7 +245,6 @@ export const useMouseHandler = () => {
       handleRectangleMove,
       handleCircleMove,
       isInsideBounds,
-      handleSelectMove,
     ]
   );
 

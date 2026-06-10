@@ -1,7 +1,7 @@
 import { ColorSelectedProvider } from "../contexts/ColorSelectedContext/ColorSelectedContext";
 import { ToolSelectedProvider } from "../contexts/ToolSelectedContext/ToolSelectedContext";
 import { ZoomProvider } from "../contexts/ZoomContext/ZoomContext";
-import { SelectionAreaProvider } from "../contexts/SelectionArea/SelectionAreaContext";
+import { SelectionProvider } from "../contexts/SelectionContext/SelectionContext";
 import { MouseCoordinatesProvider } from "../contexts/MouseCoordinatesContext/MouseCoordinatesContext";
 import { GridProvider } from "../contexts/GridContext/GridContext";
 import { SourceGhostProvider } from "../contexts/SourceGhostContext/SourceGhostContext";
@@ -16,7 +16,7 @@ const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <ColorSelectedProvider>
       <ToolSelectedProvider>
-        <SelectionAreaProvider>
+        <SelectionProvider>
           <MouseCoordinatesProvider>
             <ZoomProvider>
               <GridProvider>
@@ -30,7 +30,7 @@ const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
               </GridProvider>
             </ZoomProvider>
           </MouseCoordinatesProvider>
-        </SelectionAreaProvider>
+        </SelectionProvider>
       </ToolSelectedProvider>
     </ColorSelectedProvider>
   );

@@ -19,9 +19,10 @@ import { useSpriteEditorCanvas } from "../hooks/useSpriteEditorCanvas";
 import { useMouseHandler } from "../hooks/useMouseHandler";
 import { usePan } from "../hooks/usePan";
 import { usePasteData } from "../hooks/usePasteData";
+import { useSelectTool } from "../hooks/useSelectTool";
 
 // Component imports
-import SelectionOverlay from "./SelectionOverlay";
+import SelectionAntsOverlay from "./SelectionAntsOverlay";
 import SourceOverlay from "./SourceOverlay";
 import PreviewCanvas from "./PreviewCanvas";
 import GridOverlay from "./GridOverlay";
@@ -77,6 +78,20 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     handlePointerUp: handlePanUp,
     handlePointerLeave: handlePanLeave,
   } = usePan(offset, setOffset);
+
+  const { handlePointerDown: handleSelectDown } = useSelectTool();
+
+  // Select-tool presses on the stage (not the sprite canvas itself) still go
+  // to the select gesture handler: clicking empty stage deselects, and resize
+  // handles hanging past the sprite border stay grabbable. Presses on the
+  // canvas already reach it through useMouseHandler — skip those to avoid
+  // double-dispatch (the canvas mousedown bubbles up to this container).
+  const handleContainerMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    handlePanDown(e);
+    if (tool === "select" && e.target !== canvasRef.current) {
+      handleSelectDown(e);
+    }
+  };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const text = e.clipboardData.getData("text");
@@ -230,7 +245,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
         cursor: tool === "pan" ? "grab" : "crosshair",
       }}
       onPaste={handlePaste}
-      onMouseDown={handlePanDown}
+      onMouseDown={handleContainerMouseDown}
       onMouseMove={handlePanMove}
       onMouseUp={handlePanUp}
       onMouseLeave={handlePanLeave}
@@ -278,7 +293,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
         offset={offset}
         zoom={zoom}
       />
-      <SelectionOverlay
+      <SelectionAntsOverlay
         width={width}
         height={height}
         pixelSize={pixelSize}
