@@ -29,7 +29,7 @@ spacing / shape values live in [design-tokens.reference.css](design-tokens.refer
 - **Left rail (vertical):** pencil (active), eraser, line, rectangle, ellipse, fill, move/pan, eyedropper, zoom-in, zoom-out, fit, grid toggle. Selected tool gets accent fill.
 - **Canvas stage:** light-gray stage, sprite on transparency checkerboard with pixel grid; a "● Blue" current-color pill top-left; undo/redo top-right.
 - **Floating action layer (bottom):** size chip **▦ 32 × 32** (bottom-left) · pills **✦ Generate** (accent) / **⟲ Resize & Process** / **⎙ Export** (center) · zoom **100%** (bottom-right).
-- **Right dock (collapsible):** tabbed; first tab **Palette** with an "Arcade" palette dropdown, the 16-swatch Arcade grid, selected-swatch readout ("Blue · index 8 · #003FAD"), and a "Coming soon — layers, animation frames, AI variations, edit history" placeholder (future dock sections).
+- **Right dock (collapsible):** tabbed; first tab **Palette** with an "Arcade" palette dropdown, the 16-swatch Arcade grid, and the selected-swatch readout ("Blue · index 8 · #003FAD"); second tab **Source** with the cached source image on a checkerboard, ghost-overlay controls (Show on canvas + opacity), an Original/Sprite compare, and Re-process / Download actions. Future dock sections (layers, animation frames, AI variations, edit history) append as further tabs.
 
 ## Generate modal — `05-modal-generate`
 

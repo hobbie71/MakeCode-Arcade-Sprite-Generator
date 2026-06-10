@@ -65,6 +65,7 @@ Append `{ id: "source", label: "Source", content: <SourcePanel … /> }` to the 
 - Blank-canvas flow already nulls `sourceImage` (`GenerationControls`), which empties the panel and hides the ghost.
 - Canvas resize (e.g. 16×16 → 32×32): overlay bounds are prop-driven, so the ghost re-stretches automatically.
 - Object URLs revoked on source change and unmount.
+- Ghost registration: the ghost stretches the source to the sprite's bounds, while Process may crop/letterbox — so the ghost guides free-form tracing but is not pixel-registered with the processed placement when cropping ran or aspect ratios differ.
 
 ## Verification
 
