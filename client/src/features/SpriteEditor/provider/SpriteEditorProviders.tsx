@@ -4,6 +4,7 @@ import { ZoomProvider } from "../contexts/ZoomContext/ZoomContext";
 import { SelectionAreaProvider } from "../contexts/SelectionArea/SelectionAreaContext";
 import { MouseCoordinatesProvider } from "../contexts/MouseCoordinatesContext/MouseCoordinatesContext";
 import { GridProvider } from "../contexts/GridContext/GridContext";
+import { SourceGhostProvider } from "../contexts/SourceGhostContext/SourceGhostContext";
 import { ShapeModeProvider } from "../contexts/ShapeModeContext/ShapeModeContext";
 import { FillOptionsProvider } from "../contexts/FillOptionsContext/FillOptionsContext";
 import { PixelPerfectProvider } from "../contexts/PixelPerfectContext/PixelPerfectContext";
@@ -19,11 +20,13 @@ const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
           <MouseCoordinatesProvider>
             <ZoomProvider>
               <GridProvider>
-                <ShapeModeProvider>
-                  <FillOptionsProvider>
-                    <PixelPerfectProvider>{children}</PixelPerfectProvider>
-                  </FillOptionsProvider>
-                </ShapeModeProvider>
+                <SourceGhostProvider>
+                  <ShapeModeProvider>
+                    <FillOptionsProvider>
+                      <PixelPerfectProvider>{children}</PixelPerfectProvider>
+                    </FillOptionsProvider>
+                  </ShapeModeProvider>
+                </SourceGhostProvider>
               </GridProvider>
             </ZoomProvider>
           </MouseCoordinatesProvider>
