@@ -22,7 +22,7 @@ import { usePasteData } from "../hooks/usePasteData";
 
 // Component imports
 import SelectionOverlay from "./SelectionOverlay";
-import ImportPreview from "./ImportPreview";
+import SourceOverlay from "./SourceOverlay";
 import PreviewCanvas from "./PreviewCanvas";
 import GridOverlay from "./GridOverlay";
 
@@ -257,6 +257,13 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
           imageRendering: "pixelated",
         }}
       />
+      <SourceOverlay
+        width={width}
+        height={height}
+        pixelSize={pixelSize}
+        offset={offset}
+        zoom={zoom}
+      />
       <GridOverlay
         width={width}
         height={height}
@@ -271,7 +278,6 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
         offset={offset}
         zoom={zoom}
       />
-      <ImportPreview />
       <SelectionOverlay
         width={width}
         height={height}
