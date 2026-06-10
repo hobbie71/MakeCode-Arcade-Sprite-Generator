@@ -4,6 +4,7 @@ import LeftRail from "./layout/LeftRail";
 import CanvasStage from "./layout/CanvasStage";
 import RightDock from "./layout/RightDock";
 import PalettePanel from "./layout/PalettePanel";
+import SourcePanel from "./layout/SourcePanel";
 
 interface Props {
   onOpenGenerate: () => void;
@@ -39,6 +40,16 @@ export default function EditorSurface({
               label: "Palette",
               content: <PalettePanel />,
               defaultOpen: true,
+            },
+            {
+              id: "source",
+              label: "Source",
+              content: (
+                <SourcePanel
+                  onOpenGenerate={onOpenGenerate}
+                  onOpenResize={onOpenResize}
+                />
+              ),
             },
           ]}
         />
