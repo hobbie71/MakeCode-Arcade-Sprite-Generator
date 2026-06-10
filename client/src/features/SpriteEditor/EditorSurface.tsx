@@ -15,7 +15,7 @@ interface Props {
 /**
  * The editor shell: a contextual tool-options strip on top, then the three
  * regions — left tool rail, central canvas stage (with floating actions), and the
- * collapsible right dock (palette today; layers/frames/variations/history later).
+ * collapsible right dock (Palette and Source tabs today; layers/frames/variations/history later).
  * No editing logic lives here — only render location.
  */
 export default function EditorSurface({

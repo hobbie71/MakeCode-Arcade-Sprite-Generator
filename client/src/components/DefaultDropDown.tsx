@@ -217,7 +217,7 @@ const DefaultDropDown = <T,>({
         closeMenu();
         break;
       case "Tab":
-        closeMenu(false);
+        closeMenu();
         break;
       default:
         if (
