@@ -22,32 +22,45 @@ const SourceOverlay = ({ width, height, pixelSize, offset, zoom }: Props) => {
   const { ghostVisible, ghostOpacity } = useSourceGhost();
   const { sourceImage } = useImageImports();
   const overlayRef = useRef<HTMLCanvasElement>(null);
+  const bitmapRef = useRef<ImageBitmap | null>(null);
   const [bitmap, setBitmap] = useState<ImageBitmap | null>(null);
 
-  // Decode the source File once per change; close stale bitmaps.
+  // Decode the source File once per change. The currently-held bitmap lives in
+  // bitmapRef so stale ones are closed outside React's pure setState updaters.
   useEffect(() => {
     if (!sourceImage) {
-      setBitmap((prev) => {
-        prev?.close();
-        return null;
-      });
+      bitmapRef.current?.close();
+      bitmapRef.current = null;
+      setBitmap(null);
       return;
     }
     let cancelled = false;
-    createImageBitmap(sourceImage).then((bmp) => {
-      if (cancelled) {
-        bmp.close();
-        return;
-      }
-      setBitmap((prev) => {
-        prev?.close();
-        return bmp;
+    createImageBitmap(sourceImage)
+      .then((bmp) => {
+        if (cancelled) {
+          bmp.close();
+          return;
+        }
+        bitmapRef.current?.close();
+        bitmapRef.current = bmp;
+        setBitmap(bmp);
+      })
+      .catch(() => {
+        // Undecodable source (e.g. SVG or corrupt file): the ghost simply
+        // stays unavailable.
       });
-    });
     return () => {
       cancelled = true;
     };
   }, [sourceImage]);
+
+  // Release the held bitmap when the editor unmounts.
+  useEffect(() => {
+    return () => {
+      bitmapRef.current?.close();
+      bitmapRef.current = null;
+    };
+  }, []);
 
   // Repaint when the bitmap or sprite bounds change. ghostVisible is a dep so
   // the repaint also runs right after the canvas remounts on toggle-on.
