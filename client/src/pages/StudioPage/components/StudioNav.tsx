@@ -4,10 +4,11 @@ import { useToken } from "../../../context/TokenContext/useToken";
 
 interface Props {
   onOpenExport: () => void;
+  onOpenTokens: () => void;
 }
 
 /** Studio top bar: wordmark, the display-only token chip, Export. */
-export default function StudioNav({ onOpenExport }: Props) {
+export default function StudioNav({ onOpenExport, onOpenTokens }: Props) {
   const { balance } = useToken();
 
   return (
@@ -24,12 +25,14 @@ export default function StudioNav({ onOpenExport }: Props) {
       </Link>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-        <span
-          className="flex items-center gap-1 rounded-pill border border-line px-2.5 py-1 text-sm font-medium text-ink"
-          title="Token balance (display only)">
+        <Button
+          variant="chip"
+          onClick={onOpenTokens}
+          className="gap-1 rounded-pill text-ink"
+          title="Generation tokens">
           <span className="text-accent">★</span>
           {balance}
-        </span>
+        </Button>
         <Button onClick={onOpenExport}>Export</Button>
       </div>
     </header>
