@@ -39,7 +39,7 @@ export default function SpriteThumbnail() {
       ref={ref}
       width={cols || 1}
       height={rows || 1}
-      className="max-h-full max-w-full object-contain"
+      className="h-full w-full object-contain"
       style={{ imageRendering: "pixelated" }}
     />
   );

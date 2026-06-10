@@ -35,7 +35,7 @@ export default function SourcePanel({ onOpenGenerate, onOpenResize }: Props) {
     return () => URL.revokeObjectURL(url);
   }, [sourceImage]);
 
-  if (!sourceImage || !sourceUrl) {
+  if (!sourceImage) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-md border border-line bg-surface p-4 text-center">
         <p className="text-xs leading-relaxed text-ink-subtle">
@@ -43,11 +43,14 @@ export default function SourcePanel({ onOpenGenerate, onOpenResize }: Props) {
           for tracing, comparing and re-processing.
         </p>
         <Button variant="primary" onClick={onOpenGenerate}>
-          ✦ Generate
+          <span aria-hidden>✦</span> Generate
         </Button>
       </div>
     );
   }
+
+  // Object URL not created yet (first frame after mount/source change).
+  if (!sourceUrl) return null;
 
   return (
     <div className="space-y-3">
@@ -82,7 +85,7 @@ export default function SourcePanel({ onOpenGenerate, onOpenResize }: Props) {
             onChange={(e) => setGhostOpacity(Number(e.target.value) / 100)}
             disabled={!ghostVisible}
             className="range-input"
-            aria-label="Ghost opacity"
+            aria-label="Opacity"
           />
         </div>
       </div>
@@ -114,13 +117,13 @@ export default function SourcePanel({ onOpenGenerate, onOpenResize }: Props) {
       {/* Actions */}
       <div className="flex gap-2">
         <Button variant="secondary" onClick={onOpenResize} className="flex-1">
-          ⟲ Re-process
+          <span aria-hidden>⟲</span> Re-process
         </Button>
         <a
           href={sourceUrl}
           download={sourceImage.name}
           className="btn-outline flex-1 text-center">
-          ⬇ Download
+          <span aria-hidden>⬇</span> Download
         </a>
       </div>
     </div>
