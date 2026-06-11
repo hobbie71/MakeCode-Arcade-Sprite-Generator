@@ -1,4 +1,6 @@
+import SegmentedControl from "../../../components/SegmentedControl";
 import { useShapeMode } from "../contexts/ShapeModeContext/useShapeMode";
+import type { ShapeMode } from "../contexts/ShapeModeContext/ShapeModeContext";
 
 /**
  * Shape fill vs. outline for Rectangle/Circle. Wired to ShapeModeContext, which
@@ -8,22 +10,16 @@ import { useShapeMode } from "../contexts/ShapeModeContext/useShapeMode";
 export default function ShapeModeOption() {
   const { shapeMode, setShapeMode } = useShapeMode();
   return (
-    <div className="flex items-center gap-1">
-      <span className="mr-1 text-xs text-ink-subtle">Shape</span>
-      {(["outline", "fill"] as const).map((m) => (
-        <button
-          key={m}
-          type="button"
-          onClick={() => setShapeMode(m)}
-          aria-pressed={shapeMode === m}
-          className={`rounded-md px-2 py-1 text-xs font-medium capitalize transition-colors ${
-            shapeMode === m
-              ? "bg-accent text-on-accent"
-              : "text-ink-muted hover:bg-surface-hover"
-          }`}>
-          {m}
-        </button>
-      ))}
-    </div>
+    <SegmentedControl<ShapeMode>
+      size="sm"
+      label="Shape"
+      ariaLabel="Shape mode"
+      value={shapeMode}
+      onChange={setShapeMode}
+      options={[
+        { value: "outline", label: "Outline" },
+        { value: "fill", label: "Fill" },
+      ]}
+    />
   );
 }

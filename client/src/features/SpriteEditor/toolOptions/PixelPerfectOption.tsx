@@ -1,3 +1,4 @@
+import Switch from "../../../components/Switch";
 import { usePixelPerfect } from "../contexts/PixelPerfectContext/usePixelPerfect";
 
 /**
@@ -8,21 +9,12 @@ import { usePixelPerfect } from "../contexts/PixelPerfectContext/usePixelPerfect
 export default function PixelPerfectOption() {
   const { pixelPerfect, setPixelPerfect } = usePixelPerfect();
   return (
-    <button
-      type="button"
-      onClick={() => setPixelPerfect((v) => !v)}
-      aria-pressed={pixelPerfect}
-      className={`flex items-center gap-2 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
-        pixelPerfect
-          ? "bg-accent text-on-accent"
-          : "text-ink-muted hover:bg-surface-hover"
-      }`}>
-      <span
-        className={`inline-block h-3 w-3 rounded-sm border ${
-          pixelPerfect ? "border-on-accent bg-on-accent" : "border-line"
-        }`}
-      />
-      Pixel-perfect
-    </button>
+    <Switch
+      label="Pixel-perfect"
+      labelClassName="text-xs text-ink-subtle"
+      checked={pixelPerfect}
+      onChange={setPixelPerfect}
+      title="Removes L-shaped corner pixels on diagonal strokes (brush size 1)."
+    />
   );
 }
