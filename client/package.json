@@ -7,6 +7,7 @@
     "css:build": "tailwindcss -c ./tailwind.config.js -i ./src/tailwind.src.css -o ./src/tailwind.gen.css --minify",
     "css:dev": "tailwindcss -c ./tailwind.config.js -i ./src/tailwind.src.css -o ./src/tailwind.gen.css --watch",
     "dev": "bun run css:build && (bun run css:dev & bun run dev-server.ts)",
+    "dev:serve": "bun run dev-server.ts",
     "build": "bun run css:build && tsc -b && bun run ./build.ts && cp -R public/* dist/",
     "lint": "eslint .",
     "start": "serve -s dist"
