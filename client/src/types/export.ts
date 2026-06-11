@@ -76,11 +76,18 @@ export const ALL_AI_MODELS = [{ name: "GPTImage1-5", model: AiModel.GPTImage1 }]
 // OPENAI quality catalog (OpenAIQuality enum from shared)
 // =============================================================================
 
-/** OpenAI quality options with display names */
+/** OpenAI quality options with display names and their (display-only) token cost.
+ *  `tokenCost` is UI-only — there is no real token economy yet (ADR-0006); High
+ *  is priced higher because it costs significantly more to generate. */
 export const ALL_OPENAI_QUALITYS = [
-  { name: "Low", quality: OpenAIQuality.Low },
-  { name: "Medium", quality: OpenAIQuality.Medium },
+  { name: "Low", quality: OpenAIQuality.Low, tokenCost: 1 },
+  { name: "Medium", quality: OpenAIQuality.Medium, tokenCost: 1 },
+  { name: "High", quality: OpenAIQuality.High, tokenCost: 3 },
 ];
+
+/** Display-only token cost for a quality (defaults to 1 if unknown). */
+export const getQualityTokenCost = (quality: OpenAIQuality): number =>
+  ALL_OPENAI_QUALITYS.find((q) => q.quality === quality)?.tokenCost ?? 1;
 
 // =============================================================================
 // GENERATION METHODS (UI-only)

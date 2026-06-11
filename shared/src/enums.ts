@@ -18,5 +18,6 @@ export const AssetTypeSchema = z.enum(AssetType);
 export enum OpenAIQuality {
   Low = "low",
   Medium = "medium",
+  High = "high",
 }
 export const OpenAIQualitySchema = z.enum(OpenAIQuality);
