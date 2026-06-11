@@ -205,7 +205,7 @@ export const useMouseHandler = () => {
       // (move over the selection, crosshair elsewhere). Gestures themselves
       // run on window listeners owned by useSelectTool.
       if (tool === EditorTools.Select) {
-        updateHoverCursor(coordinates);
+        updateHoverCursor(e);
         updateMousePosition(coordinates);
         return;
       }

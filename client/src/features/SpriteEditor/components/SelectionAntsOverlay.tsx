@@ -3,6 +3,11 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useSelection } from "../contexts/SelectionContext/useSelection";
 import { buildMaskOutline } from "../libs/selectionOutline";
+import {
+  HANDLE_IDS,
+  boundsToRect,
+  handlePosition,
+} from "../libs/selectionHitTest";
 
 interface Props {
   width: number;
@@ -17,6 +22,8 @@ interface Props {
 const ANTS_TICK_MS = 100;
 /** Dash length in CSS px — converted to device px and sprite units at draw. */
 const DASH_CSS_PX = 4;
+/** Resize-handle square size, in CSS px (drawn at screen-constant size). */
+const HANDLE_CSS_PX = 8;
 
 /**
  * Marching-ants overlay. Like GridOverlay it fills the stage at device
@@ -28,7 +35,8 @@ const DASH_CSS_PX = 4;
  */
 const SelectionAntsOverlay = ({ width, height, offset, zoom }: Props) => {
   const { canvasRef } = useCanvas();
-  const { phase, mask, draft, floating, floatingPixels } = useSelection();
+  const { phase, mask, draft, floating, floatingPixels, bounds } =
+    useSelection();
   const antsRef = useRef<HTMLCanvasElement>(null);
   const tickRef = useRef(0);
 
@@ -113,7 +121,41 @@ const SelectionAntsOverlay = ({ width, height, offset, zoom }: Props) => {
     ctx.lineDashOffset = -((tickRef.current % 8) / 4) * dash;
     ctx.stroke(path);
     ctx.restore();
-  }, [canvasRef, width, height, draftPath, maskOutline, floatingOutline, floating]);
+
+    // Resize handles — screen-space squares at the bounds corners + edge
+    // midpoints, drawn only for a settled selection/float (not mid-draw).
+    if (!draftPath && bounds) {
+      const cellY = (mr.height * dpr) / height;
+      const rect = boundsToRect(bounds);
+      const size = HANDLE_CSS_PX * dpr;
+      const accent =
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--accent")
+          .trim() || "#4f46e5";
+      ctx.setLineDash([]);
+      ctx.lineWidth = Math.max(1, 1.5 * dpr);
+      for (const id of HANDLE_IDS) {
+        const pos = handlePosition(rect, id);
+        const cx = left + pos.x * cell;
+        const cy = top + pos.y * cellY;
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = accent;
+        ctx.beginPath();
+        ctx.rect(cx - size / 2, cy - size / 2, size, size);
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+  }, [
+    canvasRef,
+    width,
+    height,
+    draftPath,
+    maskOutline,
+    floatingOutline,
+    floating,
+    bounds,
+  ]);
 
   // Redraw on selection, pan, and zoom changes (geometry is re-measured).
   useEffect(() => {

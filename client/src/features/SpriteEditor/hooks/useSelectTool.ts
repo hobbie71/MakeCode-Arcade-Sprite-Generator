@@ -9,9 +9,19 @@ import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected
 import { EditorTools } from "../../../types/tools";
 
 // Lib imports
-import { getCanvasCoordinates } from "../libs/getCanvasCoordinates";
+import {
+  getCanvasCoordinates,
+  getCanvasPointFloat,
+} from "../libs/getCanvasCoordinates";
 import { maskFromRect, maskGet } from "../libs/selectionMask";
 import type { MaskCombineMode } from "../libs/selectionMask";
+import {
+  boundsToRect,
+  computeResizeRect,
+  handleCursor,
+  hitTestHandle,
+} from "../libs/selectionHitTest";
+import type { GridRect, HandleId } from "../libs/selectionHitTest";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
@@ -32,6 +42,13 @@ type SelectGesture =
       kind: "move";
       grabDX: number;
       grabDY: number;
+    }
+  | {
+      kind: "resize";
+      handle: HandleId;
+      startRect: GridRect;
+      startFlipX: boolean;
+      startFlipY: boolean;
     };
 
 /**
@@ -49,12 +66,14 @@ export const useSelectTool = () => {
   const {
     floating,
     mask,
+    bounds,
     beginDraft,
     updateDraft,
     commitDraftAsMask,
     clearSelection,
     liftSelection,
     setFloatingPosition,
+    setFloatingTransform,
     commitFloating,
   } = useSelection();
 
@@ -96,14 +115,27 @@ export const useSelectTool = () => {
     [floating, mask]
   );
 
-  /** Hover feedback: "move" over the selection, crosshair elsewhere. */
+  /**
+   * Hover feedback: directional arrows over a resize handle, "move" inside the
+   * selection, crosshair elsewhere. Uses the same float-coordinate hit test as
+   * the gesture so the cursor matches what a press would do.
+   */
   const updateHoverCursor = useCallback(
-    (p: Coordinates) => {
+    (e: React.MouseEvent) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
+      const fp = getCanvasPointFloat(canvas, e, zoomRef.current);
+      const handle = bounds
+        ? hitTestHandle(fp, boundsToRect(bounds), zoomRef.current)
+        : null;
+      if (handle) {
+        canvas.style.cursor = handleCursor(handle);
+        return;
+      }
+      const p = getCanvasCoordinates(canvas, e, zoomRef.current);
       canvas.style.cursor = isInsideSelection(p) ? "move" : "crosshair";
     },
-    [canvasRef, isInsideSelection]
+    [canvasRef, bounds, isInsideSelection]
   );
 
   const handlePointerDown = useCallback(
@@ -114,6 +146,7 @@ export const useSelectTool = () => {
       if (gestureRef.current) return;
 
       const start = getCanvasCoordinates(canvas, e, zoomRef.current);
+      const startFloat = getCanvasPointFloat(canvas, e, zoomRef.current);
       const inBounds =
         start.x >= 0 && start.y >= 0 && start.x < width && start.y < height;
       const combine: MaskCombineMode = e.shiftKey
@@ -123,22 +156,12 @@ export const useSelectTool = () => {
           : "replace";
       const plainPress = combine === "replace";
 
-      // Click on the stage outside the sprite: anchor a float / deselect.
-      if (!inBounds) {
-        if (floating) commitFloating();
-        clearSelection();
-        return;
-      }
-
-      const cleanup = () => {
-        removeListenersRef.current?.();
-      };
       const install = (
         onMove: (ev: MouseEvent) => void,
         onUp: (ev: MouseEvent) => void
       ) => {
         const up = (ev: MouseEvent) => {
-          cleanup();
+          removeListenersRef.current?.();
           onUp(ev);
         };
         window.addEventListener("mousemove", onMove);
@@ -149,6 +172,56 @@ export const useSelectTool = () => {
           removeListenersRef.current = null;
         };
       };
+
+      // A resize handle takes priority over everything (incl. modifiers, which
+      // mean aspect-lock here, not add/subtract). Lift lazily, then drag the
+      // grabbed edge; flips come from the signed-rect math.
+      const handle = bounds
+        ? hitTestHandle(startFloat, boundsToRect(bounds), zoomRef.current)
+        : null;
+      if (handle) {
+        const startFlipX = floating?.flipX ?? false;
+        const startFlipY = floating?.flipY ?? false;
+        const rect = liftSelection();
+        if (!rect) return;
+        gestureRef.current = {
+          kind: "resize",
+          handle,
+          startRect: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+          startFlipX,
+          startFlipY,
+        };
+        install(
+          (ev) => {
+            const g = gestureRef.current;
+            if (g?.kind !== "resize") return;
+            const fp = getCanvasPointFloat(canvas, ev, zoomRef.current);
+            const res = computeResizeRect(
+              g.startRect,
+              g.handle,
+              fp,
+              g.startFlipX,
+              g.startFlipY,
+              ev.shiftKey,
+              width,
+              height
+            );
+            setFloatingTransform(res.rect, res.flipX, res.flipY);
+          },
+          () => {
+            gestureRef.current = null;
+          }
+        );
+        return;
+      }
+
+      // Click on the stage outside the sprite (and off any handle): anchor a
+      // float / deselect.
+      if (!inBounds) {
+        if (floating) commitFloating();
+        clearSelection();
+        return;
+      }
 
       // Plain press inside the selection: move it (lifting lazily first).
       if (plainPress && isInsideSelection(start)) {
@@ -233,9 +306,11 @@ export const useSelectTool = () => {
       width,
       height,
       floating,
+      bounds,
       isInsideSelection,
       liftSelection,
       setFloatingPosition,
+      setFloatingTransform,
       commitFloating,
       beginDraft,
       updateDraft,

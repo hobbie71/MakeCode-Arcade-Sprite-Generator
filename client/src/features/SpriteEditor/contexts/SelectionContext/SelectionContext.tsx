@@ -27,6 +27,11 @@ import type {
   MaskCombineMode,
   SelectionMask,
 } from "../../libs/selectionMask";
+import {
+  deriveFloatingPixels,
+  rotateData90,
+  rotateMask90,
+} from "../../libs/selectionTransform";
 import { setSelectionInterruptListener } from "../../libs/selectionInterrupt";
 
 /**
@@ -91,6 +96,12 @@ type SelectionContextType = {
    */
   liftSelection: () => FloatRect | null;
   setFloatingPosition: (x: number, y: number) => void;
+  /** Resize the float: rect + flip flags (handle drags). */
+  setFloatingTransform: (rect: FloatRect, flipX: boolean, flipY: boolean) => void;
+  /** Flip / rotate the float in place; lifts first if only selected. */
+  flipHorizontal: () => void;
+  flipVertical: () => void;
+  rotate90: () => void;
   /** Merge the float into the sprite where it sits; ONE history entry. */
   commitFloating: () => void;
   /** Esc: restore the lifted pixels to their origin; no history entry. */
@@ -137,13 +148,20 @@ export const SelectionProvider = ({
         ? "selected"
         : "idle";
 
-  const floatingPixels = useMemo(
-    () =>
-      floating
-        ? { data: floating.basisData, mask: floating.basisMask }
-        : null,
-    [floating]
-  );
+  // Render pixels are always re-derived from the basis at the current rect
+  // size + flips — never from a previous render — so repeated resizes don't
+  // compound. A 1:1 unflipped float derives to a copy of the basis.
+  const floatingPixels = useMemo(() => {
+    if (!floating) return null;
+    return deriveFloatingPixels(
+      floating.basisData,
+      floating.basisMask,
+      floating.rect.w,
+      floating.rect.h,
+      floating.flipX,
+      floating.flipY
+    );
+  }, [floating]);
 
   const bounds = useMemo<MaskBounds | null>(() => {
     if (floating) {
@@ -232,6 +250,50 @@ export const SelectionProvider = ({
       prev ? { ...prev, rect: { ...prev.rect, x, y } } : prev
     );
   }, []);
+
+  const setFloatingTransform = useCallback(
+    (rect: FloatRect, flipX: boolean, flipY: boolean) => {
+      setFloating((prev) => (prev ? { ...prev, rect, flipX, flipY } : prev));
+    },
+    []
+  );
+
+  // Flip H/V toggle the derive flags (cheap, composes with any resize); a
+  // selection lifts lazily first. liftSelection's setFloating and the toggle
+  // below are functional updates, so they compose in order within one batch.
+  const flipHorizontal = useCallback(() => {
+    if (!floating && !liftSelection()) return;
+    setFloating((prev) => (prev ? { ...prev, flipX: !prev.flipX } : prev));
+  }, [floating, liftSelection]);
+
+  const flipVertical = useCallback(() => {
+    if (!floating && !liftSelection()) return;
+    setFloating((prev) => (prev ? { ...prev, flipY: !prev.flipY } : prev));
+  }, [floating, liftSelection]);
+
+  // Rotate folds into the basis (a 90° turn isn't expressible as a flip) and
+  // swaps the rect's w/h around its center so the turn pivots in place.
+  const rotate90 = useCallback(() => {
+    if (!floating && !liftSelection()) return;
+    setFloating((prev) => {
+      if (!prev) return prev;
+      const cx = prev.rect.x + prev.rect.w / 2;
+      const cy = prev.rect.y + prev.rect.h / 2;
+      const newW = prev.rect.h;
+      const newH = prev.rect.w;
+      return {
+        ...prev,
+        basisData: rotateData90(prev.basisData),
+        basisMask: rotateMask90(prev.basisMask),
+        rect: {
+          x: Math.round(cx - newW / 2),
+          y: Math.round(cy - newH / 2),
+          w: newW,
+          h: newH,
+        },
+      };
+    });
+  }, [floating, liftSelection]);
 
   const commitFloating = useCallback(() => {
     if (!floating || !floatingPixels) return;
@@ -386,6 +448,10 @@ export const SelectionProvider = ({
       clearSelection,
       liftSelection,
       setFloatingPosition,
+      setFloatingTransform,
+      flipHorizontal,
+      flipVertical,
+      rotate90,
       commitFloating,
       cancelFloating,
       deleteSelection,
@@ -404,6 +470,10 @@ export const SelectionProvider = ({
       clearSelection,
       liftSelection,
       setFloatingPosition,
+      setFloatingTransform,
+      flipHorizontal,
+      flipVertical,
+      rotate90,
       commitFloating,
       cancelFloating,
       deleteSelection,

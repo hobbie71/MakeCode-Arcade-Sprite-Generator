@@ -4,6 +4,7 @@ import StrokeSizeOption from "./StrokeSizeOption";
 import ShapeModeOption from "./ShapeModeOption";
 import FillModeOption from "./FillModeOption";
 import PixelPerfectOption from "./PixelPerfectOption";
+import SelectionActionsOption from "./SelectionActionsOption";
 
 export type ToolOptionDescriptor = {
   id: string;
@@ -12,8 +13,8 @@ export type ToolOptionDescriptor = {
 
 /**
  * Which contextual options each tool exposes in the ToolOptionsStrip. Adding an
- * option to a tool is one line here + one option component. Tools not listed
- * (Select, Pan) show no options.
+ * option to a tool is one line here + one option component. Pan shows no
+ * options; Select's mode picker is added in a later phase.
  */
 export const TOOL_OPTIONS_REGISTRY: Partial<
   Record<EditorTools, ToolOptionDescriptor[]>
@@ -33,4 +34,7 @@ export const TOOL_OPTIONS_REGISTRY: Partial<
     { id: "shape", Component: ShapeModeOption },
   ],
   [EditorTools.Fill]: [{ id: "fill-mode", Component: FillModeOption }],
+  [EditorTools.Select]: [
+    { id: "selection-actions", Component: SelectionActionsOption },
+  ],
 };
