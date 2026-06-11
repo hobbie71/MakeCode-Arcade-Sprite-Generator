@@ -1,5 +1,6 @@
 import type { Coordinates } from "../../../types/pixel";
 import type { MakeCodeColor } from "../../../types/color";
+import { getLineCoordinates } from "./getShapeCoordinates";
 
 /**
  * A selection as a whole-canvas 1-bit mask (row-major, 1 = selected). Every
@@ -121,6 +122,71 @@ export const maskFromFlood = (
  * Combine an incoming tool-produced mask with the existing selection.
  * "replace" ignores the base; "add"/"subtract" are the Shift/Alt drag modes.
  */
+/**
+ * Mask from a freehand/lasso path (a list of sampled pixel points). The outline
+ * is densified with Bresenham and closed back to the start, rasterized into a
+ * 1px-padded scratch grid; the exterior is flood-filled from the padded corner
+ * and inverted, then the outline is OR'd back in. This is robust to
+ * self-intersecting scribbles (where scanline even-odd fill misbehaves) and
+ * reuses the same flood shape as the wand. A degenerate path (one cell) selects
+ * just that cell.
+ */
+export const maskFromLassoPath = (
+  width: number,
+  height: number,
+  path: Coordinates[]
+): SelectionMask => {
+  const mask = createMask(width, height);
+  if (path.length === 0) return mask;
+
+  // Outline pixels: densify between consecutive samples + close the loop.
+  const outline: Coordinates[] = [];
+  for (let i = 0; i < path.length; i++) {
+    const a = path[i];
+    const b = path[(i + 1) % path.length];
+    const seg = getLineCoordinates(a, b);
+    // Drop the duplicated segment endpoint shared with the next segment's start.
+    for (let j = 0; j < seg.length - 1; j++) outline.push(seg[j]);
+  }
+
+  // Stamp outline into the selection (clamped) and into a padded scratch grid
+  // (pw×ph, offset by +1) so the exterior wraps fully around the shape.
+  const pw = width + 2;
+  const ph = height + 2;
+  const isOutline = new Uint8Array(pw * ph);
+  for (const p of outline) {
+    if (p.x >= 0 && p.y >= 0 && p.x < width && p.y < height) {
+      mask.bits[p.y * width + p.x] = 1;
+    }
+    const sx = p.x + 1;
+    const sy = p.y + 1;
+    if (sx >= 0 && sy >= 0 && sx < pw && sy < ph) isOutline[sy * pw + sx] = 1;
+  }
+
+  // Flood the exterior from the padded corner (always outside the outline).
+  const outside = new Uint8Array(pw * ph);
+  const stack: number[] = [0];
+  while (stack.length > 0) {
+    const idx = stack.pop()!;
+    if (outside[idx] || isOutline[idx]) continue;
+    outside[idx] = 1;
+    const x = idx % pw;
+    const y = (idx - x) / pw;
+    if (x + 1 < pw) stack.push(idx + 1);
+    if (x - 1 >= 0) stack.push(idx - 1);
+    if (y + 1 < ph) stack.push(idx + pw);
+    if (y - 1 >= 0) stack.push(idx - pw);
+  }
+
+  // Interior = not exterior. Map padded scratch back to canvas coords.
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (!outside[(y + 1) * pw + (x + 1)]) mask.bits[y * width + x] = 1;
+    }
+  }
+  return mask;
+};
+
 export const combineMasks = (
   base: SelectionMask | null,
   incoming: SelectionMask,

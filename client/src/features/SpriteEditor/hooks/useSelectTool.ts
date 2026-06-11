@@ -15,8 +15,14 @@ import {
   getCanvasCoordinates,
   getCanvasPointFloat,
 } from "../libs/getCanvasCoordinates";
-import { maskFromFlood, maskFromRect, maskGet } from "../libs/selectionMask";
+import {
+  maskFromFlood,
+  maskFromLassoPath,
+  maskFromRect,
+  maskGet,
+} from "../libs/selectionMask";
 import type { MaskCombineMode } from "../libs/selectionMask";
+import { getLineCoordinates } from "../libs/getShapeCoordinates";
 import {
   boundsToRect,
   computeResizeRect,
@@ -51,6 +57,14 @@ type SelectGesture =
       startRect: GridRect;
       startFlipX: boolean;
       startFlipY: boolean;
+    }
+  | {
+      kind: "draw-lasso";
+      combine: MaskCombineMode;
+      path: Coordinates[];
+      startClientX: number;
+      startClientY: number;
+      dragged: boolean;
     };
 
 /**
@@ -260,6 +274,58 @@ export const useSelectTool = () => {
         commitDraftAsMask(
           maskFromFlood(spriteData, width, height, start, wandContiguous),
           combine
+        );
+        return;
+      }
+
+      // Lasso mode: trace a freehand path, Bresenham-filling gaps between
+      // samples; the closed polygon rasterizes to a mask on release.
+      if (mode === "lasso") {
+        gestureRef.current = {
+          kind: "draw-lasso",
+          combine,
+          path: [start],
+          startClientX: e.clientX,
+          startClientY: e.clientY,
+          dragged: false,
+        };
+        install(
+          (ev) => {
+            const g = gestureRef.current;
+            if (g?.kind !== "draw-lasso") return;
+            if (!g.dragged) {
+              const moved = Math.max(
+                Math.abs(ev.clientX - g.startClientX),
+                Math.abs(ev.clientY - g.startClientY)
+              );
+              if (moved <= DRAG_THRESHOLD_PX) return;
+              g.dragged = true;
+              beginDraft({ kind: "lasso", path: g.path });
+            }
+            const p = clampToCanvas(
+              getCanvasCoordinates(canvas, ev, zoomRef.current)
+            );
+            const last = g.path[g.path.length - 1];
+            if (last.x === p.x && last.y === p.y) return;
+            // Fill the gap so fast drags don't leave a broken outline.
+            const seg = getLineCoordinates(last, p);
+            for (let i = 1; i < seg.length; i++) g.path.push(seg[i]);
+            updateDraft({ kind: "lasso", path: [...g.path] });
+          },
+          () => {
+            const g = gestureRef.current;
+            gestureRef.current = null;
+            if (g?.kind !== "draw-lasso") return;
+            // A plain click (no drag) deselects.
+            if (!g.dragged) {
+              clearSelection();
+              return;
+            }
+            commitDraftAsMask(
+              maskFromLassoPath(width, height, g.path),
+              g.combine
+            );
+          }
         );
         return;
       }

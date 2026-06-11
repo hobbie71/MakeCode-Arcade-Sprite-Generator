@@ -11,8 +11,8 @@ import { ALL_EDITOR_TOOLS, EditorTools } from "../../../../types/tools";
 import { type KeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
 import type { SelectionMode } from "../../contexts/SelectOptionsContext/SelectOptionsContext";
 
-/** Order the S shortcut cycles through (lasso is appended in the lasso phase). */
-const SELECTION_MODE_CYCLE: SelectionMode[] = ["rectangle", "wand"];
+/** Order the S shortcut cycles through. */
+const SELECTION_MODE_CYCLE: SelectionMode[] = ["rectangle", "wand", "lasso"];
 
 const ToolIcons = () => {
   const { tool, setTool } = useToolSelected();

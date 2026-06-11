@@ -20,7 +20,7 @@ export default function SelectModeOption() {
       options={[
         { value: "rectangle", label: "Rect" },
         { value: "wand", label: "Wand" },
-        // Lasso is added in the lasso phase.
+        { value: "lasso", label: "Lasso" },
       ]}
     />
   );
