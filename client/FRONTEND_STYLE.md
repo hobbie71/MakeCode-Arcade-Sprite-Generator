@@ -71,9 +71,28 @@ Ships light only, but is fully wired: set `document.documentElement.dataset.them
 ## Shared component classes
 
 `src/tailwind.src.css` defines reusable `@layer components` classes (`heading-*`,
-`btn`/`btn-primary`/`btn-secondary`/`btn-danger`, `card*`, `form-*`, `tab-*`,
-`tool-button`, `color-swatch`, …), all built on the tokens above. Prefer composing
-these (or raw token utilities) over ad-hoc styling.
+`btn`/`btn-primary`/`btn-secondary`/`btn-danger`/`btn-success`/`btn-outline`/`btn-chip`,
+`icon-btn*`, `card*`, `form-*`, `tab-*`, `color-swatch`, …), all built on the tokens
+above. Prefer composing these (or raw token utilities) over ad-hoc styling.
+
+### Buttons (enforced)
+
+Every clickable button comes from a shared component — **raw `<button>` JSX is
+banned by ESLint** (`no-restricted-syntax`) and fails `bun run lint`:
+
+- `src/components/Button.tsx` — text buttons. `variant`:
+  `primary | secondary | danger | success | outline | chip`; `size`: `sm | md | lg`;
+  `pressed` for chip toggles (renders `aria-pressed` + the `.active` accent-soft
+  treatment). Pill / floating / token buttons are just `Button` usages.
+- `src/components/IconButton.tsx` — ghost square icon button. `size`: `md` (32px) /
+  `sm` (compact); optional `pressed` for the accent fill (tool rail, grid toggle);
+  `aria-label` is required.
+- `src/components/Backdrop.tsx` — keyboard-dismissable scrim for sheets/popovers.
+
+A raw `<button>` is allowed **only** in those three components and in the semantic
+controls that own bespoke ARIA/keyboard behavior — `Switch`, `SegmentedControl`,
+`DefaultDropDown`, `PopoverMenu`, `ColorIcon` (the lint allowlist in
+`eslint.config.js`). Everywhere else, use the components above.
 
 The whole client is on the semantic token system — there are no legacy color
 aliases. Every component reads colors/shadows/radii/fonts from the tokens above.
