@@ -1,43 +1,31 @@
+// Component imports
+import DefaultDropDown from "../../../components/DefaultDropDown";
+
 // Context imports
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useLoading } from "../../../context/LoadingContext/useLoading";
 
-// Type import
-import { ALL_PALETTES } from "../../../types/color";
-import type { MakeCodePalette } from "../../../types/color";
+// Type import — palette catalog pre-decorated with swatch previews.
+import { PALETTE_OPTIONS } from "../../../types/color";
 
 const PaletteSelection = () => {
   const { palette, setPalette } = usePaletteSelected();
   const { isGenerating } = useLoading();
 
-  const getPaletteFromIndex = (index: number): MakeCodePalette => {
-    return ALL_PALETTES[index].palette;
-  };
+  const selectedIndex = Math.max(
+    0,
+    PALETTE_OPTIONS.findIndex((option) => option.palette === palette)
+  );
 
   return (
-    <div className="form-group flex flex-row justify-between">
-      <p className="form-label" id="palette-selection-label">
-        Palette:
-      </p>
-      <div>
-        <select
-          className={`form-select ${isGenerating ? "opacity-50 cursor-not-allowed" : ""}`}
-          value={ALL_PALETTES.findIndex((pal) => pal.palette === palette)}
-          onChange={(e) =>
-            setPalette(getPaletteFromIndex(parseInt(e.target.value)))
-          }
-          disabled={isGenerating}
-          aria-labelledby="palette-selection-label"
-          aria-describedby="palette-selection-description">
-          {ALL_PALETTES.map((pal, index) => (
-            <option key={pal.name} value={index}>
-              {pal.name}
-            </option>
-          ))}
-        </select>
-        {/* TODO: Create Custom Palette Button */}
-      </div>
-    </div>
+    <DefaultDropDown
+      options={PALETTE_OPTIONS}
+      value={selectedIndex}
+      onChange={(index) => setPalette(PALETTE_OPTIONS[index].palette)}
+      disabled={isGenerating}>
+      Palette
+    </DefaultDropDown>
+    /* TODO: Create Custom Palette Button */
   );
 };
 

@@ -115,10 +115,11 @@ const SizeInput = ({ type, fixedSize, disabled = false }: Props) => {
   return (
     <input
       ref={inputRef}
-      className={`form-input input-no-arrows min-w-24 text-center ${
+      className={`form-input input-no-arrows w-full px-3 py-2 text-left font-medium ${
         fixedSize || disabled ? "opacity-50 cursor-not-allowed" : ""
       }`}
       type="number"
+      aria-label={type === "width" ? "Width" : "Height"}
       maxLength={3}
       onInput={handleInput}
       onDoubleClick={() =>

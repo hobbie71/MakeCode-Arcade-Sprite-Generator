@@ -36,17 +36,20 @@ const SizeInputs = ({ fixedSize, disabled = false }: Props) => {
   }, [fixedSize, setWidth, setHeight]);
 
   return (
-    <div className="form-group responsive-flex mb-0">
-      <div className="form-group">
-        <label className="form-label">Width</label>
+    // Width × Height side by side, no per-input labels (a single "Size" label
+    // sits above this group). Inputs flex to share the column and can shrink.
+    <div className="flex items-center gap-2">
+      <div className="min-w-0 flex-1">
         {fixedSize ? (
           <SizeInput type="width" fixedSize={fixedSize.x} />
         ) : (
           <SizeInput type="width" disabled={disabled} />
         )}
       </div>
-      <div className="form-group">
-        <label className="form-label">Height</label>
+      <span className="text-ink-subtle" aria-hidden="true">
+        ×
+      </span>
+      <div className="min-w-0 flex-1">
         {fixedSize ? (
           <SizeInput type="height" fixedSize={fixedSize.y} />
         ) : (
