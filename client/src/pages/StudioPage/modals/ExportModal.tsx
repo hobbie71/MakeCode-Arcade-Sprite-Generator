@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import Modal from "../../../components/Modal/Modal";
 import Button from "../../../components/Button";
 import { useExportSpriteData } from "../../../features/SpriteEditor/hooks/useExportSpriteData";
+import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { ImageExportFormats } from "../../../types/export";
 import { OS } from "../../../utils/getOS";
 
@@ -12,17 +13,21 @@ interface Props {
 
 const command = OS === "mac" ? "Cmd" : "Ctrl";
 
-const PASTE_STEPS = [
-  "Copy the sprite with the button above.",
-  "Open your sprite's image editor in MakeCode Arcade.",
-  `Click the canvas and press ${command} + V to paste.`,
-];
-
 export default function ExportModal({ isOpen, onClose }: Props) {
   const { getImgCode, getSpriteDataUrl, exportSpriteToImage } =
     useExportSpriteData();
+  const { width, height } = useCanvasSize();
 
   const [copied, setCopied] = useState(false);
+
+  // Paste walkthrough — step 3 names the live sprite size so the user resizes the
+  // Arcade canvas to match before pasting.
+  const pasteSteps = [
+    "Copy the sprite with the button above.",
+    "Open your sprite's image editor in MakeCode Arcade.",
+    `Resize the canvas to ${width} × ${height}.`,
+    `Click the canvas and press ${command} + V to paste.`,
+  ];
 
   // Only render the sprite to a data URL while the modal is open.
   const previewUrl = useMemo(
@@ -46,18 +51,15 @@ export default function ExportModal({ isOpen, onClose }: Props) {
       onClose={onClose}
       size="lg"
       title="Export sprite"
-      subtitle="Paste straight into MakeCode Arcade, or download an image."
-      footer={
-        <Button variant="secondary" onClick={onClose}>
-          Done
-        </Button>
-      }>
-      {/* Primary: Copy for MakeCode */}
-      <div className="rounded-card border border-accent-border bg-accent-soft p-4">
-        <span className="text-2xs font-semibold uppercase tracking-wide text-accent">
-          ✦ Recommended
-        </span>
-        <div className="mt-2 flex items-center gap-4">
+      subtitle="Paste straight into MakeCode Arcade, or download an image.">
+      {/* Primary: Copy for MakeCode — flips to a success treatment once copied */}
+      <div
+        className={`rounded-card border p-4 transition-colors ${
+          copied
+            ? "border-success bg-success-soft"
+            : "border-accent-border bg-accent-soft"
+        }`}>
+        <div className="flex items-center gap-3 sm:gap-4">
           <div className="transparent shrink-0 rounded-md border border-line p-1">
             {previewUrl && (
               <img
@@ -65,30 +67,48 @@ export default function ExportModal({ isOpen, onClose }: Props) {
                 alt="Your sprite"
                 width={56}
                 height={56}
-                className="h-14 w-14"
+                className="h-12 w-12 sm:h-14 sm:w-14"
                 style={{ imageRendering: "pixelated" }}
               />
             )}
           </div>
-          <div className="min-w-0">
-            <h3 className="text-base font-semibold text-ink">
-              Copy for MakeCode
-            </h3>
-            <p className="text-sm text-ink-muted">
-              Copies the sprite as a MakeCode <code>img</code> literal — paste it
-              into the Arcade editor.
-            </p>
+          {/* Stacks vertically on phones; splits into text | size from sm up */}
+          <div className="flex min-w-0 flex-1 flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+            {/* Title + description */}
+            <div className="min-w-0">
+              <h3 className="text-base font-semibold text-ink">
+                Copy for MakeCode
+              </h3>
+              <p className="mt-2 text-sm text-ink-muted">
+                Copies the sprite as a MakeCode <code>img</code> literal.
+              </p>
+              <p className="mt-1 text-sm text-ink-muted">
+                Paste directly into MakeCode sprite editor.
+              </p>
+            </div>
+            {/* Sprite dimensions — inline row on phones, label-above-pill from sm up */}
+            <div className="flex shrink-0 items-center justify-between gap-2 sm:flex-col sm:items-end sm:gap-1.5">
+              <span className="text-2xs font-semibold uppercase tracking-wide text-ink-subtle">
+                Sprite size
+              </span>
+              <span
+                className={`rounded-full px-3 py-1 text-sm font-bold text-on-accent transition-colors ${
+                  copied ? "bg-success" : "bg-accent"
+                }`}>
+                {width} × {height}
+              </span>
+            </div>
           </div>
         </div>
         <Button
-          variant="primary"
+          variant={copied ? "success" : "primary"}
           onClick={copyForMakeCode}
-          className="mt-4 w-full">
-          {copied ? "Copied!" : "⧉ Copy for MakeCode"}
+          className="mt-4 w-full active:!translate-y-0">
+          {copied ? "✓ Copied!" : "⧉ Copy for MakeCode"}
         </Button>
       </div>
 
-      {/* How to paste */}
+      {/* How to paste — demo video + written steps */}
       <div className="mt-5">
         <h4 className="flex items-center gap-1.5 text-sm font-semibold text-ink">
           <span aria-hidden className="text-ink-subtle">
@@ -96,36 +116,33 @@ export default function ExportModal({ isOpen, onClose }: Props) {
           </span>
           How to paste into MakeCode Arcade
         </h4>
-        <div className="mt-2 grid items-start gap-4 sm:grid-cols-[1fr_auto]">
-          <ol className="space-y-2">
-            {PASTE_STEPS.map((step, i) => (
-              <li key={i} className="flex gap-3 text-sm text-ink-muted">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-soft-2 text-2xs font-semibold text-accent">
-                  {i + 1}
-                </span>
-                {step}
-              </li>
-            ))}
-          </ol>
-          {/* Paste-demo placeholder (desktop only — decorative, matches mockup). */}
-          <div
-            aria-hidden
-            className="hidden h-32 w-40 flex-col items-center justify-center gap-1 rounded-card border border-dashed border-line bg-surface text-ink-subtle sm:flex">
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <span className="text-2xs">Drop paste-demo GIF</span>
-          </div>
+
+        {/* Walkthrough video — muted autoplay loop, scales 16:9 at every breakpoint */}
+        <div className="mt-3 overflow-hidden rounded-card border border-line bg-surface">
+          <video
+            className="aspect-video w-full"
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls
+            preload="metadata"
+            aria-label="Demo: exporting your sprite into MakeCode Arcade">
+            <source src="/export-demo.webm" type="video/webm" />
+            <source src="/export-demo.mp4" type="video/mp4" />
+          </video>
         </div>
+
+        <ol className="mt-4 space-y-2">
+          {pasteSteps.map((step, i) => (
+            <li key={i} className="flex gap-3 text-sm text-ink-muted">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-soft-2 text-2xs font-semibold text-accent">
+                {i + 1}
+              </span>
+              {step}
+            </li>
+          ))}
+        </ol>
       </div>
 
       {/* Download as image */}
@@ -133,11 +150,11 @@ export default function ExportModal({ isOpen, onClose }: Props) {
         <h4 className="mb-2 text-sm font-semibold text-ink">
           Download as image
         </h4>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {Object.values(ImageExportFormats).map((format) => (
             <Button
               key={format}
-              variant="secondary"
+              variant="outline"
               onClick={() => exportSpriteToImage(format)}>
               {format.toUpperCase()}
             </Button>
