@@ -61,7 +61,11 @@ const ColorIcon = memo(({ color, palette }: Props) => {
   const hotkeyDisplay = isLetter ? `Shift+${color.toUpperCase()}` : color;
 
   return (
-    <Tooltip text={colorLabel} hotkey={hotkeyDisplay} className="block w-full">
+    <Tooltip
+      text={colorLabel}
+      hotkey={hotkeyDisplay}
+      placement="left"
+      className="w-full">
       <button
         className={`color-swatch ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
         onClick={() => setColor(color)}
