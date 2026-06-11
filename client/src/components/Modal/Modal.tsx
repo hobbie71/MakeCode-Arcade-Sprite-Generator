@@ -112,11 +112,11 @@ export default function Modal({
         ref={contentRef}
         tabIndex={-1}
         className={`relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-modal border border-line bg-surface-raised shadow-lg outline-none ${SIZE_CLASSES[size]}`}>
-        <button
-          type="button"
+        <IconButton
+          size="sm"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 rounded-md p-1 text-ink-subtle transition-colors hover:bg-surface-hover hover:text-ink">
+          className="absolute right-4 top-4 text-ink-subtle hover:text-ink">
           <svg
             className="h-5 w-5"
             fill="none"
@@ -129,7 +129,7 @@ export default function Modal({
               d="M6 18 18 6M6 6l12 12"
             />
           </svg>
-        </button>
+        </IconButton>
 
         {(title || subtitle) && (
           <div className="px-5 pr-12 pt-5 sm:px-6 sm:pr-14 sm:pt-6">

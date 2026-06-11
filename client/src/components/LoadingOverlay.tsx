@@ -2,6 +2,7 @@ import React from "react";
 import { useLoading } from "../context/LoadingContext/useLoading";
 import SquareResponiveAd from "./AdComponents/SquareResponiveAd";
 import ErrorSymbol from "./ErrorSymbol";
+import Spinner from "./Spinner";
 
 const LoadingOverlay: React.FC = () => {
   const { isGenerating, generationMessage } = useLoading();
@@ -13,7 +14,7 @@ const LoadingOverlay: React.FC = () => {
       <div className="popup-content text-center max-w-md mx-auto">
         {/* Loading Spinner */}
         <div className="mb-4">
-          <div className="animate-spin rounded-[50%] h-16 w-16 border-4 border-accent border-t-transparent mx-auto"></div>
+          <Spinner size="lg" className="mx-auto" />
         </div>
 
         {/* Loading Message */}
