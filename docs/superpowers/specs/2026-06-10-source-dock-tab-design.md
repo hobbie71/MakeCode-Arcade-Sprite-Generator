@@ -18,7 +18,7 @@ Decisions resolved during design review:
 | Old overlay | `ImportPreview` deleted outright. `importedImage` context state stays — it still feeds re-processing (`useImageFileHandler.ts` fallback) and gates a GenerationControls button. |
 | Clear button | **Dropped.** Clearing `sourceImage` would disable Resize & Process (gated on `sourceImage != null`), forcing a paid re-generation — contradicts ADR-0006's free re-processing model. |
 | Ghost z-order | Above the sprite pixels, below grid/selection overlays. (Below-sprite was rejected: Generate auto-processes, so the canvas starts fully painted and an under-ghost would be invisible.) |
-| Ghost persistence | Toggle is a workspace preference: stays on across new generations/uploads, swapping to the new source. Default off, opacity default 50%. |
+| Ghost persistence | Toggle is a workspace preference: stays on across new generations/uploads, swapping to the new source. Default off, opacity default 30%. |
 | Dock behavior | Palette remains the first/default tab. No auto-switching on generation. |
 | Re-process button | Kept in the tab (third entry point to the existing Resize & Process modal — contextual to the artifact it operates on). |
 | "Coming soon" card | Removed from `PalettePanel` (the dock now grows via real tabs). |
@@ -29,9 +29,8 @@ Decisions resolved during design review:
 
 Dock section content, top to bottom:
 
-- **Image viewer** — the source image (`<img>` from a memoized object URL) on a transparency checkerboard, rounded border per dock styling.
+- **Drag-to-compare viewer** (`SourceCompare`) — one box on the transparency checkerboard, letterboxed to the sprite's aspect: the source image (stretched to the sprite's box — the ghost's mapping) sits left of a draggable divider, the live sprite right of it. The sprite side is copied 1:1 from the editor's canvas element one frame after each committed repaint, so it always matches the editor exactly. *(Amendment 2026-06-10: replaced the original side-by-side Original/Sprite thumbnails after first use.)*
 - **Ghost controls** — "Show on canvas" toggle + opacity slider (disabled until toggled on). Reads/writes `SourceGhostContext`.
-- **Compare** — two labeled thumbnails side by side: **Original** (same object URL) and **Sprite** (live thumbnail drawn from `spriteData` + selected palette; re-renders on committed edits, undo/redo, palette swap).
 - **Actions row** — **Re-process** (calls the `onOpenResize` handler that opens the existing Resize & Process modal) and **Download** (anchor download of the source file, named from `sourceImage.name` — generated images are already `File("generated-sprite.png")`).
 - **Empty state** (when `sourceImage == null`, e.g. blank canvas or pasted sprite): short hint + "✦ Generate" button via `onOpenGenerate` (label matches the floating Generate pill).
 
@@ -57,7 +56,7 @@ Append `{ id: "source", label: "Source", content: <SourcePanel … /> }` to the 
 
 ## Data flow
 
-`ImageImportContext.sourceImage` (File) → object URL (created/revoked in an effect) → panel `<img>` and compare Original thumb; `SourceOverlay` decodes the File directly via `createImageBitmap` (no URL). Ghost state flows `SourcePanel` ↔ `SourceGhostContext` → `SourceOverlay`.
+`ImageImportContext.sourceImage` (File) → object URL (created/revoked in an effect) → the compare viewer's `<img>`; `SourceOverlay` decodes the File directly via `createImageBitmap` (no URL); the compare's sprite side copies the editor canvas element (`CanvasContext.canvasRef`) via `drawImage` in a rAF. Ghost state flows `SourcePanel` ↔ `SourceGhostContext` → `SourceOverlay`.
 
 ## Edge cases
 

@@ -6,6 +6,7 @@ import SegmentedControl from "../../../components/SegmentedControl";
 import Spinner from "../../../components/Spinner";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { usePostProcessing } from "../../../context/PostProcessingContext/usePostProcessing";
+import { useRightDock } from "../../../context/RightDockContext/useRightDock";
 import { useImageFileHandler } from "../../../features/InputSection/hooks/useImageFileHandler";
 import { useExportSpriteData } from "../../../features/SpriteEditor/hooks/useExportSpriteData";
 import { useSpriteData } from "../../../features/SpriteEditor/hooks/useSpriteData";
@@ -56,6 +57,7 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
   const { getSpriteDataUrl } = useExportSpriteData();
   const { getCurrentSpriteData } = useSpriteData();
   const { updateCanvasSize } = useCanvasResize();
+  const { setActiveSection } = useRightDock();
 
   // Seed staged state from the editor exactly once per open.
   const seededRef = useRef(false);
@@ -197,6 +199,9 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
       // Hand-drawn sprite: no source to re-process, so resample the grid.
       updateCanvasSize(stagedW, stagedH);
     }
+    // Reprocessing complete — reveal the Source panel so the just-applied source
+    // is front-and-center for tracing / comparing / re-processing.
+    setActiveSection("source");
     onClose();
   };
 
@@ -209,7 +214,7 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
       subtitle="Re-processing is deliberate — adjust, preview, then apply."
       footer={
         <>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button variant="primary" onClick={handleApply}>

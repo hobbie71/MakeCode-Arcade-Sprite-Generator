@@ -15,6 +15,10 @@ interface TooltipProps {
   placement?: TooltipPlacement;
   /** Sizing classes for the wrapper. Defaults to the 32px tool-button cap. */
   className?: string;
+  /** When true, the bubble never shows (hover is inert). Lets callers keep the
+      wrapper mounted — so a child can animate between states without remounting —
+      while suppressing a redundant tooltip (e.g. on an already-labelled tab). */
+  disabled?: boolean;
 }
 
 // Gap (px) between the trigger and the bubble.
@@ -66,6 +70,7 @@ const Tooltip = ({
   hotkey,
   placement = "right",
   className = "max-w-[32px] max-h-[32px]",
+  disabled = false,
 }: TooltipProps) => {
   // Non-null coords double as the "is showing" flag.
   const [coords, setCoords] = useState<Coords | null>(null);
@@ -76,6 +81,7 @@ const Tooltip = ({
   const showTooltip = coords !== null;
 
   const handleMouseEnter = () => {
+    if (disabled) return;
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
