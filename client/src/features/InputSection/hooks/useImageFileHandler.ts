@@ -49,6 +49,19 @@ export const useImageFileHandler = () => {
   const { setError } = useError();
 
   /**
+   * Caches a file as the imported + re-processable source WITHOUT committing it
+   * to the editor canvas. Used by the studio Generate modal, which hands the
+   * source off to Resize & Process instead of pasting immediately.
+   */
+  const stageSource = useCallback(
+    (file: File) => {
+      setImportedImage(file);
+      setSourceImage(file);
+    },
+    [setImportedImage, setSourceImage]
+  );
+
+  /**
    * Runs the image → sprite processing pipeline on a source file and returns the
    * resulting canvas WITHOUT committing it to the editor. All inputs are passed
    * explicitly (no editor-state coupling) so callers can render a preview of
@@ -151,7 +164,12 @@ export const useImageFileHandler = () => {
   /**
    * Generates an image using AI and converts it to sprite with post-processing
    */
-  const generateAIImageAndConvertToSprite = useCallback(async () => {
+  const generateAIImageAndConvertToSprite = useCallback(async (options?: {
+    commit?: boolean;
+  }) => {
+    // commit=true (default): paste the result into the editor (hero flow).
+    // commit=false: cache the source only and let Resize & Process commit it.
+    const commit = options?.commit ?? true;
     setError(null);
 
     // Validate Prompt then Generate AI Image
@@ -198,7 +216,7 @@ export const useImageFileHandler = () => {
       // Cache the original generated image so re-processing (resize) is free.
       setImportedImage(file);
       setSourceImage(file);
-      await processImageToSprite(file);
+      if (commit) await processImageToSprite(file);
     } catch (error) {
       setError("Error generating AI sprite: " + error);
       throw error;
@@ -239,6 +257,7 @@ export const useImageFileHandler = () => {
     importedImage,
     sourceImage,
     setSourceImage,
+    stageSource,
     processImageToSprite,
     processSourceToCanvas,
   };
