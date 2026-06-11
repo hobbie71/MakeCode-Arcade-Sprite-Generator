@@ -3,8 +3,10 @@ import { useCallback, useEffect, useRef } from "react";
 // Context imports
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
+import { useSprite } from "../../../context/SpriteContext/useSprite";
 import { useZoom } from "../contexts/ZoomContext/useZoom";
 import { useSelection } from "../contexts/SelectionContext/useSelection";
+import { useSelectOptions } from "../contexts/SelectOptionsContext/useSelectOptions";
 import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected";
 import { EditorTools } from "../../../types/tools";
 
@@ -13,7 +15,7 @@ import {
   getCanvasCoordinates,
   getCanvasPointFloat,
 } from "../libs/getCanvasCoordinates";
-import { maskFromRect, maskGet } from "../libs/selectionMask";
+import { maskFromFlood, maskFromRect, maskGet } from "../libs/selectionMask";
 import type { MaskCombineMode } from "../libs/selectionMask";
 import {
   boundsToRect,
@@ -63,6 +65,8 @@ export const useSelectTool = () => {
   const { zoom } = useZoom();
   const { width, height } = useCanvasSize();
   const { tool } = useToolSelected();
+  const { spriteData } = useSprite();
+  const { mode, wandContiguous } = useSelectOptions();
   const {
     floating,
     mask,
@@ -250,6 +254,16 @@ export const useSelectTool = () => {
       // Anything else starts a new selection; an active float anchors first.
       if (floating) commitFloating();
 
+      // Wand mode resolves on the click itself — no drag. The flood mask
+      // combines with the current selection via the Shift/Alt modifiers.
+      if (mode === "wand") {
+        commitDraftAsMask(
+          maskFromFlood(spriteData, width, height, start, wandContiguous),
+          combine
+        );
+        return;
+      }
+
       const gesture: SelectGesture = {
         kind: "draw-rect",
         anchor: start,
@@ -307,6 +321,9 @@ export const useSelectTool = () => {
       height,
       floating,
       bounds,
+      mode,
+      wandContiguous,
+      spriteData,
       isInsideSelection,
       liftSelection,
       setFloatingPosition,

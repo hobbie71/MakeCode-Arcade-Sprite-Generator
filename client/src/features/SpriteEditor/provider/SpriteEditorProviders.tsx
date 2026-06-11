@@ -2,6 +2,7 @@ import { ColorSelectedProvider } from "../contexts/ColorSelectedContext/ColorSel
 import { ToolSelectedProvider } from "../contexts/ToolSelectedContext/ToolSelectedContext";
 import { ZoomProvider } from "../contexts/ZoomContext/ZoomContext";
 import { SelectionProvider } from "../contexts/SelectionContext/SelectionContext";
+import { SelectOptionsProvider } from "../contexts/SelectOptionsContext/SelectOptionsContext";
 import { MouseCoordinatesProvider } from "../contexts/MouseCoordinatesContext/MouseCoordinatesContext";
 import { GridProvider } from "../contexts/GridContext/GridContext";
 import { SourceGhostProvider } from "../contexts/SourceGhostContext/SourceGhostContext";
@@ -17,6 +18,7 @@ const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
     <ColorSelectedProvider>
       <ToolSelectedProvider>
         <SelectionProvider>
+          <SelectOptionsProvider>
           <MouseCoordinatesProvider>
             <ZoomProvider>
               <GridProvider>
@@ -30,6 +32,7 @@ const SpriteEditorProvider = ({ children }: { children: React.ReactNode }) => {
               </GridProvider>
             </ZoomProvider>
           </MouseCoordinatesProvider>
+          </SelectOptionsProvider>
         </SelectionProvider>
       </ToolSelectedProvider>
     </ColorSelectedProvider>

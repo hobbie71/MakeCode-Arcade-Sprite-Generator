@@ -5,6 +5,8 @@ import ShapeModeOption from "./ShapeModeOption";
 import FillModeOption from "./FillModeOption";
 import PixelPerfectOption from "./PixelPerfectOption";
 import SelectionActionsOption from "./SelectionActionsOption";
+import SelectModeOption from "./SelectModeOption";
+import WandContiguousOption from "./WandContiguousOption";
 
 export type ToolOptionDescriptor = {
   id: string;
@@ -35,6 +37,8 @@ export const TOOL_OPTIONS_REGISTRY: Partial<
   ],
   [EditorTools.Fill]: [{ id: "fill-mode", Component: FillModeOption }],
   [EditorTools.Select]: [
+    { id: "select-mode", Component: SelectModeOption },
+    { id: "wand-contiguous", Component: WandContiguousOption },
     { id: "selection-actions", Component: SelectionActionsOption },
   ],
 };

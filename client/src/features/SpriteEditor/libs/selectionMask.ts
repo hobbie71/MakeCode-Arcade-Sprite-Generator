@@ -1,4 +1,5 @@
 import type { Coordinates } from "../../../types/pixel";
+import type { MakeCodeColor } from "../../../types/color";
 
 /**
  * A selection as a whole-canvas 1-bit mask (row-major, 1 = selected). Every
@@ -69,6 +70,50 @@ export const maskFromRect = (
 export const fullMask = (width: number, height: number): SelectionMask => {
   const mask = createMask(width, height);
   mask.bits.fill(1);
+  return mask;
+};
+
+/**
+ * Magic-wand mask from a click. The canvas is palette-indexed (exact colors),
+ * so there's no tolerance — cells match the clicked cell's color exactly.
+ *   contiguous=true  → 4-connected flood of the clicked region (default; the
+ *                      8-connected variant leaks through 1px diagonal outlines)
+ *   contiguous=false → every cell of that color anywhere (global same-color)
+ * Mirrors the fill tool's flood/fillAll split (useFill.ts), but accumulates
+ * mask bits instead of painting.
+ */
+export const maskFromFlood = (
+  data: MakeCodeColor[][],
+  width: number,
+  height: number,
+  start: Coordinates,
+  contiguous: boolean
+): SelectionMask => {
+  const mask = createMask(width, height);
+  if (start.x < 0 || start.y < 0 || start.x >= width || start.y >= height)
+    return mask;
+  const target = data[start.y]?.[start.x];
+  if (target === undefined) return mask;
+
+  if (!contiguous) {
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (data[y][x] === target) mask.bits[y * width + x] = 1;
+      }
+    }
+    return mask;
+  }
+
+  const stack: Coordinates[] = [start];
+  while (stack.length > 0) {
+    const { x, y } = stack.pop()!;
+    if (x < 0 || y < 0 || x >= width || y >= height) continue;
+    const i = y * width + x;
+    if (mask.bits[i] === 1) continue;
+    if (data[y][x] !== target) continue;
+    mask.bits[i] = 1;
+    stack.push({ x: x + 1, y }, { x: x - 1, y }, { x, y: y + 1 }, { x, y: y - 1 });
+  }
   return mask;
 };
 
