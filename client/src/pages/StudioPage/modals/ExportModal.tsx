@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import Modal from "../../../components/Modal/Modal";
 import Button from "../../../components/Button";
-import CodeDisplay from "../../../features/ExportSection/components/CodeDisplay";
 import { useExportSpriteData } from "../../../features/SpriteEditor/hooks/useExportSpriteData";
 import { ImageExportFormats } from "../../../types/export";
 import { OS } from "../../../utils/getOS";
@@ -20,16 +19,10 @@ const PASTE_STEPS = [
 ];
 
 export default function ExportModal({ isOpen, onClose }: Props) {
-  const {
-    getImgCode,
-    getSpriteDataUrl,
-    exportSpriteToImage,
-    getJavaScriptCode,
-    getPythonCode,
-  } = useExportSpriteData();
+  const { getImgCode, getSpriteDataUrl, exportSpriteToImage } =
+    useExportSpriteData();
 
   const [copied, setCopied] = useState(false);
-  const [showCode, setShowCode] = useState(false);
 
   // Only render the sprite to a data URL while the modal is open.
   const previewUrl = useMemo(
@@ -150,35 +143,6 @@ export default function ExportModal({ isOpen, onClose }: Props) {
             </Button>
           ))}
         </div>
-      </div>
-
-      {/* Tertiary: developer code (collapsible, low-emphasis) */}
-      <div className="mt-6 border-t border-line pt-4">
-        <button
-          type="button"
-          onClick={() => setShowCode((v) => !v)}
-          className="flex w-full items-center justify-between text-sm font-medium text-ink-muted transition-colors hover:text-ink">
-          <span>Developer code (JavaScript / Python)</span>
-          <span aria-hidden>{showCode ? "▴" : "▾"}</span>
-        </button>
-        {showCode && (
-          <div className="mt-3 space-y-4">
-            <div>
-              <p className="mb-1 text-xs font-medium text-ink-subtle">
-                JavaScript
-              </p>
-              <CodeDisplay codingLanguage="javascript">
-                {getJavaScriptCode()}
-              </CodeDisplay>
-            </div>
-            <div>
-              <p className="mb-1 text-xs font-medium text-ink-subtle">Python</p>
-              <CodeDisplay codingLanguage="python">
-                {getPythonCode()}
-              </CodeDisplay>
-            </div>
-          </div>
-        )}
       </div>
     </Modal>
   );
