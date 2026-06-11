@@ -44,6 +44,13 @@ export default function StudioPage() {
     exportModal.open();
   }, [exportModal]);
 
+  // A staged generate/upload hands off to Resize & Process: close the Generate
+  // modal and open Resize seeded with the freshly staged source image.
+  const handleGenerated = useCallback(() => {
+    generateModal.close();
+    resizeModal.open();
+  }, [generateModal, resizeModal]);
+
   return (
     <div className="flex h-screen flex-col bg-surface">
       <StudioNav onOpenExport={openExport} onOpenTokens={tokenModal.open} />
@@ -59,6 +66,7 @@ export default function StudioPage() {
       <GenerateModal
         isOpen={generateModal.isOpen}
         onClose={generateModal.close}
+        onSuccess={handleGenerated}
       />
       <ResizeProcessModal
         isOpen={resizeModal.isOpen}

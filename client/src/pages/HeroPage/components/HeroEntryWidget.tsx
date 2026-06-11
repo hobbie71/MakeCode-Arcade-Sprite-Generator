@@ -11,11 +11,7 @@ export default function HeroEntryWidget({
 }) {
   return (
     <div className="w-full rounded-modal border border-line bg-surface-raised p-5 shadow-lg sm:p-6">
-      <GenerationControls
-        onSuccess={onSuccess}
-        showQuality={false}
-        showSizePresets={false}
-      />
+      <GenerationControls onSuccess={onSuccess} surface="hero" />
     </div>
   );
 }

@@ -4,14 +4,18 @@ import GenerationControls from "../../../components/GenerationControls/Generatio
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  /** Fired when a generate/upload has staged a source image — the studio closes
+   *  this modal and opens Resize & Process. */
+  onSuccess: () => void;
 }
 
 /**
- * Generate modal — wraps the shared GenerationControls. It closes itself when a
- * generation/upload completes without error (GenerationControls fires onSuccess
- * on the isGenerating true→false transition) or when blank-canvas is chosen.
+ * Studio Generate modal — wraps the shared GenerationControls in "studio" mode:
+ * two tabs (AI Generate / Upload Image), asset type on the AI tab, no size, and
+ * generate/upload STAGE a source image (canvas untouched) then hand off to
+ * Resize & Process via onSuccess.
  */
-export default function GenerateModal({ isOpen, onClose }: Props) {
+export default function GenerateModal({ isOpen, onClose, onSuccess }: Props) {
   return (
     <Modal
       isOpen={isOpen}
@@ -19,7 +23,7 @@ export default function GenerateModal({ isOpen, onClose }: Props) {
       size="md"
       title="Generate a sprite"
       subtitle="Describe it or upload an image — AI draws it on the Arcade palette.">
-      <GenerationControls onSuccess={onClose} />
+      <GenerationControls surface="studio" onSuccess={onSuccess} />
     </Modal>
   );
 }
