@@ -37,7 +37,7 @@ export const ALL_EDITOR_TOOLS: Array<{
 }> = [
   {
     tool: EditorTools.Pencil,
-    icon: "PencilReply",
+    icon: "Edit",
     name: "Pencil",
     shortcut: "P",
   },
