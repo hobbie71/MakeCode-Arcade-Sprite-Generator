@@ -45,7 +45,7 @@ export default function FloatingActionLayer({
           Generate
         </Button>
         <Button
-          variant="secondary"
+          variant="outline"
           size="sm"
           onClick={onOpenResize}
           disabled={isGenerating}
@@ -57,7 +57,7 @@ export default function FloatingActionLayer({
           <span className="sm:hidden">Resize</span>
         </Button>
         <Button
-          variant="secondary"
+          variant="outline"
           size="sm"
           onClick={onOpenExport}
           className={PILL_CLASS}>

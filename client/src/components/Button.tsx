@@ -2,7 +2,7 @@ import React from "react";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "danger" | "outline" | "chip";
+  variant?: "primary" | "danger" | "success" | "outline" | "chip";
   size?: "sm" | "md" | "lg";
   /** Toggle state for chip-style buttons. When provided (even false), renders
       aria-pressed and the `.active` treatment while true. */
@@ -13,8 +13,8 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const VARIANT_CLASS: Record<NonNullable<ButtonProps["variant"]>, string> = {
   primary: "btn-primary",
-  secondary: "btn-secondary",
   danger: "btn-danger",
+  success: "btn-success",
   outline: "btn-outline",
   chip: "btn-chip",
 };

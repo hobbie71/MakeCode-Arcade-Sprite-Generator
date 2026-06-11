@@ -29,7 +29,7 @@ export default function ExampleGallery({
         <h2 className="text-h2 font-bold text-ink">
           A gallery of generated sprites
         </h2>
-        <Button variant="secondary" size="sm" onClick={onExplore}>
+        <Button variant="outline" size="sm" onClick={onExplore}>
           Explore the showcase →
         </Button>
       </div>

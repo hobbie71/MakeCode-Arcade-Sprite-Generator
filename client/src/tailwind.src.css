@@ -74,11 +74,13 @@
   }
 
   .text-success {
-    @apply text-success font-medium;
+    color: var(--success);
+    @apply font-medium;
   }
 
   .text-warning {
-    @apply text-warning font-medium;
+    color: var(--warning);
+    @apply font-medium;
   }
 
   .text-link {
@@ -141,23 +143,19 @@
     @apply bg-accent-hover;
   }
 
-  .btn-secondary {
-    @apply btn bg-surface text-ink border border-line shadow-sm;
-  }
-
-  .btn-secondary:hover:not(:disabled) {
-    @apply bg-surface-hover;
-  }
-
   .btn-danger {
     @apply btn bg-danger text-on-accent shadow-sm;
+  }
+
+  .btn-success {
+    @apply btn bg-success text-on-accent shadow-sm;
   }
 
   /* Outline variant: transparent fill, accent border + text. NOTE: the base
      .btn sets border-style:none, so we must re-assert `border-solid` here or
      the outline won't render (border-width alone stays invisible). */
   .btn-outline {
-    @apply btn border border-solid border-accent bg-transparent text-accent;
+    @apply btn border border-solid border-accent bg-transparent text-accent shadow-sm;
   }
 
   .btn-outline:hover:not(:disabled) {
@@ -210,6 +208,44 @@
 
   .icon-btn.active {
     @apply bg-accent text-on-accent;
+  }
+
+  /* Right-dock tabs. One persistent button per section: icon-only by default,
+     expanding to an icon + label pill when active. Keeping the element mounted
+     (rather than swapping an icon-only button for a labelled one) lets the label
+     animate its width on select instead of popping in. Layered after .btn-chip so
+     these overrides win at equal specificity. */
+  .dock-tab {
+    @apply flex items-center gap-0 rounded-chip border-0 bg-transparent p-1.5
+           text-ink-muted shadow-none transition-all duration-200;
+  }
+
+  .dock-tab:hover:not(.active):not([aria-disabled="true"]) {
+    @apply bg-surface-hover text-ink;
+  }
+
+  .dock-tab.active {
+    @apply gap-1.5 bg-accent-soft px-3 py-1.5 text-accent;
+  }
+
+  .dock-tab[aria-disabled="true"] {
+    @apply cursor-not-allowed opacity-40;
+  }
+
+  /* The label collapses to a zero-width grid track when idle; animating the
+     0fr → 1fr track reaches the text's natural width (transitioning to `auto`
+     directly is not animatable). The inner span clips the overflow mid-animation. */
+  .dock-tab__label {
+    @apply grid grid-cols-[0fr] overflow-hidden text-sm font-medium leading-none
+           opacity-0 transition-all duration-200;
+  }
+
+  .dock-tab.active .dock-tab__label {
+    @apply grid-cols-[1fr] opacity-100;
+  }
+
+  .dock-tab__label > span {
+    @apply overflow-hidden whitespace-nowrap;
   }
 
   /* Form Components */
