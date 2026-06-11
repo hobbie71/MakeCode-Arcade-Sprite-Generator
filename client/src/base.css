@@ -183,7 +183,8 @@ a:focus {
 
 button {
   background: none;
-  border: none;
+  /* No border reset here: Tailwind preflight already zeroes it with
+     border-style solid, which `border-*` width utilities rely on. */
   padding: 0;
   font: inherit;
   color: inherit;
