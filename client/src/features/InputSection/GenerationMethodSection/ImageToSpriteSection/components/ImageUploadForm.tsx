@@ -4,10 +4,18 @@ import React, { useRef, useState, useId } from "react";
 import { useImageFileHandler } from "../../../hooks/useImageFileHandler";
 import { useLoading } from "../../../../../context/LoadingContext/useLoading";
 
-const ImageUploadForm = () => {
+interface Props {
+  /** Override for what happens with the picked file. The studio passes a
+   *  stage-and-handoff handler (cache source → open Resize & Process); when
+   *  omitted (hero) the file is committed straight to the canvas. */
+  onFile?: (file: File) => void;
+}
+
+const ImageUploadForm = ({ onFile }: Props) => {
   // Hooks
   const { importImageManually } = useImageFileHandler();
   const { isGenerating } = useLoading();
+  const handleFile = onFile ?? importImageManually;
 
   // Generate unique IDs for accessibility
   const instructionsId = useId();
@@ -48,7 +56,7 @@ const ImageUploadForm = () => {
 
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
-      importImageManually(file);
+      handleFile(file);
       setLiveMessage(`Image ${file.name} uploaded successfully.`);
     } else {
       const errorMsg = "Please upload a valid image file.";
@@ -63,7 +71,7 @@ const ImageUploadForm = () => {
     setLiveMessage("");
     const file = e.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
-      importImageManually(file);
+      handleFile(file);
       setLiveMessage(`Image ${file.name} uploaded successfully.`);
     } else {
       const errorMsg = "Please upload a valid image file.";
