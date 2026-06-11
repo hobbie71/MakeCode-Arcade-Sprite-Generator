@@ -2,7 +2,7 @@ import { createContext, useState, useMemo } from "react";
 import type { Dispatch, SetStateAction } from "react";
 
 type GridContextType = {
-  /** Whether the per-pixel grid overlay is drawn on the canvas. Default on. */
+  /** Whether the per-pixel grid overlay is drawn on the canvas. Default off. */
   showGrid: boolean;
   setShowGrid: Dispatch<SetStateAction<boolean>>;
 };
@@ -10,7 +10,7 @@ type GridContextType = {
 const GridContext = createContext<undefined | GridContextType>(undefined);
 
 export const GridProvider = ({ children }: { children: React.ReactNode }) => {
-  const [showGrid, setShowGrid] = useState<boolean>(true);
+  const [showGrid, setShowGrid] = useState<boolean>(false);
 
   const contextValue = useMemo(
     () => ({ showGrid, setShowGrid }),

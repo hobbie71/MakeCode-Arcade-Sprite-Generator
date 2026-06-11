@@ -122,7 +122,7 @@ const GridOverlay = ({ width, height, offset, zoom }: Props) => {
   return (
     <canvas
       ref={gridRef}
-      className="pointer-events-none absolute inset-0 h-full w-full"
+      className="pointer-events-none absolute inset-0 z-20 h-full w-full"
     />
   );
 };
