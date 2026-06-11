@@ -18,8 +18,8 @@ import {
 import { useSpriteEditorCanvas } from "../hooks/useSpriteEditorCanvas";
 import { useMouseHandler } from "../hooks/useMouseHandler";
 import { usePan } from "../hooks/usePan";
-import { usePasteData } from "../hooks/usePasteData";
 import { useSelectTool } from "../hooks/useSelectTool";
+import { useSelection } from "../contexts/SelectionContext/useSelection";
 
 // Component imports
 import SelectionAntsOverlay from "./SelectionAntsOverlay";
@@ -36,6 +36,7 @@ import {
   FIT_BOTTOM_GAP,
   FIT_BOTTOM_FALLBACK,
 } from "../constants/canvas";
+import { EditorTools } from "../../../types/tools";
 
 // Lib imports
 import { computeStageFit } from "../libs/canvasFit";
@@ -49,11 +50,12 @@ interface Props {
 const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   // Context
   const { canvasRef } = useCanvas();
-  const { tool } = useToolSelected();
+  const { tool, setTool } = useToolSelected();
   const { zoom, setZoom, registerFitToScreen } = useZoom();
   const { width, height } = useCanvasSize();
   const { spriteData } = useSprite();
   const { palette } = usePaletteSelected();
+  const { pasteAsFloating } = useSelection();
 
   // States
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -63,7 +65,6 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
 
   // Hooks
   const { initCanvas, redrawCanvas } = useSpriteEditorCanvas(width, height);
-  const { pasteSpriteData } = usePasteData();
 
   const {
     handleMouseEnter,
@@ -101,8 +102,11 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
     if (!isValidMakeCodeSprite(text)) return;
 
     try {
-      const spriteData = parseMakeCodeSprite(text);
-      pasteSpriteData(spriteData);
+      const parsed = parseMakeCodeSprite(text);
+      // Paste becomes a floating selection (move it, then commit) rather than
+      // replacing the canvas — ADR-0007. Force Select so it's interactable.
+      if (tool !== EditorTools.Select) setTool(EditorTools.Select);
+      pasteAsFloating(parsed, text);
     } catch (error) {
       console.error("Failed to parse sprite data:", error);
     }

@@ -17,6 +17,7 @@ import type { Coordinates } from "../../../../types/pixel";
 import {
   combineMasks,
   createMask,
+  fullMask,
   maskBounds,
   maskGet,
   maskIsEmpty,
@@ -32,6 +33,10 @@ import {
   rotateData90,
   rotateMask90,
 } from "../../libs/selectionTransform";
+import {
+  cropMaskedRegion,
+  regionToImgLiteral,
+} from "../../libs/serializeSpriteRegion";
 import { setSelectionInterruptListener } from "../../libs/selectionInterrupt";
 
 /**
@@ -110,6 +115,17 @@ type SelectionContextType = {
   deleteSelection: () => void;
   /** Move the selection 1+ pixels; lifts first if needed. */
   nudge: (dx: number, dy: number) => void;
+  /** Select the whole canvas. */
+  selectAll: () => void;
+  /** Invert the selection within the canvas (no selection → select all). */
+  invertSelection: () => void;
+  /** Copy the selection (or float) to the system clipboard as an img literal. */
+  copySelection: () => void;
+  /** Copy then delete. */
+  cutSelection: () => void;
+  /** Paste a grid as a new floating selection (in-place if it's our own copy,
+   *  else centered). */
+  pasteAsFloating: (data: MakeCodeColor[][], sourceText?: string) => void;
 };
 
 const SelectionContext = createContext<undefined | SelectionContextType>(
@@ -139,6 +155,10 @@ export const SelectionProvider = ({
   // Distinguishes our own sprite writes from external ones (undo, modals,
   // imports) — external writes hard-reset the selection.
   const internalWriteRef = useRef(false);
+  // Remembers the last copy/cut so a paste of our own clip lands in place.
+  const lastCopyRef = useRef<{ text: string; x: number; y: number } | null>(
+    null
+  );
 
   const phase: SelectionPhase = floating
     ? "floating"
@@ -391,6 +411,94 @@ export const SelectionProvider = ({
     [floating, mask, liftSelection, setFloatingPosition]
   );
 
+  const selectAll = useCallback(() => {
+    setDraft(null);
+    setFloating(null);
+    setMask(fullMask(width, height));
+  }, [width, height]);
+
+  const invertSelection = useCallback(() => {
+    if (floating) return; // can't invert a lifted float
+    if (!mask) {
+      setMask(fullMask(width, height)); // invert of nothing = everything
+      return;
+    }
+    const next = createMask(width, height);
+    for (let i = 0; i < next.bits.length; i++) {
+      next.bits[i] = mask.bits[i] === 1 ? 0 : 1;
+    }
+    setMask(maskIsEmpty(next) ? null : next);
+  }, [floating, mask, width, height]);
+
+  /** The region grid + its doc origin for the current selection or float. */
+  const currentRegion = useCallback((): {
+    region: MakeCodeColor[][];
+    x: number;
+    y: number;
+  } | null => {
+    if (floatingPixels && floating) {
+      return {
+        region: floatingPixels.data,
+        x: floating.rect.x,
+        y: floating.rect.y,
+      };
+    }
+    if (mask) {
+      const region = cropMaskedRegion(spriteData, mask);
+      const b = maskBounds(mask);
+      if (region && b) return { region, x: b.minX, y: b.minY };
+    }
+    return null;
+  }, [floatingPixels, floating, mask, spriteData]);
+
+  const copySelection = useCallback(() => {
+    const r = currentRegion();
+    if (!r) return;
+    const text = regionToImgLiteral(r.region);
+    lastCopyRef.current = { text, x: r.x, y: r.y };
+    void navigator.clipboard?.writeText(text).catch(() => {});
+  }, [currentRegion]);
+
+  const cutSelection = useCallback(() => {
+    copySelection();
+    deleteSelection();
+  }, [copySelection, deleteSelection]);
+
+  const pasteAsFloating = useCallback(
+    (data: MakeCodeColor[][], sourceText?: string) => {
+      const h = data.length;
+      const w = data[0]?.length ?? 0;
+      if (w === 0 || h === 0) return;
+      if (floating) commitFloating();
+
+      // The whole pasted rectangle is selected; transparent cells simply don't
+      // paint on commit (transparent apply), so the bounding box stays grabbable.
+      const basisMask = fullMask(w, h);
+
+      // Land in place if this is our own clip and it still fits; else center.
+      let x = Math.floor((width - w) / 2);
+      let y = Math.floor((height - h) / 2);
+      const last = lastCopyRef.current;
+      if (last && sourceText && sourceText === last.text) {
+        x = last.x;
+        y = last.y;
+      }
+
+      preLiftDataRef.current = null; // a paste float has nothing to restore
+      preLiftMaskRef.current = null;
+      setMask(null);
+      setDraft(null);
+      setFloating({
+        basisData: data.map((row) => [...row]),
+        basisMask,
+        rect: { x, y, w, h },
+        flipX: false,
+        flipY: false,
+      });
+    },
+    [floating, commitFloating, width, height]
+  );
+
   // ---- Lifecycle guards -------------------------------------------------
 
   const floatingRef = useRef(floating);
@@ -456,6 +564,11 @@ export const SelectionProvider = ({
       cancelFloating,
       deleteSelection,
       nudge,
+      selectAll,
+      invertSelection,
+      copySelection,
+      cutSelection,
+      pasteAsFloating,
     }),
     [
       phase,
@@ -478,6 +591,11 @@ export const SelectionProvider = ({
       cancelFloating,
       deleteSelection,
       nudge,
+      selectAll,
+      invertSelection,
+      copySelection,
+      cutSelection,
+      pasteAsFloating,
     ]
   );
 
