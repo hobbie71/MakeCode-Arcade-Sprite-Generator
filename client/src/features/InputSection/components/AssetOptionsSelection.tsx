@@ -123,22 +123,22 @@ const AssetOptionsSelection = ({
 
   return (
     <div className="space-y-3">
-      {/* Asset type + Size on one row (mirrors the mockup) */}
-      <div className="flex gap-3 sm:gap-4">
-        <div className="min-w-0 flex-1">
-          <DefaultDropDown
-            stacked
-            options={ASSET_OPTIONS}
-            value={ALL_ASSETS_TYPE.indexOf(selectedAsset)}
-            onChange={(index) => {
-              if (!isGenerating) setSelectedAsset(ALL_ASSETS_TYPE[index]);
-            }}
-            disabled={isGenerating}>
-            Asset type
-          </DefaultDropDown>
-        </div>
+      {showSize ? (
+        /* Asset type + Size on one row (legacy side-by-side layout). */
+        <div className="flex gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <DefaultDropDown
+              stacked
+              options={ASSET_OPTIONS}
+              value={ALL_ASSETS_TYPE.indexOf(selectedAsset)}
+              onChange={(index) => {
+                if (!isGenerating) setSelectedAsset(ALL_ASSETS_TYPE[index]);
+              }}
+              disabled={isGenerating}>
+              Asset type
+            </DefaultDropDown>
+          </div>
 
-        {showSize && (
           <div className="min-w-0 flex-1">
             <label className="form-label">Size</label>
             {/* Remount per asset type so the locked dimensions re-apply on every
@@ -149,8 +149,20 @@ const AssetOptionsSelection = ({
               disabled={isGenerating}
             />
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        /* Standalone (no size): mirror the Quality dropdown — label on the left,
+           a compact control on the right (the default, non-stacked row style). */
+        <DefaultDropDown
+          options={ASSET_OPTIONS}
+          value={ALL_ASSETS_TYPE.indexOf(selectedAsset)}
+          onChange={(index) => {
+            if (!isGenerating) setSelectedAsset(ALL_ASSETS_TYPE[index]);
+          }}
+          disabled={isGenerating}>
+          Asset type
+        </DefaultDropDown>
+      )}
 
       {/* Quick square presets — Sprite only (free-form sizing); shown in the
           Studio Generate modal, hidden in the minimal hero entry widget. */}

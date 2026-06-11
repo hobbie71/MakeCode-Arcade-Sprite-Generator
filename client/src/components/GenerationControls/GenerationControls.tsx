@@ -43,30 +43,34 @@ const STUDIO_TABS: SegmentOption<GenerationMethod>[] = [
 ];
 
 interface Props {
-  /** Called after a successful generate / upload / blank.
-   *  hero → navigate to the studio; studio → open Resize & Process. */
-  onSuccess?: () => void;
-  /** Which host renders this widget.
-   *  - "hero" (default): all three tabs, asset type + size, and generate/upload
-   *    COMMIT to the canvas before firing onSuccess (then the hero navigates).
-   *  - "studio": AI Generate + Upload Image only, asset type on the AI tab (no
-   *    size), and generate/upload STAGE a source image then fire onSuccess
-   *    (which opens Resize & Process) WITHOUT pasting to the canvas. */
+  /** Fired once a source image has been STAGED (an AI generation completed, or a
+   *  file was uploaded) — never commits to the canvas here. studio → open Resize
+   *  & Process; hero → navigate to the studio and open Resize & Process there. */
+  onStaged?: () => void;
+  /** Fired after a blank canvas is created (hero "Draw Blank" tab only) — hero
+   *  navigates to the studio. Omitted on surfaces without the blank tab. */
+  onBlank?: () => void;
+  /** Which host renders this widget. Both surfaces share the SAME generate/upload
+   *  experience (AI: prompt + quality + asset type, no size; Upload: dropzone +
+   *  button; both STAGE a source then hand off to Resize & Process). The only
+   *  difference is "hero" adds the extra Draw Blank tab. */
   surface?: Surface;
 }
 
 /**
  * Shared generation UI used by BOTH the hero entry widget and the studio Generate
- * modal. Composes the existing primitives (OpenAISettingsSection, ImageUploadForm,
+ * modal — identical experience on both, except the hero adds a Draw Blank tab.
+ * Composes the existing primitives (OpenAISettingsSection, ImageUploadForm,
  * AssetOptionsSelection) behind tabs, plus a token indicator and a context-aware
- * primary button. The `surface` prop selects the hero (commit) vs studio (stage)
- * behavior and the trimmed studio layout.
+ * primary button. Generate and Upload always STAGE a source image (the canvas is
+ * untouched) and fire onStaged; the host decides where Resize & Process opens.
  */
 export default function GenerationControls({
-  onSuccess,
+  onStaged,
+  onBlank,
   surface = "hero",
 }: Props) {
-  const isStudio = surface === "studio";
+  const isHero = surface === "hero";
   const { selectedMethod, setSelectedMethod } = useGenerationMethod();
   const { isGenerating } = useLoading();
   const { error } = useError();
@@ -76,7 +80,6 @@ export default function GenerationControls({
   const { setSpriteData } = useSprite();
   const {
     generateAIImageAndConvertToSprite,
-    processImageToSprite,
     importedImage,
     setSourceImage,
     stageSource,
@@ -85,21 +88,22 @@ export default function GenerationControls({
   // Display-only token cost for the selected quality (no real economy — ADR-0006).
   const tokenCost = getQualityTokenCost(settings.quality);
 
-  // The studio has no Draw Blank tab. If the shared GenerationMethod context is
+  // Only the hero has a Draw Blank tab. If the shared GenerationMethod context is
   // still on Blank (e.g. it was chosen on the hero before navigating in), fall
-  // back to AI so a tab is always highlighted and the body always matches.
+  // back to AI on the studio so a tab is always highlighted and the body matches.
   const activeMethod =
-    isStudio && selectedMethod === GenerationMethod.BlankCanvas
+    !isHero && selectedMethod === GenerationMethod.BlankCanvas
       ? GenerationMethod.TextToSprite
       : selectedMethod;
 
-  // Fire onSuccess when an async generate/upload finishes without error. This
-  // covers the AI path on both surfaces and the committing upload on the hero.
+  // An AI generation runs async (validate → OpenAI → cache source); fire onStaged
+  // on the isGenerating true→false transition (no error). Upload/blank are sync
+  // and call their handlers directly, so this effect only ever covers AI.
   const wasGenerating = useRef(false);
   useEffect(() => {
-    if (wasGenerating.current && !isGenerating && !error) onSuccess?.();
+    if (wasGenerating.current && !isGenerating && !error) onStaged?.();
     wasGenerating.current = isGenerating;
-  }, [isGenerating, error, onSuccess]);
+  }, [isGenerating, error, onStaged]);
 
   const startBlankCanvas = () => {
     const blank: MakeCodeColor[][] = Array.from({ length: height }, () =>
@@ -107,15 +111,14 @@ export default function GenerationControls({
     );
     setSpriteData(blank);
     setSourceImage(null); // a blank canvas has no re-processable source
-    onSuccess?.();
+    onBlank?.();
   };
 
-  // Studio upload: stage the picked file (cache, do NOT paste) and hand off to
-  // Resize & Process immediately. No async generation runs, so call onSuccess
-  // directly (the isGenerating effect above won't fire for a staged upload).
-  const handleStudioUpload = (file: File) => {
+  // Upload (both surfaces): stage the picked file (cache, do NOT paste) and hand
+  // off to Resize & Process. No async generation runs, so call onStaged directly.
+  const handleUpload = (file: File) => {
     stageSource(file);
-    onSuccess?.();
+    onStaged?.();
   };
 
   const renderPrimary = () => {
@@ -126,9 +129,7 @@ export default function GenerationControls({
           className="w-full"
           isLoading={isGenerating}
           onClick={() =>
-            generateAIImageAndConvertToSprite(
-              isStudio ? { commit: false } : undefined,
-            ).catch(() => {})
+            generateAIImageAndConvertToSprite({ commit: false }).catch(() => {})
           }
         >
           ✦ Generate sprite
@@ -152,13 +153,9 @@ export default function GenerationControls({
           isLoading={isGenerating}
           disabled={!importedImage}
           onClick={() => {
-            if (isStudio) {
-              // Source is normally staged on drop (auto-advance); this button is
-              // the explicit affordance when a source is already cached.
-              if (importedImage) handleStudioUpload(importedImage);
-            } else {
-              processImageToSprite();
-            }
+            // Source is normally staged on drop (auto-advance); this button is the
+            // explicit affordance when a source is already cached.
+            if (importedImage) handleUpload(importedImage);
           }}
         >
           Process image
@@ -174,9 +171,9 @@ export default function GenerationControls({
 
   return (
     <div className="space-y-4">
-      {/* Tabs */}
+      {/* Tabs — hero adds Draw Blank; studio is AI + Upload only. */}
       <SegmentedControl
-        options={isStudio ? STUDIO_TABS : HERO_TABS}
+        options={isHero ? HERO_TABS : STUDIO_TABS}
         value={activeMethod}
         onChange={setSelectedMethod}
         ariaLabel="Generation method"
@@ -186,27 +183,21 @@ export default function GenerationControls({
 
       {/* Method-specific input */}
       {activeMethod === GenerationMethod.TextToSprite && (
-        <OpenAISettingsSection showQuality={isStudio} />
+        <OpenAISettingsSection showQuality />
       )}
       {activeMethod === GenerationMethod.ImageToSprite && (
-        <ImageUploadForm onFile={isStudio ? handleStudioUpload : undefined} />
+        <ImageUploadForm onFile={handleUpload} />
       )}
       {activeMethod === GenerationMethod.BlankCanvas && (
         <p className="text-sm text-ink-muted">
-          Start from an empty canvas at the size below and draw your sprite
-          pixel by pixel.
+          Start from an empty canvas and draw your sprite pixel by pixel.
         </p>
       )}
 
-      {/* Asset options:
-          - hero: asset type + size inputs (no preset chips), under all tabs.
-          - studio: asset type only, on the AI Generate tab only (no size). */}
-      {isStudio ? (
-        activeMethod === GenerationMethod.TextToSprite && (
-          <AssetOptionsSelection showSize={false} />
-        )
-      ) : (
-        <AssetOptionsSelection showSizePresets={false} />
+      {/* Asset type — AI Generate tab only (no size; final dimensions are chosen
+          in Resize & Process). Identical on both surfaces. */}
+      {activeMethod === GenerationMethod.TextToSprite && (
+        <AssetOptionsSelection showSize={false} />
       )}
 
       {renderPrimary()}
@@ -223,7 +214,7 @@ export default function GenerationControls({
           </span>
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
             <BoltIcon />
-            ~40s AI sprite generation
+            ~60s AI sprite generation
           </span>
         </p>
       )}

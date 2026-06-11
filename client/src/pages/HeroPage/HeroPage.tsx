@@ -45,6 +45,13 @@ export default function HeroPage() {
     navigate("/studio");
   };
 
+  // Upload/generate on the hero stages a source (no canvas commit) and routes
+  // into the studio asking it to open Resize & Process for that source.
+  const enterStudioWithResize = () => {
+    markVisited();
+    navigate("/studio", { state: { openResize: true } });
+  };
+
   return (
     <div className="min-h-screen bg-surface">
       {/* Nav */}
@@ -117,7 +124,10 @@ export default function HeroPage() {
           </ul>
         </div>
 
-        <HeroEntryWidget onSuccess={enterStudio} />
+        <HeroEntryWidget
+          onStaged={enterStudioWithResize}
+          onBlank={enterStudio}
+        />
       </section>
 
       <ExampleGallery onExplore={enterStudio} />

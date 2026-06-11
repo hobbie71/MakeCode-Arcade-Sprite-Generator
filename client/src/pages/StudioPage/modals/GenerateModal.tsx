@@ -6,7 +6,7 @@ interface Props {
   onClose: () => void;
   /** Fired when a generate/upload has staged a source image — the studio closes
    *  this modal and opens Resize & Process. */
-  onSuccess: () => void;
+  onStaged: () => void;
 }
 
 /**
@@ -15,7 +15,7 @@ interface Props {
  * generate/upload STAGE a source image (canvas untouched) then hand off to
  * Resize & Process via onSuccess.
  */
-export default function GenerateModal({ isOpen, onClose, onSuccess }: Props) {
+export default function GenerateModal({ isOpen, onClose, onStaged }: Props) {
   return (
     <Modal
       isOpen={isOpen}
@@ -23,7 +23,7 @@ export default function GenerateModal({ isOpen, onClose, onSuccess }: Props) {
       size="md"
       title="Generate a sprite"
       subtitle="Describe it or upload an image — AI draws it on the Arcade palette.">
-      <GenerationControls surface="studio" onSuccess={onSuccess} />
+      <GenerationControls surface="studio" onStaged={onStaged} />
     </Modal>
   );
 }

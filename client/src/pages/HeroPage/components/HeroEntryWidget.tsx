@@ -2,16 +2,24 @@ import GenerationControls from "../../../components/GenerationControls/Generatio
 
 /**
  * The inline hero entry widget — the same GenerationControls used in the studio's
- * Generate modal, in a card. On success it hands off to the studio.
+ * Generate modal (plus a Draw Blank tab), in a card. Generate/upload stage a
+ * source and hand off to the studio's Resize & Process via onStaged; Draw Blank
+ * hands off via onBlank.
  */
 export default function HeroEntryWidget({
-  onSuccess,
+  onStaged,
+  onBlank,
 }: {
-  onSuccess: () => void;
+  onStaged: () => void;
+  onBlank: () => void;
 }) {
   return (
     <div className="w-full rounded-modal border border-line bg-surface-raised p-5 shadow-lg sm:p-6">
-      <GenerationControls onSuccess={onSuccess} surface="hero" />
+      <GenerationControls
+        onStaged={onStaged}
+        onBlank={onBlank}
+        surface="hero"
+      />
     </div>
   );
 }
