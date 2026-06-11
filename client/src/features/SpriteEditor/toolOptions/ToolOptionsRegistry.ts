@@ -2,7 +2,7 @@ import type { ComponentType } from "react";
 import { EditorTools } from "../../../types/tools";
 import StrokeSizeOption from "./StrokeSizeOption";
 import ShapeModeOption from "./ShapeModeOption";
-import FillToleranceOption from "./FillToleranceOption";
+import FillModeOption from "./FillModeOption";
 import PixelPerfectOption from "./PixelPerfectOption";
 
 export type ToolOptionDescriptor = {
@@ -32,5 +32,5 @@ export const TOOL_OPTIONS_REGISTRY: Partial<
     { id: "stroke", Component: StrokeSizeOption },
     { id: "shape", Component: ShapeModeOption },
   ],
-  [EditorTools.Fill]: [{ id: "tolerance", Component: FillToleranceOption }],
+  [EditorTools.Fill]: [{ id: "fill-mode", Component: FillModeOption }],
 };

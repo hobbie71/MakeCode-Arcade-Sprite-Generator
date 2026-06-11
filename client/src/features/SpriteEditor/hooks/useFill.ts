@@ -26,7 +26,7 @@ export const useFill = () => {
   const { getCurrentSpriteData, setSpriteDataCoordinates, commitSpriteData } =
     useSpriteData();
   const { pushSnapshot } = useHistory();
-  const { tolerance } = useFillOptions();
+  const { fillAll } = useFillOptions();
 
   const floodFill = useCallback(
     (
@@ -46,9 +46,9 @@ export const useFill = () => {
         setSpriteDataCoordinates({ x, y }, replacementColor);
       };
 
-      // Tolerance 100 = global: replace every matching pixel on the canvas,
-      // ignoring contiguity.
-      if (tolerance >= 100) {
+      // "All matching" = global: recolor every pixel of the target color on the
+      // canvas, ignoring contiguity.
+      if (fillAll) {
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
             if (spriteData[y][x] === targetColor) paint(x, y);
@@ -57,9 +57,7 @@ export const useFill = () => {
         return;
       }
 
-      // Otherwise a contiguous flood: 4-connected at tolerance 0, 8-connected
-      // (bridges diagonal gaps) for any tolerance above 0.
-      const eightWay = tolerance > 0;
+      // Otherwise a 4-connected contiguous flood of the clicked region.
       const stack: Coordinates[] = [startCoordinates];
       const visited = new Set<string>();
 
@@ -96,16 +94,6 @@ export const useFill = () => {
           { x: current.x, y: current.y + 1 }, // Down
           { x: current.x, y: current.y - 1 } // Up
         );
-
-        // ...and diagonals when tolerance lets the fill bridge gaps
-        if (eightWay) {
-          stack.push(
-            { x: current.x + 1, y: current.y + 1 },
-            { x: current.x - 1, y: current.y + 1 },
-            { x: current.x + 1, y: current.y - 1 },
-            { x: current.x - 1, y: current.y - 1 }
-          );
-        }
       }
     },
     [
@@ -115,7 +103,7 @@ export const useFill = () => {
       height,
       getCurrentSpriteData,
       setSpriteDataCoordinates,
-      tolerance,
+      fillAll,
     ]
   );
 

@@ -3,15 +3,13 @@ import type { Dispatch, SetStateAction } from "react";
 
 type FillOptionsContextType = {
   /**
-   * Bucket-fill spread, 0–100. Because the canvas is palette-indexed (not
-   * continuous color), tolerance controls how far a fill reaches rather than a
-   * color-distance threshold:
-   *   0       → 4-connected contiguous region (default)
-   *   1..99   → 8-connected (bridges diagonal gaps)
-   *   100     → global: every pixel of the target color on the canvas
+   * Bucket-fill scope. The canvas is palette-indexed (exact-match colors), so
+   * this is a scope toggle, not a color-distance tolerance:
+   *   false → contiguous flood-fill of the clicked color's region (4-connected)
+   *   true  → global: recolor every pixel of that color across the whole canvas (default)
    */
-  tolerance: number;
-  setTolerance: Dispatch<SetStateAction<number>>;
+  fillAll: boolean;
+  setFillAll: Dispatch<SetStateAction<boolean>>;
 };
 
 const FillOptionsContext = createContext<undefined | FillOptionsContextType>(
@@ -23,12 +21,10 @@ export const FillOptionsProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [tolerance, setTolerance] = useState<number>(0);
+  // Default true → the "Contiguous" toggle starts OFF (active={!fillAll}).
+  const [fillAll, setFillAll] = useState<boolean>(true);
 
-  const contextValue = useMemo(
-    () => ({ tolerance, setTolerance }),
-    [tolerance]
-  );
+  const contextValue = useMemo(() => ({ fillAll, setFillAll }), [fillAll]);
 
   return (
     <FillOptionsContext.Provider value={contextValue}>
