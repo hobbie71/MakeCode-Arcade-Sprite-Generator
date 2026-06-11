@@ -94,9 +94,21 @@ export const useImageFileHandler = () => {
   /**
    * Converts an image file to sprite data with post-processing settings applied,
    * then commits the result to the editor canvas.
+   *
+   * `overrides` lets a caller process at explicit dimensions/settings instead of
+   * the live editor state — the Resize & Process modal stages its size + settings
+   * locally and passes them here on Apply, so re-processing doesn't depend on the
+   * canvas-size context having already been mutated.
    */
   const processImageToSprite = useCallback(
-    async (file?: File) => {
+    async (
+      file?: File,
+      overrides?: {
+        width?: number;
+        height?: number;
+        settings?: PostProcessingSettings;
+      }
+    ) => {
       setError(null);
 
       const imageFile = file ?? importedImage;
@@ -110,9 +122,9 @@ export const useImageFileHandler = () => {
 
         const canvas = await processSourceToCanvas(
           imageFile,
-          width,
-          height,
-          postProcessingSettings
+          overrides?.width ?? width,
+          overrides?.height ?? height,
+          overrides?.settings ?? postProcessingSettings
         );
 
         // Upload Canvas to UI Sprite Editor

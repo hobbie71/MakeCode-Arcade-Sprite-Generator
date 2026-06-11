@@ -2,7 +2,6 @@ import { useCallback } from "react";
 
 // Context imports
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
-import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useSprite } from "../../../context/SpriteContext/useSprite";
 import { useHistory } from "../contexts/HistoryContext/useHistory";
@@ -17,7 +16,6 @@ import { MakeCodeColor } from "../../../types/color";
 
 export const usePasteData = () => {
   const { canvasRef } = useCanvas();
-  const { width, height } = useCanvasSize();
   const { palette } = usePaletteSelected();
   const { setSpriteData } = useSprite();
   const { getSpriteDataFromCanvas } = useMakeCodeColorConverter();
@@ -27,8 +25,14 @@ export const usePasteData = () => {
     (spriteData: MakeCodeColor[][]) => {
       if (!canvasRef.current) return;
 
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
+      // Iterate the pasted data's OWN dimensions, not the current canvas size.
+      // Callers (e.g. the Resize & Process modal) paste data sized to the *new*
+      // dimensions before the canvas-size context has caught up, so keying the
+      // loop off context width/height would clip or over-read the paste.
+      const rows = spriteData.length;
+      const cols = spriteData[0]?.length ?? 0;
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
           drawPixelOnCanvas(
             canvasRef.current,
             { x, y },
@@ -41,7 +45,7 @@ export const usePasteData = () => {
       setSpriteData(spriteData);
       pushSnapshot(spriteData);
     },
-    [canvasRef, height, width, setSpriteData, palette, pushSnapshot]
+    [canvasRef, setSpriteData, palette, pushSnapshot]
   );
 
   const pasteCanvas = useCallback(

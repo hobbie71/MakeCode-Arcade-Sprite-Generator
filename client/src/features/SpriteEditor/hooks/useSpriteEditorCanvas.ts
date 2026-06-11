@@ -30,7 +30,10 @@ export const useSpriteEditorCanvas = (width: number, height: number) => {
 
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
-          const color = data[y] ? data[y][x] : MakeCodeColor.TRANSPARENT;
+          // Tolerate data smaller than the canvas (e.g. a single frame mid-resize
+          // where size and sprite data haven't converged yet): missing cells read
+          // as transparent rather than painting a stale color.
+          const color = data[y]?.[x] ?? MakeCodeColor.TRANSPARENT;
           drawPixelOnCanvas(canvas, { x, y }, color, palette);
         }
       }

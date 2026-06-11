@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Modal from "../../../components/Modal/Modal";
 import Button from "../../../components/Button";
-import CheckBox from "../../../features/InputSection/components/CheckBox";
+import Switch from "../../../components/Switch";
+import SegmentedControl from "../../../components/SegmentedControl";
+import Spinner from "../../../components/Spinner";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { usePostProcessing } from "../../../context/PostProcessingContext/usePostProcessing";
 import { useImageFileHandler } from "../../../features/InputSection/hooks/useImageFileHandler";
 import { useExportSpriteData } from "../../../features/SpriteEditor/hooks/useExportSpriteData";
+import { useSpriteData } from "../../../features/SpriteEditor/hooks/useSpriteData";
 import { useCanvasResize } from "../../../hooks/useCanvasResize";
+import { getResizedSpriteData } from "../../../libs/getResizedSpriteData";
 import { Crop, ImageExportFormats } from "../../../types/export";
 import type { PostProcessingSettings } from "../../../types/export";
 import { MAX_LENGTH, MIN_LENGTH } from "../../../types/pixel";
@@ -23,21 +27,26 @@ const CROP_MODES: { label: string; value: Crop }[] = [
   { label: "Fill", value: Crop.Fill },
 ];
 
-type Snapshot = { w: number; h: number; settings: PostProcessingSettings };
-
 const clampSize = (n: number) => Math.min(MAX_LENGTH, Math.max(MIN_LENGTH, n));
 
 /**
  * Resize & Process (mockup: resize-process modal). Stage dimensions, fit/crop
- * and background-removal, watch a *live* preview, then Apply to re-process the
- * cached source image into the editor.
+ * and background-removal, watch a *live* preview, then Apply to commit the
+ * re-processed result to the editor.
  *
- * Preview cost model: re-processing the full-resolution source (flood-fill
- * background removal + palette snap + scale) is expensive, so discrete controls
- * (size presets, fit/crop, the remove-bg toggle) refresh the preview instantly,
- * while continuous edits (typing a custom dimension, dragging Tolerance) only
- * mark it stale — the user clicks "Update preview" to recompute. Nothing touches
- * the editor until Apply; Cancel / Esc / backdrop fully restore the prior state.
+ * Nothing here touches the editor until Apply. The dimensions, crop mode and
+ * background-removal settings are all held in LOCAL state (seeded from the
+ * editor when the modal opens) — earlier versions wrote straight to the shared
+ * canvas-size / post-processing contexts, which made `SpriteDataResizer`
+ * destructively resample the real sprite on every keystroke and preset click.
+ *
+ * Preview cost model: re-processing the source (flood-fill background removal +
+ * palette snap + scale) or resampling a hand-drawn grid is expensive, so:
+ *   - discrete controls (size presets, fit/crop, the remove-bg toggle) recompute
+ *     the preview instantly, while
+ *   - continuous edits (typing a custom dimension, dragging Tolerance) only mark
+ *     it stale — the blurred preview + "Update preview" button recompute on demand.
+ * Cancel / Esc / backdrop simply close: there is nothing to roll back.
  */
 export default function ResizeProcessModal({ isOpen, onClose }: Props) {
   const { width, height, setWidth, setHeight } = useCanvasSize();
@@ -45,10 +54,11 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
   const { sourceImage, processImageToSprite, processSourceToCanvas } =
     useImageFileHandler();
   const { getSpriteDataUrl } = useExportSpriteData();
+  const { getCurrentSpriteData } = useSpriteData();
   const { updateCanvasSize } = useCanvasResize();
 
-  // Snapshot size + settings on open so closing-without-Apply restores them.
-  const snapshot = useRef<Snapshot | null>(null);
+  // Seed staged state from the editor exactly once per open.
+  const seededRef = useRef(false);
   // Monotonic token so a slow preview run can't overwrite a newer one.
   const previewToken = useRef(0);
 
@@ -56,23 +66,37 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
   const [isStale, setIsStale] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Local text for the dimension fields keeps typing smooth; the staged
-  // width/height (context) are derived from these and from preset clicks.
+  // Staged working state — committed to the editor only on Apply.
+  const [stagedW, setStagedW] = useState(width);
+  const [stagedH, setStagedH] = useState(height);
+  const [stagedSettings, setStagedSettings] =
+    useState<PostProcessingSettings>(settings);
+  // Local text for the dimension fields keeps typing smooth; the staged numeric
+  // width/height are derived from these and from preset clicks.
   const [widthText, setWidthText] = useState(String(width));
   const [heightText, setHeightText] = useState(String(height));
-  useEffect(() => setWidthText(String(width)), [width]);
-  useEffect(() => setHeightText(String(height)), [height]);
 
-  /** Re-run the real pipeline on the cached source and show the result. */
+  /**
+   * Recompute the preview for the given staged values WITHOUT touching the editor.
+   * With a cached source we re-run the real image pipeline; for a hand-drawn
+   * sprite we resample the current grid — the same result Apply will produce.
+   */
   const runPreview = useCallback(
     async (w: number, h: number, s: PostProcessingSettings) => {
-      if (!sourceImage) return;
       const token = ++previewToken.current;
       setIsProcessing(true);
       try {
-        const canvas = await processSourceToCanvas(sourceImage, w, h, s);
-        if (token !== previewToken.current) return; // superseded by a newer run
-        setPreviewUrl(canvas.toDataURL("image/png"));
+        let url: string;
+        if (sourceImage) {
+          const canvas = await processSourceToCanvas(sourceImage, w, h, s);
+          if (token !== previewToken.current) return; // superseded
+          url = canvas.toDataURL("image/png");
+        } else {
+          const resized = getResizedSpriteData(getCurrentSpriteData(), w, h);
+          url = getSpriteDataUrl(ImageExportFormats.PNG, resized, w, h);
+        }
+        if (token !== previewToken.current) return;
+        setPreviewUrl(url);
         setIsStale(false);
       } catch {
         // Keep the previous preview on failure.
@@ -80,47 +104,43 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
         if (token === previewToken.current) setIsProcessing(false);
       }
     },
-    [sourceImage, processSourceToCanvas]
+    [sourceImage, processSourceToCanvas, getCurrentSpriteData, getSpriteDataUrl]
   );
 
-  // Initialise once per open: snapshot the starting state and seed the preview.
+  // Seed staged state + the preview once per open.
   useEffect(() => {
     if (!isOpen) {
-      snapshot.current = null;
+      seededRef.current = false;
       return;
     }
-    if (snapshot.current) return;
-    snapshot.current = { w: width, h: height, settings: { ...settings } };
+    if (seededRef.current) return;
+    seededRef.current = true;
+    setStagedW(width);
+    setStagedH(height);
+    setWidthText(String(width));
+    setHeightText(String(height));
+    setStagedSettings({ ...settings });
     setIsStale(false);
-    if (sourceImage) {
-      runPreview(width, height, settings);
-    } else {
-      // No cached source (hand-drawn sprite): show the current sprite as-is.
-      setPreviewUrl(getSpriteDataUrl(ImageExportFormats.PNG));
-    }
-  }, [
-    isOpen,
-    width,
-    height,
-    settings,
-    sourceImage,
-    runPreview,
-    getSpriteDataUrl,
-  ]);
+    runPreview(width, height, settings);
+  }, [isOpen, width, height, settings, runPreview]);
 
-  // --- Discrete controls: stage + auto-refresh the preview ------------------
+  // --- Discrete controls: stage + recompute the preview instantly -----------
   const applyPreset = (size: number) => {
-    setWidth(size);
-    setHeight(size);
-    runPreview(size, size, settings);
+    setStagedW(size);
+    setStagedH(size);
+    setWidthText(String(size));
+    setHeightText(String(size));
+    runPreview(size, size, stagedSettings);
   };
   const applyCrop = (value: Crop) => {
-    updateSetting("crop", value);
-    runPreview(width, height, { ...settings, crop: value });
+    const next = { ...stagedSettings, crop: value };
+    setStagedSettings(next);
+    runPreview(stagedW, stagedH, next);
   };
   const applyRemoveBackground = (on: boolean) => {
-    updateSetting("removeBackground", on);
-    runPreview(width, height, { ...settings, removeBackground: on });
+    const next = { ...stagedSettings, removeBackground: on };
+    setStagedSettings(next);
+    runPreview(stagedW, stagedH, next);
   };
 
   // --- Continuous controls: stage + mark stale (manual "Update preview") ----
@@ -129,53 +149,53 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
     else setHeightText(raw);
     const n = parseInt(raw, 10);
     if (!Number.isNaN(n) && n >= MIN_LENGTH && n <= MAX_LENGTH) {
-      if (axis === "w") setWidth(n);
-      else setHeight(n);
+      if (axis === "w") setStagedW(n);
+      else setStagedH(n);
     }
-    if (sourceImage) setIsStale(true);
+    setIsStale(true);
   };
   const commitDimension = (axis: "w" | "h") => {
     const raw = axis === "w" ? widthText : heightText;
     const parsed = parseInt(raw, 10);
-    const fallback = axis === "w" ? width : height;
+    const fallback = axis === "w" ? stagedW : stagedH;
     const n = clampSize(Number.isNaN(parsed) ? fallback : parsed);
     if (axis === "w") {
-      setWidth(n);
+      setStagedW(n);
       setWidthText(String(n));
     } else {
-      setHeight(n);
+      setStagedH(n);
       setHeightText(String(n));
     }
   };
   const setTolerance = (value: number) => {
-    updateSetting("tolerance", value);
-    if (sourceImage) setIsStale(true);
+    setStagedSettings((s) => ({ ...s, tolerance: value }));
+    setIsStale(true);
   };
 
-  const refreshPreview = () => runPreview(width, height, settings);
+  const refreshPreview = () => runPreview(stagedW, stagedH, stagedSettings);
 
   // --- Footer actions -------------------------------------------------------
-  const restoreSnapshot = () => {
-    const s = snapshot.current;
-    if (!s) return;
-    setWidth(s.w);
-    setHeight(s.h);
-    updateSetting("removeBackground", s.settings.removeBackground);
-    updateSetting("crop", s.settings.crop);
-    updateSetting("tolerance", s.settings.tolerance);
+  const commitStagedSettings = () => {
+    updateSetting("removeBackground", stagedSettings.removeBackground);
+    updateSetting("crop", stagedSettings.crop);
+    updateSetting("tolerance", stagedSettings.tolerance);
   };
-  // X / Escape / backdrop / Cancel all discard changes.
-  const handleCancel = () => {
-    restoreSnapshot();
-    onClose();
-  };
+  // X / Escape / backdrop / Cancel all discard staged changes — nothing to undo.
   const handleApply = async () => {
-    snapshot.current = null; // commit — don't restore on the resulting close
+    commitStagedSettings();
     if (sourceImage) {
-      await processImageToSprite(sourceImage);
+      // Re-process the cached source at the staged size/settings, then sync the
+      // editor's canvas-size context to match the freshly pasted sprite.
+      await processImageToSprite(sourceImage, {
+        width: stagedW,
+        height: stagedH,
+        settings: stagedSettings,
+      });
+      setWidth(stagedW);
+      setHeight(stagedH);
     } else {
       // Hand-drawn sprite: no source to re-process, so resample the grid.
-      updateCanvasSize(width, height);
+      updateCanvasSize(stagedW, stagedH);
     }
     onClose();
   };
@@ -183,13 +203,13 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
   return (
     <Modal
       isOpen={isOpen}
-      onClose={handleCancel}
+      onClose={onClose}
       size="lg"
       title="Resize & Process"
       subtitle="Re-processing is deliberate — adjust, preview, then apply."
       footer={
         <>
-          <Button variant="secondary" onClick={handleCancel}>
+          <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
           <Button variant="primary" onClick={handleApply}>
@@ -240,19 +260,15 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               {PRESETS.map((size) => {
-                const active = width === size && height === size;
+                const active = stagedW === size && stagedH === size;
                 return (
-                  <button
+                  <Button
                     key={size}
-                    type="button"
-                    onClick={() => applyPreset(size)}
-                    className={`rounded-md border px-2.5 py-1 text-sm transition-colors ${
-                      active
-                        ? "border-accent bg-accent-soft text-accent"
-                        : "border-line text-ink-muted hover:bg-surface-hover"
-                    }`}>
+                    variant="chip"
+                    pressed={active}
+                    onClick={() => applyPreset(size)}>
                     {size}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -262,46 +278,36 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
             <h4 className="mb-2 text-sm font-semibold text-ink">
               Fit / crop mode
             </h4>
-            <div className="flex gap-2">
-              {CROP_MODES.map(({ label, value }) => {
-                const active = settings.crop === value;
-                return (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => applyCrop(value)}
-                    className={`flex-1 whitespace-nowrap rounded-md border px-2 py-1.5 text-sm transition-colors sm:px-3 ${
-                      active
-                        ? "border-accent bg-accent-soft text-accent"
-                        : "border-line text-ink-muted hover:bg-surface-hover"
-                    }`}>
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
+            <SegmentedControl<Crop>
+              stretch
+              ariaLabel="Fit / crop mode"
+              value={stagedSettings.crop}
+              onChange={applyCrop}
+              options={CROP_MODES}
+            />
             <p className="mt-1.5 text-xs text-ink-subtle">
               How the source is fit into the new dimensions.
             </p>
           </div>
 
           <div className="rounded-card border border-line bg-surface p-3">
-            <CheckBox
-              checked={settings.removeBackground}
-              onChange={applyRemoveBackground}>
-              Remove background
-            </CheckBox>
-            {settings.removeBackground && (
+            <Switch
+              label="Remove background"
+              checked={stagedSettings.removeBackground}
+              onChange={applyRemoveBackground}
+              className="w-full justify-between"
+            />
+            {stagedSettings.removeBackground && (
               <div className="mt-3">
                 <div className="mb-1 flex items-center justify-between text-xs text-ink-muted">
                   <span>Tolerance</span>
-                  <span>{settings.tolerance}%</span>
+                  <span>{stagedSettings.tolerance}%</span>
                 </div>
                 <input
                   type="range"
                   min={1}
                   max={100}
-                  value={settings.tolerance}
+                  value={stagedSettings.tolerance}
                   onChange={(e) => setTolerance(Number(e.target.value))}
                   className="range-input"
                 />
@@ -320,45 +326,47 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
                   src={previewUrl}
                   alt="Processed sprite preview"
                   className={`h-full w-full object-contain transition duration-200 ${
-                    isStale ? "opacity-60 blur-[3px]" : ""
+                    isStale || isProcessing
+                      ? "scale-105 opacity-50 blur-[6px]"
+                      : ""
                   }`}
                   style={{ imageRendering: "pixelated" }}
                 />
               )}
 
-              {/* Size badge (mockup) */}
-              <span className="absolute bottom-2 right-2 rounded-md border border-line bg-surface-raised/90 px-2 py-0.5 text-xs font-medium text-ink-muted">
-                {width}×{height}
-              </span>
-
-              {/* Processing indicator */}
+              {/* Processing: a centered spinner over the blurred preview. */}
               {isProcessing && (
-                <span className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full bg-ink/80 px-2 py-0.5 text-xs font-medium text-surface-raised">
-                  Processing…
-                </span>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                  <Spinner size="md" />
+                  <span className="text-xs font-medium text-ink-muted">
+                    Processing…
+                  </span>
+                </div>
+              )}
+
+              {/* Stale (typing a custom size / dragging Tolerance is expensive):
+                  a centered call-to-action recomputes the preview on demand. */}
+              {isStale && !isProcessing && (
+                <Button
+                  variant="primary"
+                  onClick={refreshPreview}
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shadow-lg">
+                  <span aria-hidden className="mr-1.5">
+                    ⟳
+                  </span>
+                  Update preview
+                </Button>
               )}
             </div>
-
-            {/* Manual refresh gate: custom dimensions + tolerance are expensive */}
-            {isStale && sourceImage && (
-              <Button
-                variant="secondary"
-                onClick={refreshPreview}
-                disabled={isProcessing}
-                className="mt-3 w-full">
-                <span aria-hidden className="mr-1.5">
-                  ⟳
-                </span>
-                {isProcessing ? "Updating…" : "Update preview"}
-              </Button>
-            )}
           </div>
 
           <p className="mt-2 flex items-start gap-1.5 text-xs text-ink-subtle">
             <span aria-hidden>ⓘ</span>
             <span>
               Output is snapped to the active palette
-              {settings.removeBackground ? " and background removed." : "."}
+              {stagedSettings.removeBackground
+                ? " and background removed."
+                : "."}
             </span>
           </p>
         </div>
