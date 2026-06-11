@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 // Component imports
 import SizeInputs from "./SizeInputs";
+import Button from "../../../components/Button";
 import DefaultDropDown from "../../../components/DefaultDropDown";
 
 // Context imports

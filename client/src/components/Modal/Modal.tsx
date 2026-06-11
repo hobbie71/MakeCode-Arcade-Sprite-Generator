@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import IconButton from "../IconButton";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl";
 
