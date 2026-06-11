@@ -93,9 +93,16 @@ interface Props {
   /** Quick square-size preset chips (8×8 … 64×64) beneath the Width/Height inputs.
    *  Shown in the Studio Generate modal; hidden in the minimal hero entry widget. */
   showSizePresets?: boolean;
+  /** When false, hide the Size inputs AND the preset chips entirely — the
+   *  asset-type dropdown renders standalone (studio AI tab owns no sizing; final
+   *  dimensions are chosen in Resize & Process). */
+  showSize?: boolean;
 }
 
-const AssetOptionsSelection = ({ showSizePresets = true }: Props) => {
+const AssetOptionsSelection = ({
+  showSizePresets = true,
+  showSize = true,
+}: Props) => {
   const { selectedAsset, setSelectedAsset } = useAssetType();
   const { width, height, setWidth, setHeight } = useCanvasSize();
   const { isGenerating } = useLoading();
@@ -131,21 +138,23 @@ const AssetOptionsSelection = ({ showSizePresets = true }: Props) => {
           </DefaultDropDown>
         </div>
 
-        <div className="min-w-0 flex-1">
-          <label className="form-label">Size</label>
-          {/* Remount per asset type so the locked dimensions re-apply on every
-              switch (Background → 160×120, Tile → 16×16; Sprite is editable). */}
-          <SizeInputs
-            key={selectedAsset}
-            fixedSize={fixedSize}
-            disabled={isGenerating}
-          />
-        </div>
+        {showSize && (
+          <div className="min-w-0 flex-1">
+            <label className="form-label">Size</label>
+            {/* Remount per asset type so the locked dimensions re-apply on every
+                switch (Background → 160×120, Tile → 16×16; Sprite is editable). */}
+            <SizeInputs
+              key={selectedAsset}
+              fixedSize={fixedSize}
+              disabled={isGenerating}
+            />
+          </div>
+        )}
       </div>
 
       {/* Quick square presets — Sprite only (free-form sizing); shown in the
           Studio Generate modal, hidden in the minimal hero entry widget. */}
-      {selectedAsset === AssetType.Sprite && showSizePresets && (
+      {showSize && selectedAsset === AssetType.Sprite && showSizePresets && (
         <div className="flex flex-wrap gap-1.5">
           {COMMON_SIZES.map((n) => {
             const active = width === n && height === n;
