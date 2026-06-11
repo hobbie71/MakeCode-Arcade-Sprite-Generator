@@ -106,7 +106,10 @@ type SelectionContextType = {
   /** Flip / rotate the float in place; lifts first if only selected. */
   flipHorizontal: () => void;
   flipVertical: () => void;
+  /** Rotate 90° clockwise. */
   rotate90: () => void;
+  /** Rotate 90° counter-clockwise. */
+  rotate90CCW: () => void;
   /** Merge the float into the sprite where it sits; ONE history entry. */
   commitFloating: () => void;
   /** Esc: restore the lifted pixels to their origin; no history entry. */
@@ -292,28 +295,41 @@ export const SelectionProvider = ({
   }, [floating, liftSelection]);
 
   // Rotate folds into the basis (a 90° turn isn't expressible as a flip) and
-  // swaps the rect's w/h around its center so the turn pivots in place.
-  const rotate90 = useCallback(() => {
-    if (!floating && !liftSelection()) return;
-    setFloating((prev) => {
-      if (!prev) return prev;
-      const cx = prev.rect.x + prev.rect.w / 2;
-      const cy = prev.rect.y + prev.rect.h / 2;
-      const newW = prev.rect.h;
-      const newH = prev.rect.w;
-      return {
-        ...prev,
-        basisData: rotateData90(prev.basisData),
-        basisMask: rotateMask90(prev.basisMask),
-        rect: {
-          x: Math.round(cx - newW / 2),
-          y: Math.round(cy - newH / 2),
-          w: newW,
-          h: newH,
-        },
-      };
-    });
-  }, [floating, liftSelection]);
+  // swaps the rect's w/h around its center so the turn pivots in place. CCW is
+  // three CW quarter-turns — net dimensions still swap once either way, so the
+  // rect handling is identical regardless of direction.
+  const rotate = useCallback(
+    (ccw: boolean) => {
+      if (!floating && !liftSelection()) return;
+      setFloating((prev) => {
+        if (!prev) return prev;
+        const cx = prev.rect.x + prev.rect.w / 2;
+        const cy = prev.rect.y + prev.rect.h / 2;
+        const newW = prev.rect.h;
+        const newH = prev.rect.w;
+        let basisData = prev.basisData;
+        let basisMask = prev.basisMask;
+        for (let i = 0; i < (ccw ? 3 : 1); i++) {
+          basisData = rotateData90(basisData);
+          basisMask = rotateMask90(basisMask);
+        }
+        return {
+          ...prev,
+          basisData,
+          basisMask,
+          rect: {
+            x: Math.round(cx - newW / 2),
+            y: Math.round(cy - newH / 2),
+            w: newW,
+            h: newH,
+          },
+        };
+      });
+    },
+    [floating, liftSelection]
+  );
+  const rotate90 = useCallback(() => rotate(false), [rotate]); // clockwise
+  const rotate90CCW = useCallback(() => rotate(true), [rotate]); // counter-cw
 
   const commitFloating = useCallback(() => {
     if (!floating || !floatingPixels) return;
@@ -560,6 +576,7 @@ export const SelectionProvider = ({
       flipHorizontal,
       flipVertical,
       rotate90,
+      rotate90CCW,
       commitFloating,
       cancelFloating,
       deleteSelection,
@@ -587,6 +604,7 @@ export const SelectionProvider = ({
       flipHorizontal,
       flipVertical,
       rotate90,
+      rotate90CCW,
       commitFloating,
       cancelFloating,
       deleteSelection,

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
 
 // Context imports
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
@@ -83,6 +84,7 @@ export const useSelectTool = () => {
   const { mode, wandContiguous } = useSelectOptions();
   const {
     floating,
+    floatingPixels,
     mask,
     bounds,
     beginDraft,
@@ -120,17 +122,23 @@ export const useSelectTool = () => {
     [width, height]
   );
 
-  /** Hit-test against the floating buffer's mask or the selection mask. */
+  /**
+   * Hit-test against the floating buffer's CURRENT (derived) mask or the
+   * selection mask. Using floatingPixels.mask — not floating.basisMask — is
+   * load-bearing: after a resize the rect changes size while the basis stays
+   * the original dimensions, so testing the basis would report points inside a
+   * grown float as "outside" and a move-press would start a new marquee.
+   */
   const isInsideSelection = useCallback(
     (p: Coordinates): boolean => {
-      if (floating) {
+      if (floating && floatingPixels) {
         const lx = p.x - floating.rect.x;
         const ly = p.y - floating.rect.y;
-        return maskGet(floating.basisMask, lx, ly);
+        return maskGet(floatingPixels.mask, lx, ly);
       }
       return mask ? maskGet(mask, p.x, p.y) : false;
     },
-    [floating, mask]
+    [floating, floatingPixels, mask]
   );
 
   /**
@@ -224,7 +232,9 @@ export const useSelectTool = () => {
               width,
               height
             );
-            setFloatingTransform(res.rect, res.flipX, res.flipY);
+            // flushSync for the same reason as the move gesture: raw-listener
+            // updates must commit synchronously to stay live during the drag.
+            flushSync(() => setFloatingTransform(res.rect, res.flipX, res.flipY));
           },
           () => {
             gestureRef.current = null;
@@ -256,7 +266,11 @@ export const useSelectTool = () => {
             if (g?.kind !== "move") return;
             // Unclamped: the float may be dragged partly/fully off-canvas.
             const p = getCanvasCoordinates(canvas, ev, zoomRef.current);
-            setFloatingPosition(p.x - g.grabDX, p.y - g.grabDY);
+            // flushSync: this runs in a raw window listener, and React 18 won't
+            // flush the update until its next render — which, when the gesture
+            // didn't lift (already floating), never comes, so the float would
+            // appear frozen. Forcing a synchronous commit keeps the drag live.
+            flushSync(() => setFloatingPosition(p.x - g.grabDX, p.y - g.grabDY));
           },
           () => {
             gestureRef.current = null;

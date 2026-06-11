@@ -1,14 +1,22 @@
 import { IconButton } from "../../../components/IconButton";
 import Tooltip from "../../../components/Tooltip";
 import { useSelection } from "../contexts/SelectionContext/useSelection";
+import {
+  FlipHorizontalIcon,
+  FlipVerticalIcon,
+  RotateLeftIcon,
+  RotateRightIcon,
+} from "./SelectionActionIcons";
 
 /**
- * Flip H / Flip V / Rotate 90° actions on the active selection. They operate on
- * the floating selection, auto-lifting first when only a mask exists. Disabled
- * when there's nothing selected (idle) or a marquee is mid-draw.
+ * Flip H / Flip V / Rotate left / Rotate right actions on the active selection.
+ * They operate on the floating selection, auto-lifting first when only a mask
+ * exists. Disabled when there's nothing selected (idle) or a marquee is
+ * mid-draw.
  */
 export default function SelectionActionsOption() {
-  const { phase, flipHorizontal, flipVertical, rotate90 } = useSelection();
+  const { phase, flipHorizontal, flipVertical, rotate90, rotate90CCW } =
+    useSelection();
   const disabled = phase === "idle" || phase === "drawing";
 
   return (
@@ -19,7 +27,7 @@ export default function SelectionActionsOption() {
           aria-label="Flip horizontal"
           disabled={disabled}
           onClick={flipHorizontal}>
-          <i className="ms-Icon ms-Icon--FlipHorizontal" aria-hidden="true" />
+          <FlipHorizontalIcon />
         </IconButton>
       </Tooltip>
       <Tooltip text="Flip vertical">
@@ -28,16 +36,25 @@ export default function SelectionActionsOption() {
           aria-label="Flip vertical"
           disabled={disabled}
           onClick={flipVertical}>
-          <i className="ms-Icon ms-Icon--FlipVertical" aria-hidden="true" />
+          <FlipVerticalIcon />
         </IconButton>
       </Tooltip>
-      <Tooltip text="Rotate 90°">
+      <Tooltip text="Rotate left">
         <IconButton
           size="sm"
-          aria-label="Rotate 90 degrees"
+          aria-label="Rotate left 90 degrees"
+          disabled={disabled}
+          onClick={rotate90CCW}>
+          <RotateLeftIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip text="Rotate right">
+        <IconButton
+          size="sm"
+          aria-label="Rotate right 90 degrees"
           disabled={disabled}
           onClick={rotate90}>
-          <i className="ms-Icon ms-Icon--Rotate" aria-hidden="true" />
+          <RotateRightIcon />
         </IconButton>
       </Tooltip>
     </div>
