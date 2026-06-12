@@ -15,6 +15,7 @@ import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected
 import { usePencil } from "./usePencil";
 import { useEraser } from "./useEraser";
 import { useFill } from "./useFill";
+import { useEyedropper } from "./useEyedropper";
 import { useLine } from "./useLine";
 import { useRectangle } from "./useRectangle";
 import { useCircle } from "./useCircle";
@@ -48,6 +49,7 @@ export const useMouseHandler = () => {
     handlePointerUp: handleEraserUp,
   } = useEraser();
   const { handlePointerDown: handleFillDown } = useFill();
+  const { handlePointerDown: handleEyedropperDown } = useEyedropper();
   const {
     handlePointerDown: handleLineDown,
     handlePointerMove: handleLineMove,
@@ -75,6 +77,7 @@ export const useMouseHandler = () => {
       [EditorTools.Pencil]: handlePencilDown,
       [EditorTools.Eraser]: handleEraserDown,
       [EditorTools.Fill]: handleFillDown,
+      [EditorTools.Eyedropper]: handleEyedropperDown,
       [EditorTools.Line]: handleLineDown,
       [EditorTools.Rectangle]: handleRectangleDown,
       [EditorTools.Circle]: handleCircleDown,
@@ -83,6 +86,7 @@ export const useMouseHandler = () => {
       handlePencilDown,
       handleEraserDown,
       handleFillDown,
+      handleEyedropperDown,
       handleLineDown,
       handleRectangleDown,
       handleCircleDown,
@@ -240,12 +244,13 @@ export const useMouseHandler = () => {
       }
 
       // Draw dot preview if Left Mouse Button not down AND the tool paints a
-      // pixel on press. Fill and Pan don't, so a colored preview dot
+      // pixel on press. Fill, Eyedropper and Pan don't, so a colored preview dot
       // would be misleading. (Select already returned above.)
       if (
         !isMouseDownRef.current &&
         !isDrawing.current &&
         tool !== EditorTools.Fill &&
+        tool !== EditorTools.Eyedropper &&
         tool !== EditorTools.Pan
       ) {
         // if eraser draw clear preview

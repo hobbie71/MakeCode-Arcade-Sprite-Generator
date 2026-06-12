@@ -2,6 +2,7 @@ export enum EditorTools {
   Pencil = "pencil",
   Eraser = "eraser",
   Fill = "fill",
+  Eyedropper = "eyedropper",
   Line = "line",
   Rectangle = "rectangle",
   Circle = "circle",
@@ -41,6 +42,12 @@ export const ALL_EDITOR_TOOLS: Array<{
     shortcut: "C",
   },
   { tool: EditorTools.Fill, icon: "BucketColor", name: "Fill", shortcut: "F" },
+  {
+    tool: EditorTools.Eyedropper,
+    icon: "Eyedropper",
+    name: "Eyedropper",
+    shortcut: "I",
+  },
   { tool: EditorTools.Pan, icon: "HandsFree", name: "Pan", shortcut: "H" },
   {
     tool: EditorTools.Select,
