@@ -6,7 +6,7 @@ import type {
   Size,
 } from "@makespritecode/shared";
 import { config } from "./config";
-import { getSpriteGenerationPrompt } from "./prompt";
+import { getGenerationPrompt } from "./prompt";
 import { getOpenAIFinalSize, openAIFinalSizeToDims } from "./size";
 
 // Lazily constructed so importing this module (e.g. in tests, or for request
@@ -28,10 +28,12 @@ export async function generateOpenAISprite(
   const finalSize = getOpenAIFinalSize(intendedSize);
 
   const params: OpenAI.Images.ImageGenerateParams = {
-    model: "gpt-image-1.5",
-    prompt: getSpriteGenerationPrompt(settings, intendedSize, palette),
+    model: "gpt-image-2",
+    prompt: getGenerationPrompt(settings, palette),
     n: 1,
-    size: finalSize,
+    // The SDK's `size` union predates gpt-image-2's arbitrary resolutions; the
+    // API accepts any valid "WxH" string, so we assert past the stale literal type.
+    size: finalSize as OpenAI.Images.ImageGenerateParams["size"],
   };
   // Only set quality when non-blank, matching the Python guard.
   if (settings.quality && settings.quality.trim()) {
