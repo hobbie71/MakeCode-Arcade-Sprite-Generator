@@ -32,12 +32,18 @@ bun run --filter server typecheck    # tsc --noEmit
 # Client (cd client, or use --filter client)
 bun run --filter client build        # css:build + tsc -b + build.ts + copy public/ → dist/
 bun run --filter client lint         # eslint
+bun run --filter client test         # bun:test under happy-dom + RTL (harness ready; no client specs yet)
+bun run --filter client typecheck    # tsc -b
 bun run --filter client start        # serve the built dist/ statically
+
+# All workspaces at once (this is what CI runs)
+bun run test                         # fans out to every workspace's test script
+bun run typecheck                    # client tsc -b + server tsc --noEmit
 
 docker compose up                    # bring up both containerized services locally
 ```
 
-Tests live next to source as `*.test.ts` (**server only**): `app.test.ts`, `moderation-logic.test.ts`, `prompt.test.ts`, `size.test.ts`. There is no client test suite.
+Server and shared have `*.test.ts` suites that run plain `bun:test` next to source. The **client test suite was removed in the UI redesign** — those specs targeted the pre-redesign components — and is to be rebuilt for the new UI. The harness, however, is still wired up: happy-dom registers DOM globals via `client/happydom.ts`, RTL's `afterEach(cleanup)` via `client/test-setup.ts`, both through `client/bunfig.toml`'s `[test].preload`, with shared render helpers (`renderWithProviders`, `renderHookWithProviders`) in `client/src/test/test-utils.tsx`. So `bun run --filter client test` passes green with no specs yet, and new `*.test.tsx` files can be dropped in beside their components. Client test files are **excluded from the production `tsc -b` build** (see the `exclude` in `client/tsconfig.app.json`). GitHub Actions runs the suite + typecheck on every pull request (`.github/workflows/test.yml`).
 
 ## Architecture — the big picture
 

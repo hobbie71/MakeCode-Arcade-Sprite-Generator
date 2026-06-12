@@ -10,6 +10,8 @@
     "dev:serve": "bun run dev-server.ts",
     "build": "bun run css:build && tsc -b && bun run ./build.ts && cp -R public/* dist/",
     "lint": "eslint .",
+    "test": "bun test",
+    "typecheck": "tsc -b",
     "start": "serve -s dist"
   },
   "dependencies": {
@@ -24,6 +26,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@happy-dom/global-registrator": "^20.9.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/bun": "^1.3.14",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "eslint": "^9.33.0",

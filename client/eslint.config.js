@@ -52,4 +52,15 @@ export default tseslint.config([
     files: RAW_BUTTON_ALLOWLIST,
     rules: { 'no-restricted-syntax': 'off' },
   },
+  {
+    // Test files and shared test helpers aren't shipped UI: a raw <button> is
+    // fine in render fixtures, and exporting non-component helpers (render
+    // wrappers, re-exports) is the whole point of test-utils — so the
+    // design-system and fast-refresh rules don't apply here.
+    files: ['**/*.test.{ts,tsx}', 'src/test/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': 'off',
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])
