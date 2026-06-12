@@ -14,10 +14,12 @@
   },
   "dependencies": {
     "@makespritecode/shared": "workspace:*",
+    "@remotion/player": "4.0.475",
     "bad-words": "^4.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.17.0",
+    "remotion": "4.0.475",
     "serve": "^14.2.4"
   },
   "devDependencies": {

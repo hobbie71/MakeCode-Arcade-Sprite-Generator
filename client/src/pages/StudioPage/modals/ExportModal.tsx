@@ -5,6 +5,8 @@ import { useExportSpriteData } from "../../../features/SpriteEditor/hooks/useExp
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { ImageExportFormats } from "../../../types/export";
 import { OS } from "../../../utils/getOS";
+import RemotionClip from "../../../remotion/RemotionClip";
+import { EXPORT_FLOW_DEMO } from "../../../remotion/registry";
 
 interface Props {
   isOpen: boolean;
@@ -117,23 +119,29 @@ export default function ExportModal({ isOpen, onClose }: Props) {
           How to paste into MakeCode Arcade
         </h4>
 
-        {/* Walkthrough video — decorative, non-interactive muted autoplay loop,
-            scales 16:9 at every breakpoint. mp4 first so the crisp H.264 encode
-            plays everywhere; pointer-events-none + no controls = can't pause,
-            scrub, hover, or right-click. */}
-        <div className="mt-3 overflow-hidden rounded-card border border-line bg-surface">
-          <video
-            className="pointer-events-none aspect-video w-full"
-            autoPlay
-            muted
-            loop
-            playsInline
-            disablePictureInPicture
-            preload="metadata"
-            aria-label="Demo: exporting your sprite into MakeCode Arcade">
-            <source src="/export-demo.mp4" type="video/mp4" />
-            <source src="/export-demo.webm" type="video/webm" />
-          </video>
+        {/* Walkthrough — the ExportFlowDemo composition rendered live in-browser via
+            @remotion/player (crisper than a baked video). The pre-rendered video is
+            wired in as `fallback` so a live-Player render error can never blank it:
+            normal case shows the live clip, error case silently swaps to the video. */}
+        <div className="mt-3">
+          <RemotionClip
+            composition={EXPORT_FLOW_DEMO}
+            label="Walkthrough: exporting your sprite into MakeCode Arcade"
+            fallback={
+              <video
+                className="h-full w-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+                disablePictureInPicture
+                preload="metadata"
+                aria-label="Demo: exporting your sprite into MakeCode Arcade">
+                <source src="/export-demo.mp4" type="video/mp4" />
+                <source src="/export-demo.webm" type="video/webm" />
+              </video>
+            }
+          />
         </div>
 
         <ol className="mt-4 space-y-2">
