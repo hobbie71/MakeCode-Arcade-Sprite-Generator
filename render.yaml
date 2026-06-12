@@ -34,9 +34,5 @@ services:
         sync: false # set to the makespritecode-api public URL
       - key: VITE_GOOGLE_AD_CLIENT_ID
         sync: false
-      - key: VITE_VERTICAL_AD_SLOT_ID
-        sync: false
-      - key: VITE_HORIZONTAL_AD_SLOT_ID
-        sync: false
       - key: VITE_SQUARE_AD_SLOT_ID
         sync: false

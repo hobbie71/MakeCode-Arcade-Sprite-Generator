@@ -69,7 +69,7 @@ Two **decoupled** Docker services (ADR-0004, ADR-0005), defined as code in `rend
 
 The split lets them version and roll back independently; cutover/rollback is done by re-pointing the client's build-time `VITE_API_URL`.
 
-**Environment variables.** API: `OPENAI_API_KEY`, `CORS_ORIGINS` (a JSON-array literal *or* comma-separated list — see `parseCorsOrigins` in `config.ts`), `ENVIRONMENT`, `PORT` (defaults to 8000), `HOST`, `DEBUG`. Client (**build-time**, inlined into the bundle — must be present at build, not runtime): `VITE_API_URL`, `VITE_GOOGLE_AD_CLIENT_ID`, `VITE_VERTICAL_AD_SLOT_ID`, `VITE_HORIZONTAL_AD_SLOT_ID`, `VITE_SQUARE_AD_SLOT_ID`. Copy `.env.example` → `.env` in both `client/` and `server/` for local dev.
+**Environment variables.** API: `OPENAI_API_KEY`, `CORS_ORIGINS` (a JSON-array literal *or* comma-separated list — see `parseCorsOrigins` in `config.ts`), `ENVIRONMENT`, `PORT` (defaults to 8000), `HOST`, `DEBUG`. Client (**build-time**, inlined into the bundle — must be present at build, not runtime): `VITE_API_URL`, `VITE_GOOGLE_AD_CLIENT_ID`, `VITE_SQUARE_AD_SLOT_ID`. Copy `.env.example` → `.env` in both `client/` and `server/` for local dev.
 
 ## Decisions
 
