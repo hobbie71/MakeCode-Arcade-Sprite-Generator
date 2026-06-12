@@ -315,7 +315,7 @@ const DefaultDropDown = <T,>({
             aria-label={children ? undefined : ariaLabel}
             aria-activedescendant={optionId(activeIndex)}
             onKeyDown={handleListKeyDown}
-            className={`absolute top-full z-50 mt-1.5 max-h-72 w-max min-w-full max-w-[20rem] overflow-auto rounded-card border border-line bg-surface-raised p-1.5 shadow-lg focus:outline-none ${
+            className={`absolute top-full z-50 mt-1.5 flex max-h-72 w-max min-w-full max-w-[20rem] flex-col gap-1 overflow-auto rounded-card border border-line bg-surface-raised p-1.5 shadow-lg focus:outline-none ${
               stacked ? "left-0" : "right-0"
             }`}>
             {options.map(renderOption)}
