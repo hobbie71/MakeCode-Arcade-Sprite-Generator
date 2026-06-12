@@ -117,19 +117,22 @@ export default function ExportModal({ isOpen, onClose }: Props) {
           How to paste into MakeCode Arcade
         </h4>
 
-        {/* Walkthrough video — muted autoplay loop, scales 16:9 at every breakpoint */}
+        {/* Walkthrough video — decorative, non-interactive muted autoplay loop,
+            scales 16:9 at every breakpoint. mp4 first so the crisp H.264 encode
+            plays everywhere; pointer-events-none + no controls = can't pause,
+            scrub, hover, or right-click. */}
         <div className="mt-3 overflow-hidden rounded-card border border-line bg-surface">
           <video
-            className="aspect-video w-full"
+            className="pointer-events-none aspect-video w-full"
             autoPlay
             muted
             loop
             playsInline
-            controls
+            disablePictureInPicture
             preload="metadata"
             aria-label="Demo: exporting your sprite into MakeCode Arcade">
-            <source src="/export-demo.webm" type="video/webm" />
             <source src="/export-demo.mp4" type="video/mp4" />
+            <source src="/export-demo.webm" type="video/webm" />
           </video>
         </div>
 

@@ -354,12 +354,10 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
               {isStale && !isProcessing && (
                 <Button
                   variant="primary"
+                  size="sm"
                   onClick={refreshPreview}
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 shadow-lg">
-                  <span aria-hidden className="mr-1.5">
-                    ⟳
-                  </span>
-                  Update preview
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 gap-1.5 whitespace-nowrap shadow-lg">
+                  <span aria-hidden>⟲</span> Update preview
                 </Button>
               )}
             </div>
