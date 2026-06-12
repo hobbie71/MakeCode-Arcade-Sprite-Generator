@@ -14,11 +14,11 @@ import { useError } from "../../../context/ErrorContext/useError";
 import { usePasteData } from "../../../features/SpriteEditor/hooks/usePasteData";
 import { useMakeCodeColorConverter } from "./useMakeCodeColorConverter";
 
-// Lib imports
-import { createCanvasFromImage } from "../utils/imageProcessers";
-
 // Utils imports
-import { fileToImageElement } from "../utils/imageProcessers";
+import {
+  createCanvasFromImage,
+  fileToImageElement,
+} from "../utils/imageProcessers";
 import {
   removeBackground,
   cropToVisibleContent,
@@ -33,6 +33,23 @@ import { generateOpenAiImage } from "../../../api/generateImageApi";
 // Type imports
 import { AiModel, Crop } from "../../../types/export";
 import type { PostProcessingSettings } from "../../../types/export";
+
+/**
+ * Decodes a base64 data URL into a File
+ */
+const dataUrlToFile = (dataUrl: string, filename: string): File => {
+  const byteString = atob(dataUrl.split(",")[1]);
+  const mimeString = dataUrl.split(",")[0].split(":")[1].split(";")[0];
+
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+
+  const blob = new Blob([ab], { type: mimeString });
+  return new File([blob], filename, { type: mimeString });
+};
 
 export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();
@@ -197,21 +214,7 @@ export const useImageFileHandler = () => {
       }
 
       // Convert Data To Image File
-
-      const dataUrl = response.image_data;
-      const byteString = atob(dataUrl.split(",")[1]);
-      const mimeString = dataUrl.split(",")[0].split(":")[1].split(";")[0];
-
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-      }
-
-      const blob = new Blob([ab], { type: mimeString });
-      const file = new File([blob], "generated-sprite.png", {
-        type: mimeString,
-      });
+      const file = dataUrlToFile(response.image_data, "generated-sprite.png");
 
       // Cache the original generated image so re-processing (resize) is free.
       setImportedImage(file);

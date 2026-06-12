@@ -98,10 +98,6 @@ const expandHueZone = (
   let changed = false;
 
   hueZones.forEach((zone, idx) => {
-    // Calculate current zone size
-    let zoneSize = zone.zoneEnd - zone.zoneStart;
-    if (zoneSize < 0) zoneSize += 360; // Handle wrap-around
-
     // Try to expand start (counter-clockwise)
     let proposedStart = zone.zoneStart - 1;
     if (proposedStart < 0) proposedStart = 359;
@@ -110,51 +106,33 @@ const expandHueZone = (
     let proposedEnd = zone.zoneEnd + 1;
     if (proposedEnd >= 360) proposedEnd = 0;
 
-    // Check if expanding start would overlap with any other zone
-    const startOverlaps = hueZones.some((otherZone, otherIdx) => {
-      if (otherIdx === idx) return false;
-      const isOverlap = angleInZone(proposedStart, otherZone);
-      if (isOverlap) {
-        const otherZoneSize =
-          otherZone.zoneEnd - otherZone.zoneStart < 0
-            ? 360 - otherZone.zoneStart + otherZone.zoneEnd
-            : otherZone.zoneEnd - otherZone.zoneStart;
-        const thisZoneSize =
-          zone.zoneEnd - zone.zoneStart < 0
-            ? 360 - zone.zoneStart + zone.zoneEnd
-            : zone.zoneEnd - zone.zoneStart;
-        // Only combine if both are small and actually overlap, not just touch
+    // Check if the proposed angle lands inside another zone; small zones
+    // that meet the canCombine condition are merged into this one
+    const overlapsOtherZone = (
+      proposed: number,
+      canCombine: (otherZone: HueZone) => boolean
+    ): boolean =>
+      hueZones.some((otherZone, otherIdx) => {
+        if (otherIdx === idx) return false;
+        if (!angleInZone(proposed, otherZone)) return false;
         if (
-          otherZoneSize < 10 &&
-          thisZoneSize < 10 &&
-          angleInRange(otherZone.zoneStart, proposedStart, zone.zoneEnd) &&
-          angleInRange(otherZone.zoneEnd, proposedStart, zone.zoneEnd)
+          zoneSpan(otherZone) < 10 &&
+          zoneSpan(zone) < 10 &&
+          canCombine(otherZone)
         ) {
           hueZones = combineZones(hueZones, zone, otherZone);
         }
-      }
-      return isOverlap;
-    });
+        return true;
+      });
 
-    // Check if expanding end would overlap with any other zone
-    const endOverlaps = hueZones.some((otherZone, otherIdx) => {
-      if (otherIdx === idx) return false;
-      const isOverlap = angleInZone(proposedEnd, otherZone);
-      if (isOverlap) {
-        const otherZoneSize =
-          otherZone.zoneEnd - otherZone.zoneStart < 0
-            ? 360 - otherZone.zoneStart + otherZone.zoneEnd
-            : otherZone.zoneEnd - otherZone.zoneStart;
-        const thisZoneSize =
-          zone.zoneEnd - zone.zoneStart < 0
-            ? 360 - zone.zoneStart + zone.zoneEnd
-            : zone.zoneEnd - zone.zoneStart;
-        if (otherZoneSize < 10 && thisZoneSize < 10) {
-          hueZones = combineZones(hueZones, zone, otherZone);
-        }
-      }
-      return isOverlap;
-    });
+    const startOverlaps = overlapsOtherZone(
+      proposedStart,
+      // Only combine if the other zone actually overlaps, not just touches
+      (otherZone) =>
+        angleInRange(otherZone.zoneStart, proposedStart, zone.zoneEnd) &&
+        angleInRange(otherZone.zoneEnd, proposedStart, zone.zoneEnd)
+    );
+    const endOverlaps = overlapsOtherZone(proposedEnd, () => true);
 
     // Expand start if no overlap and won't enclose another zone
     if (!startOverlaps) {
@@ -170,6 +148,14 @@ const expandHueZone = (
   });
 
   return { zones: hueZones, changed };
+};
+
+/**
+ * Zone size in degrees, handling wrap-around past 0°
+ */
+const zoneSpan = (zone: HueZone): number => {
+  const span = zone.zoneEnd - zone.zoneStart;
+  return span < 0 ? span + 360 : span;
 };
 
 /**
@@ -190,35 +176,27 @@ const angleInRange = (angle: number, start: number, end: number): boolean => {
   return angle >= start && angle <= end;
 };
 
+/**
+ * True when angle `a` sits counter-clockwise of angle `b`, taking the
+ * shorter way around the hue circle
+ */
+const isCounterClockwiseOf = (a: number, b: number): boolean =>
+  (a < b && b - a < 180) || (a > b && a - b > 180);
+
 const combineZones = (
   zones: HueZone[],
   zone1: HueZone,
   zone2: HueZone
 ): HueZone[] => {
   const hueZones = [...zones];
-  const combineZone = [zone1, zone2];
 
-  // Determine new start and end
-  const starts = combineZone.map((z) => z.zoneStart);
-  const ends = combineZone.map((z) => z.zoneEnd);
-
-  // Find the most counter-clockwise start (smallest angle, considering wrap-around)
-  let newStart = starts[0];
-  let newEnd = ends[0];
-  for (let i = 1; i < starts.length; i++) {
-    if (
-      (starts[i] < newStart && newStart - starts[i] < 180) ||
-      (starts[i] > newStart && starts[i] - newStart > 180)
-    ) {
-      newStart = starts[i];
-    }
-    if (
-      (ends[i] > newEnd && ends[i] - newEnd < 180) ||
-      (ends[i] < newEnd && newEnd - ends[i] > 180)
-    ) {
-      newEnd = ends[i];
-    }
-  }
+  // Take the most counter-clockwise start and the most clockwise end
+  const newStart = isCounterClockwiseOf(zone2.zoneStart, zone1.zoneStart)
+    ? zone2.zoneStart
+    : zone1.zoneStart;
+  const newEnd = isCounterClockwiseOf(zone1.zoneEnd, zone2.zoneEnd)
+    ? zone2.zoneEnd
+    : zone1.zoneEnd;
 
   // Merge luminance zones, always white on bottom, black on top
   const luminanceZone = [...zone1.luminanceZone, ...zone2.luminanceZone];
@@ -294,27 +272,17 @@ const expandLuminanceZone = (hueZone: HueZone): boolean => {
     let proposedEnd = lumZone.zoneEnd + 1;
     if (proposedEnd > 100) proposedEnd = 100; // Clamp to maximum
 
-    // Check if expanding start would overlap with any other luminance zone
-    const startOverlaps = hueZone.luminanceZone.some(
-      (otherLumZone, otherIdx) => {
-        if (otherIdx === idx) return false;
-        return luminanceInRange(
-          proposedStart,
-          otherLumZone.zoneStart,
-          otherLumZone.zoneEnd
-        );
-      }
+    // Check if expanding either boundary would overlap with any other luminance zone
+    const startOverlaps = overlapsOtherLuminanceZone(
+      hueZone.luminanceZone,
+      idx,
+      proposedStart
     );
-
-    // Check if expanding end would overlap with any other luminance zone
-    const endOverlaps = hueZone.luminanceZone.some((otherLumZone, otherIdx) => {
-      if (otherIdx === idx) return false;
-      return luminanceInRange(
-        proposedEnd,
-        otherLumZone.zoneStart,
-        otherLumZone.zoneEnd
-      );
-    });
+    const endOverlaps = overlapsOtherLuminanceZone(
+      hueZone.luminanceZone,
+      idx,
+      proposedEnd
+    );
 
     // Special handling for boundary zones (after sorting, first = darkest, last = brightest)
     const isFirstZone = idx === 0; // Darkest zone (should extend to 0)
@@ -358,6 +326,20 @@ const luminanceInRange = (
 ): boolean => {
   return luminance >= start && luminance <= end;
 };
+
+/**
+ * Check if a luminance value falls inside any zone other than the one at selfIdx
+ */
+const overlapsOtherLuminanceZone = (
+  zones: LuminanceZone[],
+  selfIdx: number,
+  luminance: number
+): boolean =>
+  zones.some(
+    (otherLumZone, otherIdx) =>
+      otherIdx !== selfIdx &&
+      luminanceInRange(luminance, otherLumZone.zoneStart, otherLumZone.zoneEnd)
+  );
 
 const isLuminanceZoneStable = (hueZone: HueZone): boolean => {
   // Check if zones are touching each other and covering the full 0-100 range

@@ -4,14 +4,11 @@ import {
   getPixel,
 } from "../../../utils/getDataFromCanvas";
 
-interface BackgroundDetectionResult {
-  backgroundColor: string;
-  boundingBox: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+interface ContentBounds {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
 }
 
 /**
@@ -40,28 +37,14 @@ function sampleBorderColors(
 }
 
 /**
- * Detects the background color and finds the bounding box of non-background content
+ * Finds the bounding box of all non-transparent pixels, or null when the
+ * canvas has no visible content
  */
-export const detectBackgroundAndBounds = (
-  canvas: HTMLCanvasElement,
-  tolerance: number = 30
-): BackgroundDetectionResult => {
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  if (!ctx) {
-    throw new Error("Could not get canvas context");
-  }
-
-  const { width, height } = canvas;
-  const imageData = getImageDataFromCanvas(canvas);
-  const data = imageData.data;
-
-  // Sample border pixels to determine background color (more data than just corners)
-  const borderSamples = sampleBorderColors(data, width, height);
-
-  // Find the most common border color (assuming it's the background)
-  const backgroundColor = findMostCommonColor(borderSamples);
-
-  // Find bounding box of non-background pixels
+const findVisibleContentBounds = (
+  data: Uint8ClampedArray,
+  width: number,
+  height: number
+): ContentBounds | null => {
   let minX = width;
   let minY = height;
   let maxX = -1;
@@ -69,10 +52,7 @@ export const detectBackgroundAndBounds = (
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const pixel = getPixel(data, width, x, y);
-
-      // Check if pixel is significantly different from background
-      if (!isColorSimilar(pixel, backgroundColor, tolerance)) {
+      if (getPixel(data, width, x, y).a > 0) {
         minX = Math.min(minX, x);
         minY = Math.min(minY, y);
         maxX = Math.max(maxX, x);
@@ -81,23 +61,8 @@ export const detectBackgroundAndBounds = (
     }
   }
 
-  // If no content found, return full canvas
-  if (maxX === -1) {
-    return {
-      backgroundColor: `rgba(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, ${backgroundColor.a})`,
-      boundingBox: { x: 0, y: 0, width, height },
-    };
-  }
-
-  return {
-    backgroundColor: `rgba(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b}, ${backgroundColor.a})`,
-    boundingBox: {
-      x: minX,
-      y: minY,
-      width: maxX - minX + 1,
-      height: maxY - minY + 1,
-    },
-  };
+  if (maxX === -1) return null;
+  return { minX, minY, maxX, maxY };
 };
 
 /**
@@ -144,19 +109,55 @@ function floodFill(
 }
 
 /**
+ * Flood fills inward from every border pixel that matches the background
+ * color, returning the mask of pixels reached (the background region)
+ */
+const markBackgroundFromEdges = (
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+  bgColor: RGBA,
+  tolerance: number
+): boolean[][] => {
+  const visited: boolean[][] = Array.from({ length: height }, () =>
+    Array(width).fill(false)
+  );
+
+  const seedFill = (x: number, y: number) => {
+    if (visited[y][x]) return;
+    if (isColorSimilar(getPixel(data, width, x, y), bgColor, tolerance)) {
+      floodFill(data, width, height, x, y, bgColor, tolerance, visited);
+    }
+  };
+
+  // Top and bottom edges
+  for (let x = 0; x < width; x++) {
+    seedFill(x, 0);
+    seedFill(x, height - 1);
+  }
+
+  // Left and right edges (excluding corners to avoid duplication)
+  for (let y = 1; y < height - 1; y++) {
+    seedFill(0, y);
+    seedFill(width - 1, y);
+  }
+
+  return visited;
+};
+
+/**
  * Removes background from canvas using flood fill algorithm
  */
 export const removeBackground = (
   sourceCanvas: HTMLCanvasElement,
   tolerance: number = 30
 ): HTMLCanvasElement => {
-  const detection = detectBackgroundAndBounds(sourceCanvas, tolerance);
-  const { backgroundColor } = detection;
+  const { width, height } = sourceCanvas;
 
   // Create new canvas with same dimensions
   const processedCanvas = document.createElement("canvas");
-  processedCanvas.width = sourceCanvas.width;
-  processedCanvas.height = sourceCanvas.height;
+  processedCanvas.width = width;
+  processedCanvas.height = height;
   const processedCtx = processedCanvas.getContext("2d", {
     willReadFrequently: true,
     alpha: true,
@@ -166,112 +167,31 @@ export const removeBackground = (
     throw new Error("Could not get processed canvas context");
   }
 
-  // Get source image data
-  const sourceCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
-  if (!sourceCtx) {
-    throw new Error("Could not get source canvas context");
-  }
+  const sourceData = getImageDataFromCanvas(sourceCanvas).data;
 
-  const sourceImageData = getImageDataFromCanvas(sourceCanvas);
-  const sourceData = sourceImageData.data;
-
-  // Create new image data for the processed canvas
-  const processedImageData = processedCtx.createImageData(
-    sourceCanvas.width,
-    sourceCanvas.height
-  );
+  // Start the processed canvas as a copy of the source
+  const processedImageData = processedCtx.createImageData(width, height);
   const processedData = processedImageData.data;
+  processedData.set(sourceData);
 
-  // Copy all source data first
-  for (let i = 0; i < sourceData.length; i++) {
-    processedData[i] = sourceData[i];
-  }
-
-  // Parse background color from string
-  const bgMatch = backgroundColor.match(
-    /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d*))?\)/
+  // The most common border color is assumed to be the background
+  const bgColor = findMostCommonColor(
+    sampleBorderColors(sourceData, width, height)
   );
 
-  if (!bgMatch) {
-    processedCtx.putImageData(processedImageData, 0, 0);
-    return processedCanvas;
-  }
-
-  const bgColor: RGBA = {
-    r: parseInt(bgMatch[1]),
-    g: parseInt(bgMatch[2]),
-    b: parseInt(bgMatch[3]),
-    a: bgMatch[4] ? parseInt(bgMatch[4]) : 255,
-  };
-
-  // Create visited array to track flood filled pixels
-  const visited: boolean[][] = Array.from({ length: sourceCanvas.height }, () =>
-    Array(sourceCanvas.width).fill(false)
+  const background = markBackgroundFromEdges(
+    sourceData,
+    width,
+    height,
+    bgColor,
+    tolerance
   );
 
-  const { width, height } = sourceCanvas;
-
-  // Flood fill from border pixels that match background color
-  // Top and bottom edges
-  for (let x = 0; x < width; x++) {
-    // Top edge
-    const topPixel = getPixel(sourceData, width, x, 0);
-    if (isColorSimilar(topPixel, bgColor, tolerance) && !visited[0][x]) {
-      floodFill(sourceData, width, height, x, 0, bgColor, tolerance, visited);
-    }
-
-    // Bottom edge
-    const bottomPixel = getPixel(sourceData, width, x, height - 1);
-    if (
-      isColorSimilar(bottomPixel, bgColor, tolerance) &&
-      !visited[height - 1][x]
-    ) {
-      floodFill(
-        sourceData,
-        width,
-        height,
-        x,
-        height - 1,
-        bgColor,
-        tolerance,
-        visited
-      );
-    }
-  }
-
-  // Left and right edges (excluding corners to avoid duplication)
-  for (let y = 1; y < height - 1; y++) {
-    // Left edge
-    const leftPixel = getPixel(sourceData, width, 0, y);
-    if (isColorSimilar(leftPixel, bgColor, tolerance) && !visited[y][0]) {
-      floodFill(sourceData, width, height, 0, y, bgColor, tolerance, visited);
-    }
-
-    // Right edge
-    const rightPixel = getPixel(sourceData, width, width - 1, y);
-    if (
-      isColorSimilar(rightPixel, bgColor, tolerance) &&
-      !visited[y][width - 1]
-    ) {
-      floodFill(
-        sourceData,
-        width,
-        height,
-        width - 1,
-        y,
-        bgColor,
-        tolerance,
-        visited
-      );
-    }
-  }
-
-  // Apply transparency to all visited (background) pixels
+  // Make every background pixel transparent
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      if (visited[y][x]) {
-        const i = (y * width + x) * 4;
-        processedData[i + 3] = 0; // Set alpha to 0 (transparent)
+      if (background[y][x]) {
+        processedData[(y * width + x) * 4 + 3] = 0;
       }
     }
   }
@@ -293,34 +213,14 @@ export const cropToVisibleContent = (
   }
 
   const { width, height } = sourceCanvas;
-  const imageData = getImageDataFromCanvas(sourceCanvas);
-  const data = imageData.data;
-
-  // Find bounding box of non-transparent pixels
-  let minX = width;
-  let minY = height;
-  let maxX = -1;
-  let maxY = -1;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const pixel = getPixel(data, width, x, y);
-
-      // Check if pixel is not fully transparent
-      if (pixel.a > 0) {
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
-      }
-    }
-  }
+  const data = getImageDataFromCanvas(sourceCanvas).data;
+  const bounds = findVisibleContentBounds(data, width, height);
 
   // If no visible content found, return original canvas
-  if (maxX === -1) {
+  if (!bounds) {
     const newCanvas = document.createElement("canvas");
-    newCanvas.width = sourceCanvas.width;
-    newCanvas.height = sourceCanvas.height;
+    newCanvas.width = width;
+    newCanvas.height = height;
     const newCtx = newCanvas.getContext("2d");
     if (newCtx) {
       newCtx.drawImage(sourceCanvas, 0, 0);
@@ -329,10 +229,10 @@ export const cropToVisibleContent = (
   }
 
   // Tight bounding box crop on all sides
-  const srcX = minX;
-  const srcY = minY;
-  const srcW = Math.max(1, maxX - minX + 1);
-  const srcH = Math.max(1, maxY - minY + 1);
+  const srcX = bounds.minX;
+  const srcY = bounds.minY;
+  const srcW = Math.max(1, bounds.maxX - bounds.minX + 1);
+  const srcH = Math.max(1, bounds.maxY - bounds.minY + 1);
 
   // Create new canvas with cropped dimensions
   const croppedCanvas = document.createElement("canvas");
@@ -364,62 +264,20 @@ export const cropToVisibleContent = (
 };
 
 /**
- * Crops canvas until content touches all 4 edges, maintaining target aspect ratio
- * Removes parts that don't fit to make content fill the entire canvas
+ * Largest crop rect with the target aspect ratio, centered on the content
+ * bounds and clamped to the source canvas
  */
-export const fillToEdges = (
-  sourceCanvas: HTMLCanvasElement,
-  targetWidth: number,
-  targetHeight: number
-): HTMLCanvasElement => {
-  const { width: sourceWidth, height: sourceHeight } = sourceCanvas;
-
-  // Validate input dimensions
-  if (sourceWidth <= 0 || sourceHeight <= 0) {
-    throw new Error("Source canvas must have positive dimensions");
-  }
-
-  if (targetWidth <= 0 || targetHeight <= 0) {
-    throw new Error("Target dimensions must be positive");
-  }
-
-  // Find the actual content bounds first
-  const imageData = getImageDataFromCanvas(sourceCanvas);
-  const data = imageData.data;
-
-  let minX = sourceWidth;
-  let minY = sourceHeight;
-  let maxX = -1;
-  let maxY = -1;
-
-  for (let y = 0; y < sourceHeight; y++) {
-    for (let x = 0; x < sourceWidth; x++) {
-      const pixel = getPixel(data, sourceWidth, x, y);
-      if (pixel.a > 0) {
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
-      }
-    }
-  }
-
-  // If no content found, return canvas with target aspect ratio
-  if (maxX === -1) {
-    const filledCanvas = document.createElement("canvas");
-    filledCanvas.width = targetWidth;
-    filledCanvas.height = targetHeight;
-    return filledCanvas;
-  }
-
+const computeAspectCrop = (
+  bounds: ContentBounds,
+  sourceWidth: number,
+  sourceHeight: number,
+  targetAspect: number
+): { x: number; y: number; width: number; height: number } => {
   // Calculate content dimensions and center
-  const contentWidth = maxX - minX + 1;
-  const contentHeight = maxY - minY + 1;
-  const contentCenterX = minX + contentWidth / 2;
-  const contentCenterY = minY + contentHeight / 2;
-
-  // Calculate target aspect ratio
-  const targetAspect = targetWidth / targetHeight;
+  const contentWidth = bounds.maxX - bounds.minX + 1;
+  const contentHeight = bounds.maxY - bounds.minY + 1;
+  const contentCenterX = bounds.minX + contentWidth / 2;
+  const contentCenterY = bounds.minY + contentHeight / 2;
 
   // Calculate crop dimensions that will touch all 4 edges while maintaining target aspect ratio
   let cropWidth, cropHeight;
@@ -445,21 +303,50 @@ export const fillToEdges = (
   );
 
   // Ensure crop dimensions are valid integers
-  const finalCropWidth = Math.max(
-    1,
-    Math.min(Math.floor(cropWidth), sourceWidth - Math.floor(cropX))
-  );
-  const finalCropHeight = Math.max(
-    1,
-    Math.min(Math.floor(cropHeight), sourceHeight - Math.floor(cropY))
-  );
-  const finalCropX = Math.floor(cropX);
-  const finalCropY = Math.floor(cropY);
+  const x = Math.floor(cropX);
+  const y = Math.floor(cropY);
+  return {
+    x,
+    y,
+    width: Math.max(1, Math.min(Math.floor(cropWidth), sourceWidth - x)),
+    height: Math.max(1, Math.min(Math.floor(cropHeight), sourceHeight - y)),
+  };
+};
+
+/**
+ * Crops canvas until content touches all 4 edges, maintaining target aspect ratio
+ * Removes parts that don't fit to make content fill the entire canvas
+ */
+export const fillToEdges = (
+  sourceCanvas: HTMLCanvasElement,
+  targetWidth: number,
+  targetHeight: number
+): HTMLCanvasElement => {
+  const { width: sourceWidth, height: sourceHeight } = sourceCanvas;
+
+  // Validate input dimensions
+  if (sourceWidth <= 0 || sourceHeight <= 0) {
+    throw new Error("Source canvas must have positive dimensions");
+  }
+
+  if (targetWidth <= 0 || targetHeight <= 0) {
+    throw new Error("Target dimensions must be positive");
+  }
+
+  // Find the actual content bounds first
+  const data = getImageDataFromCanvas(sourceCanvas).data;
+  const bounds = findVisibleContentBounds(data, sourceWidth, sourceHeight);
 
   // Create new canvas with target dimensions
   const filledCanvas = document.createElement("canvas");
   filledCanvas.width = targetWidth;
   filledCanvas.height = targetHeight;
+
+  // If no content found, return empty canvas with target aspect ratio
+  if (!bounds) {
+    return filledCanvas;
+  }
+
   const filledCtx = filledCanvas.getContext("2d", {
     willReadFrequently: true,
     alpha: true,
@@ -469,13 +356,20 @@ export const fillToEdges = (
     throw new Error("Could not get filled canvas context");
   }
 
+  const crop = computeAspectCrop(
+    bounds,
+    sourceWidth,
+    sourceHeight,
+    targetWidth / targetHeight
+  );
+
   // Draw the cropped content to fill the entire target canvas
   filledCtx.drawImage(
     sourceCanvas,
-    finalCropX, // source x (crop start)
-    finalCropY, // source y (crop start)
-    finalCropWidth, // source width (cropped)
-    finalCropHeight, // source height (cropped)
+    crop.x, // source x (crop start)
+    crop.y, // source y (crop start)
+    crop.width, // source width (cropped)
+    crop.height, // source height (cropped)
     0, // dest x
     0, // dest y
     targetWidth, // dest width (fill target)

@@ -46,15 +46,9 @@ const ImageUploadForm = ({ onFile }: Props) => {
     setLiveMessage("");
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isGenerating) return;
-    setIsDragging(false);
+  const acceptFile = (file: File | undefined) => {
     setError(null);
     setLiveMessage("");
-
-    const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
       handleFile(file);
       setLiveMessage(`Image ${file.name} uploaded successfully.`);
@@ -65,19 +59,17 @@ const ImageUploadForm = ({ onFile }: Props) => {
     }
   };
 
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isGenerating) return;
+    setIsDragging(false);
+    acceptFile(e.dataTransfer.files[0]);
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isGenerating) return;
-    setError(null);
-    setLiveMessage("");
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      handleFile(file);
-      setLiveMessage(`Image ${file.name} uploaded successfully.`);
-    } else {
-      const errorMsg = "Please upload a valid image file.";
-      setError(errorMsg);
-      setLiveMessage(errorMsg);
-    }
+    acceptFile(e.target.files?.[0]);
   };
 
   const handleClick = () => {
