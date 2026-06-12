@@ -1,4 +1,4 @@
-import { rgbaToHsla, type HSLA, type RGBA } from "./colors/colorConversion";
+import type { RGBA } from "./colors/colorConversion";
 
 /**
  * Get a single pixel from image data
@@ -50,20 +50,4 @@ export const getRgbaDataFromCanvas = (canvas: HTMLCanvasElement): RGBA[][] => {
   }
 
   return rgbaData;
-};
-
-export const getHslaDataFromCanvas = (canvas: HTMLCanvasElement): HSLA[][] => {
-  const RgbaData = getRgbaDataFromCanvas(canvas);
-  const HslaData: HSLA[][] = [];
-
-  for (const row of RgbaData) {
-    const hslaRow: HSLA[] = [];
-    for (const rgba of row) {
-      const { r, g, b, a } = rgba;
-      hslaRow.push(rgbaToHsla(r, g, b, a));
-    }
-    HslaData.push(hslaRow);
-  }
-
-  return HslaData;
 };

@@ -2,21 +2,21 @@ import type { ModerationResponse } from "../../../types/export";
 import { Filter } from "bad-words";
 import { moderatePrompt } from "../../../api/moderatePrompt";
 
-export const isTextInappropriate = (text: string) => {
+const isTextInappropriate = (text: string) => {
   if (!text) return false;
 
   const filter = new Filter();
   return filter.isProfane(text);
 };
 
-export const filterBadWords = (text: string): string => {
+const filterBadWords = (text: string): string => {
   if (!text) return text;
 
   const filter = new Filter();
   return filter.clean(text);
 };
 
-export const getModerationError = (moderation: ModerationResponse): string => {
+const getModerationError = (moderation: ModerationResponse): string => {
   const categories = moderation.categories;
 
   const flaggedCategories = Object.entries(categories)

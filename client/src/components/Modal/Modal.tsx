@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import IconButton from "../IconButton";
 
-export type ModalSize = "sm" | "md" | "lg" | "xl";
+type ModalSize = "sm" | "md" | "lg" | "xl";
 
 const SIZE_CLASSES: Record<ModalSize, string> = {
   sm: "max-w-sm",

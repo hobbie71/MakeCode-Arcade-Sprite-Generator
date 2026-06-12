@@ -9,7 +9,6 @@ import { AssetType, OpenAIQuality } from "@makespritecode/shared";
 export { AssetType, OpenAIQuality };
 export type {
   Size,
-  BaseGenerationSettings,
   OpenAIGenerationSettings,
   OpenAISpriteRequest,
   ModerationResponse,
@@ -25,29 +24,6 @@ export enum ImageExportFormats {
   JPEG = "jpeg",
   WEBP = "webp",
 }
-
-export const ALL_IMAGE_EXPORT_FORMATS = [
-  { name: "PNG", format: ImageExportFormats.PNG },
-  { name: "JPEG", format: ImageExportFormats.JPEG },
-  { name: "WEBP", format: ImageExportFormats.WEBP },
-];
-
-// =============================================================================
-// CODE EXPORT FORMATS (UI-only)
-// =============================================================================
-
-/** Supported code export formats for sprites */
-export enum CodeExportFormats {
-  SPRITE_EDITOR = "sprite-editor",
-  JAVASCRIPT = "javascript",
-  PYTHON = "python",
-}
-
-export const ALL_CODE_EXPORT_FORMATS = [
-  { name: "Sprite Editor", format: CodeExportFormats.SPRITE_EDITOR },
-  { name: "Javascript", format: CodeExportFormats.JAVASCRIPT },
-  { name: "Python", format: CodeExportFormats.PYTHON },
-];
 
 // =============================================================================
 // ASSET TYPES — UI selection catalog (AssetType enum from shared)
@@ -68,9 +44,6 @@ export const ALL_ASSETS_TYPE: AssetType[] = [
 export enum AiModel {
   GPTImage1 = "gpt-image-1",
 }
-
-/** AI model options with display names */
-export const ALL_AI_MODELS = [{ name: "GPTImage1-5", model: AiModel.GPTImage1 }];
 
 // =============================================================================
 // OPENAI quality catalog (OpenAIQuality enum from shared)
@@ -101,22 +74,9 @@ export enum GenerationMethod {
   BlankCanvas = "blank",
 }
 
-/** Available generation methods */
-export const generationMethods: GenerationMethod[] = [
-  GenerationMethod.TextToSprite,
-  GenerationMethod.ImageToSprite,
-];
-
 // =============================================================================
 // POST-PROCESSING & EXPORT SETTINGS (UI-only)
 // =============================================================================
-
-/** Settings for image export processing */
-export type ImageExportSettings = {
-  removeBackground: boolean;
-  cropEdges: boolean;
-  tolerance: number;
-};
 
 /** Cropping options for post-processing */
 export enum Crop {
@@ -125,23 +85,9 @@ export enum Crop {
   Fill = "fill",
 }
 
-/** Crop options with display names */
-export const ALL_CROP_OPTIONS = [
-  { name: "None", option: Crop.None },
-  { name: "Edges", option: Crop.Edges },
-  { name: "Fill", option: Crop.Fill },
-];
-
 /** Settings for post-processing generated images */
 export type PostProcessingSettings = {
   removeBackground: boolean;
   crop: Crop;
   tolerance: number;
-};
-
-/** Default settings for text-to-sprite generation */
-export const DEFAULT_TEXT_TO_SPRITE_SETTINGS: ImageExportSettings = {
-  removeBackground: false,
-  cropEdges: false,
-  tolerance: 30,
 };

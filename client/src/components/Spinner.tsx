@@ -15,7 +15,7 @@ const SIZES = {
  * that rotates. Used for in-flight work (the global generation overlay, the
  * Resize & Process live-preview recompute, …).
  */
-export const Spinner = ({ size = "md", className = "" }: SpinnerProps) => (
+const Spinner = ({ size = "md", className = "" }: SpinnerProps) => (
   <div
     role="status"
     aria-label="Loading"

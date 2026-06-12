@@ -25,7 +25,7 @@ const SIZE_CLASS: Record<NonNullable<ButtonProps["size"]>, string> = {
   lg: "btn-lg",
 };
 
-export const Button = ({
+const Button = ({
   children,
   className = "",
   variant = "primary",
