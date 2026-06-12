@@ -3,7 +3,8 @@ import type {
   MakeCodePalette,
   OpenAIGenerationSettings,
 } from "@makespritecode/shared";
-import { AssetType, Style, OpenAIQuality } from "@makespritecode/shared";
+import { AssetType, OpenAIQuality } from "@makespritecode/shared";
+import { getOpenAIFinalSize } from "./size";
 
 // ---------------------------------------------------------------------------
 // Stub the OpenAI SDK so importing/exercising ./openai needs no API key and
@@ -67,7 +68,6 @@ const palette: MakeCodePalette = {
 const baseSettings: OpenAIGenerationSettings = {
   prompt: "a cute green dragon",
   assetType: AssetType.Sprite,
-  style: Style.Retro,
   quality: OpenAIQuality.Low,
 };
 
@@ -81,20 +81,18 @@ describe("generateOpenAISprite", () => {
   test("returns a data URL plus width/height derived from the final size (square)", async () => {
     const result = await generateOpenAISprite(baseSettings, { width: 16, height: 16 }, palette);
     expect(result.image_data).toBe("data:image/png;base64,QUJDREVG");
-    expect(result.width).toBe(1024);
-    expect(result.height).toBe(1024);
+    // gpt-image-2 sizing preserves the sprite's aspect ratio; a square stays square.
+    expect(result.width).toBe(result.height);
   });
 
-  test("landscape intended size -> 1536x1024 dims", async () => {
+  test("landscape intended size -> wider-than-tall dims", async () => {
     const result = await generateOpenAISprite(baseSettings, { width: 24, height: 16 }, palette);
-    expect(result.width).toBe(1536);
-    expect(result.height).toBe(1024);
+    expect(result.width).toBeGreaterThan(result.height);
   });
 
-  test("portrait intended size -> 1024x1536 dims", async () => {
+  test("portrait intended size -> taller-than-wide dims", async () => {
     const result = await generateOpenAISprite(baseSettings, { width: 16, height: 24 }, palette);
-    expect(result.width).toBe(1024);
-    expect(result.height).toBe(1536);
+    expect(result.height).toBeGreaterThan(result.width);
   });
 
   test("forwards the correct params to images.generate", async () => {
@@ -107,9 +105,9 @@ describe("generateOpenAISprite", () => {
       size: string;
       quality?: string;
     };
-    expect(params.model).toBe("gpt-image-1.5");
+    expect(params.model).toBe("gpt-image-2");
     expect(params.n).toBe(1);
-    expect(params.size).toBe("1024x1024");
+    expect(params.size).toBe(getOpenAIFinalSize({ width: 16, height: 16 }));
     expect(typeof params.prompt).toBe("string");
     // Prompt is built from settings -> contains the user prompt text.
     expect(params.prompt).toContain("a cute green dragon");

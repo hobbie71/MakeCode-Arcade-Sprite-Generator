@@ -5,6 +5,7 @@ import { usePreviewCanvas } from "../../../context/PreviewCanvasContext/usePrevi
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
+import { useShapeMode } from "../contexts/ShapeModeContext/useShapeMode";
 
 // Lib imports
 import {
@@ -15,6 +16,8 @@ import {
   getLineCoordinates,
   getCircleCoordinates,
   getSquareCoordinates,
+  getFilledCircleCoordinates,
+  getFilledSquareCoordinates,
 } from "../libs/getShapeCoordinates";
 
 // Type imports
@@ -24,11 +27,17 @@ import { PIXEL_SIZE } from "../constants/canvas";
 import type { Coordinates } from "../../../types/pixel";
 import type { MakeCodeColor } from "../../../types/color";
 
+type GetShapeCoordinates = (
+  start: Coordinates,
+  end: Coordinates
+) => Coordinates[];
+
 export const useCanvasPreview = () => {
   const { previewCanvasRef } = usePreviewCanvas();
   const { color } = useColorSelected();
   const { palette } = usePaletteSelected();
   const { strokeSize } = useStrokeSize();
+  const { shapeMode } = useShapeMode();
 
   const clearPreview = useCallback(() => {
     const canvas = previewCanvasRef.current;
@@ -59,14 +68,19 @@ export const useCanvasPreview = () => {
     [clearPreview, previewCanvasRef, color, palette, strokeSize]
   );
 
-  const drawLinePreview = useCallback(
-    (startCoordinates: Coordinates, endCoordinates: Coordinates) => {
+  // Shared body of the shape previews; not exported from the hook.
+  const drawShapePreview = useCallback(
+    (
+      getCoordinates: GetShapeCoordinates,
+      startCoordinates: Coordinates,
+      endCoordinates: Coordinates
+    ) => {
       const canvas = previewCanvasRef.current;
       if (!canvas) return;
 
       clearPreview();
 
-      const coordinates = getLineCoordinates(startCoordinates, endCoordinates);
+      const coordinates = getCoordinates(startCoordinates, endCoordinates);
       drawPixelsOnCanvas(
         canvas,
         coordinates,
@@ -77,52 +91,36 @@ export const useCanvasPreview = () => {
       );
     },
     [clearPreview, color, palette, previewCanvasRef, strokeSize]
+  );
+
+  const drawLinePreview = useCallback(
+    (startCoordinates: Coordinates, endCoordinates: Coordinates) =>
+      drawShapePreview(getLineCoordinates, startCoordinates, endCoordinates),
+    [drawShapePreview]
   );
 
   const drawSquarePreview = useCallback(
-    (startCoordinates: Coordinates, endCoordinates: Coordinates) => {
-      const canvas = previewCanvasRef.current;
-      if (!canvas) return;
-
-      clearPreview();
-
-      const coordinates = getSquareCoordinates(
+    (startCoordinates: Coordinates, endCoordinates: Coordinates) =>
+      drawShapePreview(
+        shapeMode === "fill"
+          ? getFilledSquareCoordinates
+          : getSquareCoordinates,
         startCoordinates,
         endCoordinates
-      );
-      drawPixelsOnCanvas(
-        canvas,
-        coordinates,
-        color,
-        palette,
-        PIXEL_SIZE,
-        strokeSize
-      );
-    },
-    [clearPreview, color, palette, previewCanvasRef, strokeSize]
+      ),
+    [drawShapePreview, shapeMode]
   );
 
   const drawCirclePreview = useCallback(
-    (startCoordinates: Coordinates, endCoordinates: Coordinates) => {
-      const canvas = previewCanvasRef.current;
-      if (!canvas) return;
-
-      clearPreview();
-
-      const coordinates = getCircleCoordinates(
+    (startCoordinates: Coordinates, endCoordinates: Coordinates) =>
+      drawShapePreview(
+        shapeMode === "fill"
+          ? getFilledCircleCoordinates
+          : getCircleCoordinates,
         startCoordinates,
         endCoordinates
-      );
-      drawPixelsOnCanvas(
-        canvas,
-        coordinates,
-        color,
-        palette,
-        PIXEL_SIZE,
-        strokeSize
-      );
-    },
-    [clearPreview, color, palette, previewCanvasRef, strokeSize]
+      ),
+    [drawShapePreview, shapeMode]
   );
 
   return {

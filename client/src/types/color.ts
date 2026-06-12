@@ -86,7 +86,7 @@ export const ArcadePalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#000000",
 };
 
-export const MattePalette: MakeCodePalette = {
+const MattePalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
   [MakeCodeColor.WHITE]: "#FFF1E8",
   [MakeCodeColor.RED]: "#FF004D",
@@ -105,7 +105,7 @@ export const MattePalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#1D2B53",
 };
 
-export const PastelPalette: MakeCodePalette = {
+const PastelPalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
   [MakeCodeColor.WHITE]: "#FFF7E4",
   [MakeCodeColor.RED]: "#F98284",
@@ -124,7 +124,7 @@ export const PastelPalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#28282E",
 };
 
-export const SweetPalette: MakeCodePalette = {
+const SweetPalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
   [MakeCodeColor.WHITE]: "#F4F4F4",
   [MakeCodeColor.RED]: "#B13E53",
@@ -143,7 +143,7 @@ export const SweetPalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#1A1C2C",
 };
 
-export const PokePalette: MakeCodePalette = {
+const PokePalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
   [MakeCodeColor.WHITE]: "#FFFFFF",
   [MakeCodeColor.RED]: "#D45362",
@@ -162,7 +162,7 @@ export const PokePalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#1B1221",
 };
 
-export const AdventurePalette: MakeCodePalette = {
+const AdventurePalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
   [MakeCodeColor.WHITE]: "#F5EDBA",
   [MakeCodeColor.RED]: "#9D303B",
@@ -180,7 +180,7 @@ export const AdventurePalette: MakeCodePalette = {
   [MakeCodeColor.BROWN]: "#9A6348",
   [MakeCodeColor.BLACK]: "#1F0E1C",
 };
-export const DIYPalette: MakeCodePalette = {
+const DIYPalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
   [MakeCodeColor.WHITE]: "#F8F8F8",
   [MakeCodeColor.RED]: "#F80000",
@@ -199,7 +199,7 @@ export const DIYPalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#000000",
 };
 
-export const AdafruitPalette: MakeCodePalette = {
+const AdafruitPalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
   [MakeCodeColor.WHITE]: "#FFFFFF",
   [MakeCodeColor.RED]: "#FF0000",
@@ -218,7 +218,7 @@ export const AdafruitPalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#000000",
 };
 
-export const StillLifePalette: MakeCodePalette = {
+const StillLifePalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
   [MakeCodeColor.WHITE]: "#A8E4D4",
   [MakeCodeColor.RED]: "#D13B27",
@@ -237,7 +237,7 @@ export const StillLifePalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#000000",
 };
 
-export const SteamPunkPalette: MakeCodePalette = {
+const SteamPunkPalette: MakeCodePalette = {
   [MakeCodeColor.TRANSPARENT]: "rgba(0,0,0,0)",
   [MakeCodeColor.WHITE]: "#C0D1CC",
   [MakeCodeColor.RED]: "#603B3A",
@@ -256,7 +256,7 @@ export const SteamPunkPalette: MakeCodePalette = {
   [MakeCodeColor.BLACK]: "#2F213B",
 };
 
-export const ALL_PALETTES = [
+const ALL_PALETTES = [
   { name: "Arcade", palette: ArcadePalette },
   { name: "Matte", palette: MattePalette },
   { name: "Pastel", palette: PastelPalette },
@@ -268,3 +268,19 @@ export const ALL_PALETTES = [
   { name: "StillLife", palette: StillLifePalette },
   { name: "SteamPunk", palette: SteamPunkPalette },
 ];
+
+// The opaque colours of a palette, in canonical order — used to render the
+// little colour-preview mosaic in the palette dropdowns (Transparent dropped).
+const OPAQUE_COLOR_ORDER = ColorOrder.filter(
+  (color) => color !== MakeCodeColor.TRANSPARENT
+);
+
+const getPaletteSwatches = (palette: MakeCodePalette): string[] =>
+  OPAQUE_COLOR_ORDER.map((color) => palette[color]);
+
+/** ALL_PALETTES decorated with swatch previews, ready for the dropdown. */
+export const PALETTE_OPTIONS = ALL_PALETTES.map((entry) => ({
+  name: entry.name,
+  palette: entry.palette,
+  swatches: getPaletteSwatches(entry.palette),
+}));

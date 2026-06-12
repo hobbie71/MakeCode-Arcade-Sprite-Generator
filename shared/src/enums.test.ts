@@ -2,8 +2,6 @@ import { test, expect, describe } from "bun:test";
 import {
   AssetType,
   AssetTypeSchema,
-  Style,
-  StyleSchema,
   OpenAIQuality,
   OpenAIQualitySchema,
 } from "./enums";
@@ -26,19 +24,11 @@ describe("AssetType", () => {
   });
 });
 
-describe("Style", () => {
-  test("schema round-trips every member", () => {
-    for (const value of Object.values(Style)) {
-      expect(StyleSchema.parse(value)).toBe(value);
-    }
-    expect(StyleSchema.safeParse("baroque").success).toBe(false);
-  });
-});
-
 describe("OpenAIQuality", () => {
-  test("only low/medium are valid (no 'high')", () => {
+  test("low, medium and high are valid; unknown strings are rejected", () => {
     expect(OpenAIQualitySchema.parse(OpenAIQuality.Low)).toBe("low");
     expect(OpenAIQualitySchema.parse(OpenAIQuality.Medium)).toBe("medium");
-    expect(OpenAIQualitySchema.safeParse("high").success).toBe(false);
+    expect(OpenAIQualitySchema.parse(OpenAIQuality.High)).toBe("high");
+    expect(OpenAIQualitySchema.safeParse("ultra").success).toBe(false);
   });
 });

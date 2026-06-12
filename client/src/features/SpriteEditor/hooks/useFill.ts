@@ -5,6 +5,8 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
+import { useHistory } from "../contexts/HistoryContext/useHistory";
+import { useFillOptions } from "../contexts/FillOptionsContext/useFillOptions";
 
 // Hook imports
 import { useSpriteData } from "./useSpriteData";
@@ -23,6 +25,8 @@ export const useFill = () => {
   const { width, height } = useCanvasSize();
   const { getCurrentSpriteData, setSpriteDataCoordinates, commitSpriteData } =
     useSpriteData();
+  const { pushSnapshot } = useHistory();
+  const { fillAll } = useFillOptions();
 
   const floodFill = useCallback(
     (
@@ -36,6 +40,27 @@ export const useFill = () => {
       if (targetColor === replacementColor) return;
 
       const spriteData = getCurrentSpriteData();
+
+      const paint = (x: number, y: number) => {
+        drawPixelOnCanvas(canvasRef.current!, { x, y }, replacementColor, palette);
+        setSpriteDataCoordinates({ x, y }, replacementColor);
+      };
+
+      // "All matching" = global: recolor every pixel of the target color on the
+      // canvas, ignoring contiguity.
+      if (fillAll) {
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            if (spriteData[y][x] === targetColor) paint(x, y);
+          }
+        }
+        return;
+      }
+
+      // Otherwise a 4-connected contiguous flood of the clicked region.
+      const isInBounds = ({ x, y }: Coordinates) =>
+        x >= 0 && x < width && y >= 0 && y < height;
+
       const stack: Coordinates[] = [startCoordinates];
       const visited = new Set<string>();
 
@@ -43,35 +68,14 @@ export const useFill = () => {
         const current = stack.pop()!;
         const key = `${current.x},${current.y}`;
 
-        // Skip if already visited or out of bounds
-        if (
-          visited.has(key) ||
-          current.x < 0 ||
-          current.x >= width ||
-          current.y < 0 ||
-          current.y >= height
-        ) {
-          continue;
-        }
+        // Skip if already visited, out of bounds, or not the target color
+        if (visited.has(key) || !isInBounds(current)) continue;
+        if (spriteData[current.y][current.x] !== targetColor) continue;
 
-        // Skip if current pixel is not the target color
-        if (spriteData[current.y][current.x] !== targetColor) {
-          continue;
-        }
-
-        // Mark as visited
         visited.add(key);
+        paint(current.x, current.y);
 
-        // Fill the current pixel
-        drawPixelOnCanvas(
-          canvasRef.current,
-          current,
-          replacementColor,
-          palette
-        );
-        setSpriteDataCoordinates(current, replacementColor);
-
-        // Add neighboring pixels to stack
+        // Continue the flood through the orthogonal neighbors
         stack.push(
           { x: current.x + 1, y: current.y }, // Right
           { x: current.x - 1, y: current.y }, // Left
@@ -87,6 +91,7 @@ export const useFill = () => {
       height,
       getCurrentSpriteData,
       setSpriteDataCoordinates,
+      fillAll,
     ]
   );
 
@@ -113,6 +118,7 @@ export const useFill = () => {
 
       // Commit the changes
       commitSpriteData();
+      pushSnapshot(getCurrentSpriteData());
     },
     [
       canvasRef,
@@ -122,6 +128,7 @@ export const useFill = () => {
       floodFill,
       color,
       commitSpriteData,
+      pushSnapshot,
     ]
   );
 

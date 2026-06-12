@@ -7,5 +7,6 @@ export const usePaletteSelected = () => {
     throw new Error(
       "usePaletteSelected must be inside <PaletteSelectedProvider>"
     );
-  return context;
+  const { value: palette, setValue: setPalette } = context;
+  return { palette, setPalette };
 };

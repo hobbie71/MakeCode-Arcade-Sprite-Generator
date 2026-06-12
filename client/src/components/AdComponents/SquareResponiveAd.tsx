@@ -3,7 +3,7 @@ import { useEffect } from "react";
 // Const imports
 import { GOOGLE_AD_CLIENT_ID, SQUARE_AD_SLOT_ID } from "../../constants/ads";
 
-export const SquareResponiveAd = () => {
+const SquareResponiveAd = () => {
   useEffect(() => {
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});

@@ -21,18 +21,7 @@ export const drawPixelOnCanvas = (
     if (color === MakeCodeColor.TRANSPARENT) {
       drawCheckerboard(canvas, strokePosition, pixelSize);
     } else {
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      const hexColor = getHexFromMakeCodeColor(color, palette);
-
-      ctx.fillStyle = hexColor;
-      ctx.fillRect(
-        strokePosition.x * pixelSize,
-        strokePosition.y * pixelSize,
-        pixelSize,
-        pixelSize
-      );
+      fillPixel(canvas, strokePosition, color, palette, pixelSize);
     }
   });
 };
@@ -50,41 +39,8 @@ export const drawPixelOnCanvasTransparent = (
   const strokePositions = getStrokeCoordinates(position, strokeSize);
 
   strokePositions.forEach((strokePosition) => {
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const hexColor = getHexFromMakeCodeColor(color, palette);
-
-    ctx.fillStyle = hexColor;
-    ctx.fillRect(
-      strokePosition.x * pixelSize,
-      strokePosition.y * pixelSize,
-      pixelSize,
-      pixelSize
-    );
+    fillPixel(canvas, strokePosition, color, palette, pixelSize);
   });
-};
-
-export const drawSpriteDataOnCanvas = (
-  canvas: HTMLCanvasElement,
-  startPosition: Coordinates,
-  spriteData: MakeCodeColor[][],
-  palette: MakeCodePalette,
-  pixelSize: number = PIXEL_SIZE,
-  strokeSize: StrokeSize = 1
-) => {
-  for (let y = 0; y < spriteData.length; y++) {
-    for (let x = 0; x < spriteData[y].length; x++) {
-      drawPixelOnCanvas(
-        canvas,
-        { x: startPosition.x + x, y: startPosition.y + y },
-        spriteData[y][x],
-        palette,
-        pixelSize,
-        strokeSize
-      );
-    }
-  }
 };
 
 export const drawSpriteDataOnCanvasTransparent = (
@@ -120,6 +76,25 @@ export const drawPixelsOnCanvas = (
   positions.forEach((position) => {
     drawPixelOnCanvas(canvas, position, color, palette, pixelSize, strokeSize);
   });
+};
+
+const fillPixel = (
+  canvas: HTMLCanvasElement,
+  position: Coordinates,
+  color: MakeCodeColor,
+  palette: MakeCodePalette,
+  pixelSize: number
+) => {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  ctx.fillStyle = getHexFromMakeCodeColor(color, palette);
+  ctx.fillRect(
+    position.x * pixelSize,
+    position.y * pixelSize,
+    pixelSize,
+    pixelSize
+  );
 };
 
 const drawCheckerboard = (

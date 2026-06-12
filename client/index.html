@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <!-- Favicon -->
@@ -30,6 +30,12 @@
       name="twitter:description"
       content="Easily create, edit, and export pixel art sprites for MakeCode Arcade. Text-to-Sprite and Image-to-Sprite Generation for Sprites, Background, and Tiles" />
     <meta name="twitter:image" content="/web-app-manifest-512x512.png" />
+    <!-- Fonts: Geist (UI), Geist Mono (code), Press Start 2P (pixel accent) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400..600&family=Press+Start+2P&display=swap" />
     <!-- Google AdSense (I've change my Client ID) -->
     <script
       async
@@ -44,9 +50,8 @@
     <script src="/errorProtectionMessage.js"></script>
     <!-- Setup -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css" />
+    <!-- Fabric MDL2 icon font is self-hosted and bundled via `import` in main.tsx
+         (was loaded from the office-ui-fabric-core CDN). See src/main.tsx. -->
   </head>
   <body>
     <div id="root"></div>

@@ -23,9 +23,11 @@ const SizeInput = ({ type, fixedSize, disabled = false }: Props) => {
   // Ref
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // A fixed value or disabled state locks out all user interaction
+  const isLocked = Boolean(fixedSize) || disabled;
+
   const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
-    // Don't allow input if fixedSize is set or disabled
-    if (fixedSize || disabled) return;
+    if (isLocked) return;
 
     const input = e.currentTarget;
     if (input.value.length > 3) {
@@ -38,8 +40,7 @@ const SizeInput = ({ type, fixedSize, disabled = false }: Props) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Don't allow keyboard interaction if fixedSize is set or disabled
-    if (fixedSize || disabled) {
+    if (isLocked) {
       e.preventDefault();
       return;
     }
@@ -63,8 +64,7 @@ const SizeInput = ({ type, fixedSize, disabled = false }: Props) => {
   };
 
   const handleUserSubmit = () => {
-    // Don't allow submission if fixedSize is set or disabled
-    if (fixedSize || disabled) return;
+    if (isLocked) return;
 
     const input = inputRef.current;
     if (!input) return;
@@ -77,21 +77,16 @@ const SizeInput = ({ type, fixedSize, disabled = false }: Props) => {
   };
 
   const incrementSize = (amount: number) => {
-    // Don't allow increment if fixedSize is set or disabled
-    if (fixedSize || disabled) return;
+    if (isLocked) return;
 
     const input = inputRef.current;
     if (!input) return;
 
-    if (amount < 0) {
-      // Decreasing
-      if (Number(input.value) === MIN_LENGTH) return;
-    } else {
-      // Increasing
-      if (Number(input.value) === MAX_LENGTH) return;
-    }
+    const value = Number(input.value);
+    const limit = amount < 0 ? MIN_LENGTH : MAX_LENGTH;
+    if (value === limit) return;
 
-    input.value = String(Number(input.value) + amount);
+    input.value = String(value + amount);
     handleUserSubmit();
   };
 
@@ -115,15 +110,14 @@ const SizeInput = ({ type, fixedSize, disabled = false }: Props) => {
   return (
     <input
       ref={inputRef}
-      className={`form-input input-no-arrows min-w-24 text-center ${
-        fixedSize || disabled ? "opacity-50 cursor-not-allowed" : ""
+      className={`form-input input-no-arrows w-full px-3 py-2 text-left font-medium ${
+        isLocked ? "opacity-50 cursor-not-allowed" : ""
       }`}
       type="number"
+      aria-label={type === "width" ? "Width" : "Height"}
       maxLength={3}
       onInput={handleInput}
-      onDoubleClick={() =>
-        !fixedSize && !disabled && inputRef.current?.select()
-      }
+      onDoubleClick={() => !isLocked && inputRef.current?.select()}
       onKeyDown={handleKeyDown}
       onBlur={() => handleUserSubmit()}
       max={MAX_LENGTH}
@@ -138,7 +132,7 @@ const SizeInput = ({ type, fixedSize, disabled = false }: Props) => {
             : undefined
       }
       style={{
-        userSelect: fixedSize || disabled ? "none" : "auto",
+        userSelect: isLocked ? "none" : "auto",
       }}
     />
   );

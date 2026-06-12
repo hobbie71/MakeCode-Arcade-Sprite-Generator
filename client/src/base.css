@@ -1,4 +1,137 @@
-/* Box sizing reset */
+/* ============================================================================
+   DESIGN TOKENS — semantic CSS variables (light + dark).
+
+   Source of truth: docs/design/design-tokens.reference.css, extracted verbatim
+   from the locked redesign mockup (docs/design/redesign-mockup.html).
+
+   - oklch color space; one accent hue (--accent-h: 264, indigo) threads through
+     accent, surfaces, text, borders and shadows — retheme by changing the hue.
+   - :root === light. [data-theme="dark"] overrides the surfaces/text/borders for
+     the future dark toggle (no toggle ships yet, but the whole app flips via these).
+   - Components must NEVER hardcode colors. Use the Tailwind utilities mapped to
+     these vars in tailwind.config.js (bg-surface, text-ink, bg-accent, …) or
+     var(--token) directly.
+   ============================================================================ */
+:root,
+[data-theme="light"] {
+  /* Accent (indigo, hue 264) */
+  --accent-h: 264;
+  --accent: oklch(0.58 0.18 var(--accent-h));
+  --accent-hover: oklch(0.52 0.18 var(--accent-h));
+  --accent-press: oklch(0.46 0.18 var(--accent-h));
+  --accent-contrast: #ffffff;
+  --accent-soft: oklch(0.965 0.028 var(--accent-h));
+  --accent-soft-2: oklch(0.93 0.05 var(--accent-h));
+  --accent-border: oklch(0.86 0.07 var(--accent-h));
+  --accent-ring: oklch(0.58 0.18 var(--accent-h) / 0.32);
+
+  /* Surfaces */
+  --surface: oklch(0.985 0.002 var(--accent-h));
+  --surface-raised: #ffffff;
+  --surface-sunken: oklch(0.972 0.003 var(--accent-h));
+  --surface-hover: oklch(0.965 0.004 var(--accent-h));
+  --canvas-stage: oklch(0.95 0.004 var(--accent-h));
+
+  /* Text */
+  --text: oklch(0.24 0.012 var(--accent-h));
+  --text-muted: oklch(0.48 0.012 var(--accent-h));
+  --text-subtle: oklch(0.62 0.01 var(--accent-h));
+  --text-on-accent: #ffffff;
+
+  /* Borders */
+  --border: oklch(0.92 0.004 var(--accent-h));
+  --border-strong: oklch(0.85 0.006 var(--accent-h));
+  --border-faint: oklch(0.955 0.003 var(--accent-h));
+
+  /* State */
+  --success: oklch(0.6 0.15 155);
+  --success-soft: oklch(0.95 0.04 155);
+  --warning: oklch(0.72 0.15 75);
+  --warning-soft: oklch(0.96 0.05 85);
+  --danger: oklch(0.58 0.2 25);
+  --danger-soft: oklch(0.95 0.05 25);
+  --info: var(--accent);
+
+  /* Canvas transparency checkerboard */
+  --checker-a: oklch(0.99 0 0);
+  --checker-b: oklch(0.93 0.003 var(--accent-h));
+
+  /* Shadows (accent-tinted neutrals) */
+  --shadow-xs: 0 1px 2px oklch(0.4 0.03 var(--accent-h) / 0.06);
+  --shadow-sm: 0 1px 2px oklch(0.4 0.03 var(--accent-h) / 0.05),
+    0 2px 6px oklch(0.4 0.03 var(--accent-h) / 0.06);
+  --shadow-md: 0 2px 4px oklch(0.4 0.03 var(--accent-h) / 0.05),
+    0 8px 20px oklch(0.4 0.03 var(--accent-h) / 0.09);
+  --shadow-lg: 0 10px 24px oklch(0.4 0.03 var(--accent-h) / 0.1),
+    0 24px 60px oklch(0.4 0.03 var(--accent-h) / 0.14);
+  --shadow-accent: 0 2px 8px oklch(0.58 0.18 var(--accent-h) / 0.32),
+    0 1px 2px oklch(0.58 0.18 var(--accent-h) / 0.24);
+
+  /* Radii */
+  --radius-xs: 6px;
+  --radius-sm: 9px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-pill: 999px;
+
+  /* Spacing scale */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-20: 80px;
+  --sp-24: 96px;
+
+  /* Typography */
+  --font-sans: "Geist", "Geist Fallback", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-pixel: "Press Start 2P", "Geist", monospace;
+  --fs-display: clamp(40px, 5.2vw, 68px);
+  --fs-h1: clamp(30px, 3.4vw, 44px);
+  --fs-h2: 30px;
+  --fs-h3: 22px;
+  --fs-h4: 18px;
+  --fs-body-lg: 17px;
+  --fs-body: 15px;
+  --fs-sm: 13.5px;
+  --fs-xs: 12px;
+  --fs-2xs: 11px;
+
+  /* Easing */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] {
+  --surface: oklch(0.17 0.008 var(--accent-h));
+  --surface-raised: oklch(0.21 0.01 var(--accent-h));
+  --surface-sunken: oklch(0.15 0.008 var(--accent-h));
+  --surface-hover: oklch(0.25 0.012 var(--accent-h));
+  --canvas-stage: oklch(0.13 0.006 var(--accent-h));
+  --text: oklch(0.95 0.004 var(--accent-h));
+  --text-muted: oklch(0.72 0.01 var(--accent-h));
+  --text-subtle: oklch(0.58 0.01 var(--accent-h));
+  --border: oklch(0.3 0.01 var(--accent-h));
+  --border-strong: oklch(0.4 0.012 var(--accent-h));
+  --border-faint: oklch(0.25 0.008 var(--accent-h));
+  --accent-soft: oklch(0.28 0.06 var(--accent-h));
+  --accent-soft-2: oklch(0.34 0.09 var(--accent-h));
+  --accent-border: oklch(0.42 0.1 var(--accent-h));
+  --checker-a: oklch(0.26 0.006 var(--accent-h));
+  --checker-b: oklch(0.21 0.006 var(--accent-h));
+}
+
+/* ============================================================================
+   BASE RESETS + token-driven element defaults
+   ============================================================================ */
 *,
 *::before,
 *::after {
@@ -8,56 +141,22 @@
   scroll-behavior: smooth;
 }
 
-/* Remove default margin and padding */
 html,
 body {
   height: 100%;
   width: 100%;
-  font-family: "Inter", Arial, sans-serif;
-  background: #171717;
 }
 
-/* Remove list styles */
-ul,
-ol {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* Default link styles */
-a {
-  color: #0078d4;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-a:hover,
-a:focus {
-  color: #005fa3;
-  text-decoration: underline;
-}
-
-/* Remove default button styles */
-button {
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
-  cursor: pointer;
-}
-
-/* Remove default image border */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  border: 0;
-}
-
-/* Set base box-sizing for all elements */
 body {
-  line-height: 1.5;
   min-height: 100vh;
+  line-height: 1.5;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  background-color: var(--surface);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 #root {
@@ -65,34 +164,63 @@ body {
   min-height: 100vh;
 }
 
-/* Remove outline on active elements, but keep for accessibility */
-:focus {
-  outline: 2px solid #0078d4;
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s var(--ease);
+}
+a:hover,
+a:focus {
+  color: var(--accent-hover);
+}
+
+button {
+  background: none;
+  /* No border reset here: Tailwind preflight already zeroes it with
+     border-style solid, which `border-*` width utilities rely on. */
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border: 0;
+}
+
+/* Keyboard-only focus ring (no ring on mouse clicks) */
+:focus-visible {
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-/* Transparent Background */
-:root {
-  --transparent-primary-color: #aeaeae;
-  --transparent-secondary-color: #dedede;
-}
-
+/* Transparency checkerboard for the canvas + sprite previews */
 .transparent {
-  background-color: var(--transparent-primary-color);
+  background-color: var(--checker-a);
   background-image:
     linear-gradient(
       45deg,
-      var(--transparent-secondary-color) 25%,
+      var(--checker-b) 25%,
       transparent 25%,
       transparent 75%,
-      var(--transparent-secondary-color) 75%
+      var(--checker-b) 75%
     ),
     linear-gradient(
       45deg,
-      var(--transparent-secondary-color) 25%,
-      var(--transparent-primary-color) 25%,
-      var(--transparent-primary-color) 75%,
-      var(--transparent-secondary-color) 75%
+      var(--checker-b) 25%,
+      var(--checker-a) 25%,
+      var(--checker-a) 75%,
+      var(--checker-b) 75%
     );
   background-size: 11px 11px;
   background-position:
@@ -102,12 +230,6 @@ body {
 
 canvas {
   image-rendering: pixelated;
-}
-
-html,
-body {
-  background-color: #121418;
-  color: white;
 }
 
 .input-no-arrows::-webkit-inner-spin-button,

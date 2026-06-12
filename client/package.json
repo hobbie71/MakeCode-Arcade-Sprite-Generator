@@ -6,7 +6,8 @@
   "scripts": {
     "css:build": "tailwindcss -c ./tailwind.config.js -i ./src/tailwind.src.css -o ./src/tailwind.gen.css --minify",
     "css:dev": "tailwindcss -c ./tailwind.config.js -i ./src/tailwind.src.css -o ./src/tailwind.gen.css --watch",
-    "dev": "bun run css:build && (bun run css:dev & bun index.html)",
+    "dev": "bun run css:build && (bun run css:dev & bun run dev-server.ts)",
+    "dev:serve": "bun run dev-server.ts",
     "build": "bun run css:build && tsc -b && bun run ./build.ts && cp -R public/* dist/",
     "lint": "eslint .",
     "test": "bun test",
@@ -15,10 +16,12 @@
   },
   "dependencies": {
     "@makespritecode/shared": "workspace:*",
+    "@remotion/player": "4.0.475",
     "bad-words": "^4.0.0",
-    "prismjs": "^1.30.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-router-dom": "^7.17.0",
+    "remotion": "4.0.475",
     "serve": "^14.2.4"
   },
   "devDependencies": {
@@ -27,7 +30,6 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
     "@types/bun": "^1.3.14",
-    "@types/prismjs": "^1.26.5",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "eslint": "^9.33.0",

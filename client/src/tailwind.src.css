@@ -2,76 +2,95 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tooltip entrance: a quick fade + subtle scale so the bubble feels like it
+   pops out of the trigger rather than blinking in. */
+@keyframes tooltip-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @layer components {
+  .tooltip-pop {
+    animation: tooltip-pop 120ms var(--ease-out);
+  }
+
   /* Typography Components */
   .heading-1 {
-    @apply text-3xl lg:text-4xl font-bold text-text-default-300 mb-4 leading-tight;
+    @apply text-3xl lg:text-4xl font-bold text-ink mb-4 leading-tight;
   }
 
   .heading-2 {
-    @apply text-2xl lg:text-3xl font-bold text-text-default-300 mb-3 leading-tight;
+    @apply text-2xl lg:text-3xl font-bold text-ink mb-3 leading-tight;
   }
 
   .heading-3 {
-    @apply text-xl lg:text-2xl font-semibold text-text-default-300 mb-3 leading-snug;
+    @apply text-xl lg:text-2xl font-semibold text-ink mb-3 leading-snug;
   }
 
   .heading-4 {
-    @apply text-lg lg:text-xl font-semibold text-text-default-300 mb-2 leading-snug;
+    @apply text-lg lg:text-xl font-semibold text-ink mb-2 leading-snug;
   }
 
   .heading-5 {
-    @apply text-base lg:text-lg font-medium text-text-default-300 mb-2 leading-normal;
+    @apply text-base lg:text-lg font-medium text-ink mb-2 leading-normal;
   }
 
   .heading-6 {
-    @apply text-sm lg:text-base font-medium text-text-default-300 mb-2 leading-normal;
+    @apply text-sm lg:text-base font-medium text-ink mb-2 leading-normal;
   }
 
   .paragraph {
-    @apply text-base text-text-default-300 mb-4 leading-relaxed;
+    @apply text-base text-ink mb-4 leading-relaxed;
   }
 
   .paragraph-sm {
-    @apply text-sm text-text-default-300 mb-3 leading-relaxed;
+    @apply text-sm text-ink mb-3 leading-relaxed;
   }
 
   .paragraph-lg {
-    @apply text-lg text-text-default-300 mb-4 leading-relaxed;
+    @apply text-lg text-ink mb-4 leading-relaxed;
   }
 
   .text-muted {
-    @apply text-text-default-200 text-sm;
+    @apply text-ink-muted text-sm;
   }
 
   .text-caption {
-    @apply text-xs text-text-default-200 uppercase tracking-wide font-medium;
+    @apply text-xs text-ink-muted uppercase tracking-wide font-medium;
   }
 
   .text-emphasis {
-    @apply font-semibold text-primary-500;
+    @apply font-semibold text-accent;
   }
 
   .text-error {
-    @apply text-danger-500 font-medium;
+    @apply text-danger font-medium;
   }
 
   .text-success {
-    @apply text-green-600 font-medium;
+    color: var(--success);
+    @apply font-medium;
   }
 
   .text-warning {
-    @apply text-yellow-600 font-medium;
+    color: var(--warning);
+    @apply font-medium;
   }
 
   .text-link {
-    @apply text-focus hover:text-focus-dark underline cursor-pointer transition-colors;
+    @apply text-accent hover:text-accent-hover underline cursor-pointer transition-colors;
   }
 
   /* Layout Components */
 
   .sidebar {
-    @apply hidden sm:block w-80 bg-default-200 border-r border-text-default-200 flex-shrink-0;
+    @apply hidden sm:block w-80 bg-surface border-r border-line flex-shrink-0;
   }
 
   .sidebar-mobile {
@@ -95,7 +114,7 @@
   }
 
   .popup-content {
-    @apply bg-default-200 shadow-default-lg rounded-3xl p-6 max-w-md mx-auto w-full relative text-text-default-200;
+    @apply bg-surface-raised shadow-lg rounded-modal p-6 max-w-md mx-auto w-full relative text-ink border border-line;
   }
 
   .absolute-center {
@@ -104,11 +123,7 @@
 
   /* Button Components */
   .btn {
-    @apply text-text-default-300 font-medium rounded-lg px-3 py-2 my-2 flex items-center justify-center border-none;
-  }
-
-  .btn:hover:not(:disabled) {
-    @apply bg-primary-600;
+    @apply text-ink font-medium rounded-chip px-3 py-2 flex items-center justify-center border-none transition-colors;
   }
 
   .btn:active:not(:disabled) {
@@ -121,23 +136,116 @@
   }
 
   .btn-primary {
-    @apply btn bg-primary-500 shadow-default-lg;
+    @apply btn bg-accent text-on-accent shadow-accent;
   }
 
-  .btn-secondary {
-    @apply btn bg-default-400 shadow-default-lg;
+  .btn-primary:hover:not(:disabled) {
+    @apply bg-accent-hover;
   }
 
   .btn-danger {
-    @apply btn bg-danger-500 shadow-[2px_2px_0px_theme('colors.danger.600')];
+    @apply btn bg-danger text-on-accent shadow-sm;
+  }
+
+  .btn-success {
+    @apply btn bg-success text-on-accent shadow-sm;
+  }
+
+  /* Outline variant: transparent fill, accent border + text. NOTE: the base
+     .btn sets border-style:none, so we must re-assert `border-solid` here or
+     the outline won't render (border-width alone stays invisible). */
+  .btn-outline {
+    @apply btn border border-solid border-accent bg-transparent text-accent shadow-sm;
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    @apply bg-accent-soft;
   }
 
   .btn-sm {
-    @apply px-2 py-1 text-sm;
+    @apply px-4 py-2 text-sm;
   }
 
   .btn-lg {
-    @apply px-4 py-3 text-lg;
+    @apply px-6 py-3 text-base;
+  }
+
+  /* Chip: small toggle/preset pill. Like .btn-outline, `border-solid` must be
+     re-asserted because the base .btn sets border-style:none. The :not(.active)
+     hover guards keep the hover fill from washing out the pressed state. */
+  .btn-chip {
+    @apply btn border border-solid border-line bg-transparent px-2.5 py-1 text-sm text-ink-muted shadow-none;
+  }
+
+  .btn-chip:hover:not(:disabled):not(.active) {
+    @apply bg-surface-hover text-ink;
+  }
+
+  .btn-chip.active {
+    @apply border-accent bg-accent-soft text-accent;
+  }
+
+  /* Ghost square icon button (IconButton component). */
+  .icon-btn {
+    @apply flex shrink-0 items-center justify-center rounded text-ink transition-colors;
+  }
+
+  .icon-btn:hover:not(:disabled):not(.active) {
+    @apply bg-surface-hover;
+  }
+
+  .icon-btn:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .icon-btn-md {
+    @apply h-8 w-8;
+  }
+
+  .icon-btn-sm {
+    @apply rounded-md p-1;
+  }
+
+  .icon-btn.active {
+    @apply bg-accent text-on-accent;
+  }
+
+  /* Right-dock tabs. One persistent button per section: icon-only by default,
+     expanding to an icon + label pill when active. Keeping the element mounted
+     (rather than swapping an icon-only button for a labelled one) lets the label
+     animate its width on select instead of popping in. Layered after .btn-chip so
+     these overrides win at equal specificity. */
+  .dock-tab {
+    @apply flex items-center gap-0 rounded-chip border-0 bg-transparent p-1.5
+           text-ink-muted shadow-none transition-all duration-200;
+  }
+
+  .dock-tab:hover:not(.active):not([aria-disabled="true"]) {
+    @apply bg-surface-hover text-ink;
+  }
+
+  .dock-tab.active {
+    @apply gap-1.5 bg-accent-soft px-3 py-1.5 text-accent;
+  }
+
+  .dock-tab[aria-disabled="true"] {
+    @apply cursor-not-allowed opacity-40;
+  }
+
+  /* The label collapses to a zero-width grid track when idle; animating the
+     0fr → 1fr track reaches the text's natural width (transitioning to `auto`
+     directly is not animatable). The inner span clips the overflow mid-animation. */
+  .dock-tab__label {
+    @apply grid grid-cols-[0fr] overflow-hidden text-sm font-medium leading-none
+           opacity-0 transition-all duration-200;
+  }
+
+  .dock-tab.active .dock-tab__label {
+    @apply grid-cols-[1fr] opacity-100;
+  }
+
+  .dock-tab__label > span {
+    @apply overflow-hidden whitespace-nowrap;
   }
 
   /* Form Components */
@@ -150,15 +258,15 @@
   }
 
   .form-label {
-    @apply block font-medium text-text-default-200 mb-1;
+    @apply block font-medium text-ink-muted mb-1;
   }
 
   .form-input {
-    @apply px-2 py-1 text-text-default-300 bg-default-300 rounded-md shadow-default-lg hover:bg-default-400 transition-colors;
+    @apply px-2 py-1 text-ink bg-surface-raised border border-line rounded-md shadow-xs hover:bg-surface-hover focus:border-accent transition-colors;
   }
 
   .form-select {
-    @apply form-input appearance-none bg-default-300 border-none text-text-default-300 shadow-default-lg cursor-pointer hover:bg-default-400;
+    @apply form-input appearance-none cursor-pointer;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.5rem center;
     background-repeat: no-repeat;
@@ -176,11 +284,11 @@
   }
 
   .tab-button {
-    @apply btn px-4 py-2 text-sm font-medium bg-default-300;
+    @apply btn px-4 py-2 text-sm font-medium bg-surface text-ink;
   }
 
   .tab-button.active {
-    @apply bg-primary-500;
+    @apply bg-accent text-on-accent;
   }
 
   .tab-panel {
@@ -189,11 +297,11 @@
 
   /* Card Components */
   .card {
-    @apply rounded-lg shadow-default-lg border overflow-hidden;
+    @apply rounded-card shadow-md border border-line bg-surface-raised overflow-hidden;
   }
 
   .card-header {
-    @apply px-4 py-3 bg-default-300 border-b;
+    @apply px-4 py-3 bg-surface border-b border-line;
   }
 
   .card-body {
@@ -201,7 +309,7 @@
   }
 
   .card-footer {
-    @apply px-4 py-3 bg-default-300 border-t;
+    @apply px-4 py-3 bg-surface border-t border-line;
   }
 
   /* Tool Components */
@@ -210,28 +318,32 @@
   }
 
   .tool-button {
-    @apply flex w-8 h-8 text-white bg-default-300 hover:bg-default-400 shadow-default-md items-center justify-center rounded;
+    @apply flex w-8 h-8 text-ink hover:bg-surface-hover items-center justify-center rounded transition-colors;
   }
 
   .tool-button.active {
-    @apply border border-solid border-white;
+    @apply bg-accent text-on-accent;
   }
 
   .color-palette {
-    @apply flex flex-row flex-wrap justify-center gap-1.5;
+    @apply grid grid-cols-4 gap-2;
   }
 
   .color-swatch {
-    @apply w-8 h-8 rounded shadow-default-lg cursor-pointer hover:scale-110 transition-transform;
+    @apply w-full aspect-square rounded shadow-sm cursor-pointer hover:scale-110 transition-transform;
   }
 
   /* Canvas Components */
+  /* `isolate` makes this its own stacking context so the canvas overlays'
+     z-indexes (preview/grid/import/selection) stay contained and don't paint
+     over the floating stage widgets (color badge, history, action bar) that are
+     its siblings in CanvasStage. */
   .canvas-container {
-    @apply flex-1 overflow-hidden relative h-screen sm:h-auto rounded-lg;
+    @apply isolate flex-1 overflow-hidden relative h-full;
   }
 
   .canvas-wrapper {
-    @apply relative bg-white rounded-lg shadow-lg overflow-hidden;
+    @apply relative bg-surface-raised rounded-lg shadow-lg overflow-hidden;
   }
 
   /* Export Components */
@@ -240,7 +352,7 @@
   }
 
   .export-card {
-    @apply card text-center transition-shadow bg-primary-500 p-3 border-none;
+    @apply card text-center transition-shadow bg-accent text-on-accent p-3 border-none;
   }
 
   /* Mobile Components */
@@ -270,14 +382,14 @@
 
   /* Input Range/Slider */
   .range-input {
-    @apply w-full h-2 bg-default-300 rounded-lg appearance-none cursor-pointer;
+    @apply w-full h-2 bg-surface-hover rounded-lg appearance-none cursor-pointer;
   }
 
   .range-input::-webkit-slider-thumb {
-    @apply appearance-none w-4 h-4 bg-primary-500 rounded-full cursor-pointer;
+    @apply appearance-none w-4 h-4 bg-accent rounded-full cursor-pointer;
   }
 
   .range-input::-moz-range-thumb {
-    @apply w-4 h-4 bg-primary-500 rounded-full cursor-pointer border-none;
+    @apply w-4 h-4 bg-accent rounded-full cursor-pointer border-none;
   }
 }

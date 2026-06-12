@@ -1,28 +1,7 @@
-import { createContext, useState, useMemo } from "react";
+import { createStateContext } from "../createStateContext";
 
-type ErrorContextType = {
-  error: string | null;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
-};
+const { Context: ErrorContext, Provider: ErrorProvider } = createStateContext<
+  string | null
+>(null);
 
-const ErrorContext = createContext<undefined | ErrorContextType>(undefined);
-
-export const ErrorProvider = ({ children }: { children: React.ReactNode }) => {
-  const [error, setError] = useState<string | null>(null);
-
-  const contextValue = useMemo(
-    () => ({
-      error,
-      setError,
-    }),
-    [error]
-  );
-
-  return (
-    <ErrorContext.Provider value={contextValue}>
-      {children}
-    </ErrorContext.Provider>
-  );
-};
-
-export { ErrorContext };
+export { ErrorContext, ErrorProvider };

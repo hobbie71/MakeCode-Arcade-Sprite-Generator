@@ -1,13 +1,17 @@
 import { useColorSelected } from "../../../../features/SpriteEditor/contexts/ColorSelectedContext/useColorSelected";
 import { MakeCodeColor } from "../../../../types/color";
 import { getHexFromMakeCodeColor } from "../../../../utils/colors/getColorFromMakeCodeColor";
+import IconButton from "../../../../components/IconButton";
 import Tooltip from "../../../../components/Tooltip";
 import { useKeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
 import type { KeyboardShortcut } from "../../../../hooks/useKeyboardShortcut";
 import { getColorName } from "../../../../types/color";
 
-const ICON_SIZE = 32; // px
-
+/**
+ * Compact current-color chip for the left rail: a swatch of the primary color
+ * with the secondary peeking behind it. Click (or press X) swaps primary and
+ * secondary. Sized to sit inside the narrow rail — it never overflows or clips.
+ */
 const SelectedColorIcons = () => {
   const { color, setColor, alternateColor, setAlternateColor } =
     useColorSelected();
@@ -26,47 +30,29 @@ const SelectedColorIcons = () => {
   const ariaLabel = `Swap colors. Primary: ${primaryColorName}, Secondary: ${secondaryColorName}`;
   const tooltipText = `Swap colors (${primaryColorName} ↔ ${secondaryColorName})`;
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    switch (e.key) {
-      case "Enter":
-      case " ":
-        e.preventDefault();
-        swapColors();
-        break;
-      default:
-        break;
-    }
-  };
-
   return (
     <Tooltip text={tooltipText} hotkey="x">
-      <button
-        className="relative w-full my-2 rounded"
-        style={{ height: ICON_SIZE + 8 }} // +8 for overlap
+      <IconButton
         onClick={swapColors}
-        onKeyDown={handleKeyDown}
         aria-label={ariaLabel}
-        role="button"
-        type="button"
-        tabIndex={0}>
-        <div
-          className={`absolute border border-black rounded-lg w-4/5 top-0 left-0 z-10 shadow-default-lg pointer-events-none ${color === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
-          style={{
-            height: ICON_SIZE,
-            backgroundColor: getHexFromMakeCodeColor(color),
-          }}
-          aria-hidden="true"
-          tabIndex={-1}
-        />
-        <div
-          className={`absolute border border-black rounded-lg w-4/5 bottom-0 right-0 z-0 shadow-default-lg pointer-events-none ${alternateColor === MakeCodeColor.TRANSPARENT ? "transparent" : ""}`}
-          style={{
-            height: ICON_SIZE,
-            backgroundColor: getHexFromMakeCodeColor(alternateColor),
-          }}
+        className="relative">
+        {/* Secondary swatch, offset behind the primary */}
+        <span
+          className={`absolute bottom-0 right-0 h-5 w-5 rounded-md border border-line shadow-xs ${
+            alternateColor === MakeCodeColor.TRANSPARENT ? "transparent" : ""
+          }`}
+          style={{ backgroundColor: getHexFromMakeCodeColor(alternateColor) }}
           aria-hidden="true"
         />
-      </button>
+        {/* Primary swatch, on top */}
+        <span
+          className={`absolute left-0 top-0 h-5 w-5 rounded-md border border-line shadow-sm ${
+            color === MakeCodeColor.TRANSPARENT ? "transparent" : ""
+          }`}
+          style={{ backgroundColor: getHexFromMakeCodeColor(color) }}
+          aria-hidden="true"
+        />
+      </IconButton>
     </Tooltip>
   );
 };

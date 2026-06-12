@@ -1,31 +1,7 @@
-import { createContext, useState, useMemo } from "react";
-import type { Dispatch, SetStateAction } from "react";
 import type { StrokeSize } from "../../../../types/pixel";
+import { createStateContext } from "../../../../context/createStateContext";
 
-type StrokeSizeType = {
-  strokeSize: StrokeSize;
-  setStrokeSize: Dispatch<SetStateAction<StrokeSize>>;
-};
+const { Context: StrokeSizeContext, Provider: StrokeSizeProvider } =
+  createStateContext<StrokeSize>(1);
 
-const StrokeSizeContext = createContext<undefined | StrokeSizeType>(undefined);
-
-export const StrokeSizeProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [strokeSize, setStrokeSize] = useState<StrokeSize>(1);
-
-  const contextValue = useMemo(
-    () => ({ strokeSize, setStrokeSize }),
-    [strokeSize]
-  );
-
-  return (
-    <StrokeSizeContext.Provider value={contextValue}>
-      {children}
-    </StrokeSizeContext.Provider>
-  );
-};
-
-export { StrokeSizeContext };
+export { StrokeSizeContext, StrokeSizeProvider };

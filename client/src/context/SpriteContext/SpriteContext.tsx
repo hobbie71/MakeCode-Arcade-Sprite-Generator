@@ -1,29 +1,9 @@
 import { MakeCodeColor } from "../../types/color";
-import { createContext, useState, useMemo } from "react";
+import { createStateContext } from "../createStateContext";
 
-type SpriteContextType = {
-  spriteData: MakeCodeColor[][];
-  setSpriteData: React.Dispatch<React.SetStateAction<MakeCodeColor[][]>>;
-};
+// Lazy initial so each provider mount gets its own empty grid (never a shared
+// module-level array instance).
+const { Context: SpriteContext, Provider: SpriteProvider } =
+  createStateContext<MakeCodeColor[][]>(() => [[]]);
 
-const SpriteContext = createContext<undefined | SpriteContextType>(undefined);
-
-export const SpriteProvider = ({ children }: { children: React.ReactNode }) => {
-  const [spriteData, setSpriteData] = useState<MakeCodeColor[][]>([[]]);
-
-  const contextValue = useMemo(
-    () => ({
-      spriteData,
-      setSpriteData,
-    }),
-    [spriteData]
-  );
-
-  return (
-    <SpriteContext.Provider value={contextValue}>
-      {children}
-    </SpriteContext.Provider>
-  );
-};
-
-export { SpriteContext };
+export { SpriteContext, SpriteProvider };

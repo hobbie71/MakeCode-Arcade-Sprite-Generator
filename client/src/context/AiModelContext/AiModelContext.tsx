@@ -17,7 +17,7 @@ export const AiModelProvider: React.FC<AiModelProviderProps> = ({
   children,
 }) => {
   const [selectedModel, setSelectedModel] = useState<AiModel>(
-    AiModel.GPTImage1
+    AiModel.GPTImage
   );
 
   const value = {

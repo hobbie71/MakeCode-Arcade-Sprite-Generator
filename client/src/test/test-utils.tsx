@@ -8,14 +8,15 @@
 // that call useContext won't throw "must be inside <Provider>".
 import { render, renderHook, type RenderOptions } from "@testing-library/react";
 import type { ReactElement, ReactNode } from "react";
-import AppProviders from "../providers/AppProviders";
+import GlobalProviders from "../providers/GlobalProviders";
 import SpriteEditorProvider from "../features/SpriteEditor/provider/SpriteEditorProviders";
 
-/** Every app + sprite-editor provider, composed. Use as a renderHook/render wrapper. */
+/** Every global + sprite-editor provider, composed. Use as a renderHook/render
+ *  wrapper. GlobalProviders sits above the router, so no Router is needed here. */
 export const AllProviders = ({ children }: { children: ReactNode }) => (
-  <AppProviders>
+  <GlobalProviders>
     <SpriteEditorProvider>{children}</SpriteEditorProvider>
-  </AppProviders>
+  </GlobalProviders>
 );
 
 /** RTL `render`, with the full provider stack injected as the wrapper. */

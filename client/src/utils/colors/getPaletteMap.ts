@@ -4,12 +4,8 @@ import type { MakeCodePalette } from "../../types/color";
 
 const paletteRgbMap = new WeakMap<MakeCodePalette, Map<MakeCodeColor, RGB>>();
 const paletteHslMap = new WeakMap<MakeCodePalette, Map<MakeCodeColor, HSL>>();
-const paletteHexMap = new WeakMap<
-  MakeCodePalette,
-  Map<MakeCodeColor, string>
->();
 
-export const getPaletteRgbMap = (
+const getPaletteRgbMap = (
   palette: MakeCodePalette
 ): Map<MakeCodeColor, RGB> => {
   let map = paletteRgbMap.get(palette);
@@ -41,22 +37,6 @@ export const getPaletteHslMap = (
       map.set(makeCodeColor, hsl);
     }
     paletteHslMap.set(palette, map);
-  }
-  return map;
-};
-
-export const getPaletteHexMap = (
-  palette: MakeCodePalette
-): Map<MakeCodeColor, string> => {
-  let map = paletteHexMap.get(palette);
-  if (!map) {
-    map = new Map<MakeCodeColor, string>();
-    // Use palette directly since it already contains hex values
-    for (const [makeCodeColor, colorHex] of Object.entries(palette)) {
-      if (colorHex.toLowerCase().startsWith("rgba")) continue;
-      map.set(makeCodeColor as MakeCodeColor, colorHex);
-    }
-    paletteHexMap.set(palette, map);
   }
   return map;
 };

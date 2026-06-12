@@ -8,7 +8,7 @@ import {
   GenerateImageResponseSchema,
   ModerationResponseSchema,
 } from "./wire";
-import { AssetType, Style, OpenAIQuality } from "./enums";
+import { AssetType, OpenAIQuality } from "./enums";
 
 describe("SizeSchema", () => {
   test("accepts integer width/height", () => {
@@ -41,7 +41,6 @@ describe("BaseGenerationSettingsSchema", () => {
   const valid = {
     prompt: "a friendly dragon",
     assetType: AssetType.Sprite,
-    style: Style.Retro,
   };
 
   test("accepts a valid settings object", () => {
@@ -52,14 +51,6 @@ describe("BaseGenerationSettingsSchema", () => {
     const result = BaseGenerationSettingsSchema.safeParse({
       ...valid,
       assetType: "spaceship",
-    });
-    expect(result.success).toBe(false);
-  });
-
-  test("rejects an unknown style", () => {
-    const result = BaseGenerationSettingsSchema.safeParse({
-      ...valid,
-      style: "baroque",
     });
     expect(result.success).toBe(false);
   });
@@ -80,7 +71,6 @@ describe("OpenAIGenerationSettingsSchema", () => {
   const base = {
     prompt: "a knight",
     assetType: AssetType.Tile,
-    style: Style.Modern,
   };
 
   test("defaults quality to medium when omitted", () => {
@@ -97,9 +87,9 @@ describe("OpenAIGenerationSettingsSchema", () => {
     expect(parsed.quality).toBe("low");
   });
 
-  test("rejects an invalid quality value (e.g. high)", () => {
+  test("rejects an invalid quality value (e.g. ultra)", () => {
     expect(
-      OpenAIGenerationSettingsSchema.safeParse({ ...base, quality: "high" })
+      OpenAIGenerationSettingsSchema.safeParse({ ...base, quality: "ultra" })
         .success,
     ).toBe(false);
   });
@@ -117,7 +107,6 @@ describe("OpenAISpriteRequestSchema", () => {
     settings: {
       prompt: "a green slime",
       assetType: AssetType.Sprite,
-      style: Style.Chibi,
       quality: OpenAIQuality.Low,
     },
     size: { width: 16, height: 16 },

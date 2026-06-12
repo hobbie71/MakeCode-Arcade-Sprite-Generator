@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useCallback, useEffect } from "react";
 
 // Component imports
 import AiPromptInput from "../components/AiPromptInput";
 import DefaultDropDown from "../../../../../components/DefaultDropDown";
-import AdvanceDropDownButton from "./AdvanceDropDownButton";
 
 // Hooks imports
 import { useOpenAISettings } from "../../../../../context/OpenAISettingsContext/useOpenAISettings";
@@ -11,15 +10,25 @@ import { useAssetType } from "../../../../../context/AssetTypeContext/useAssetTy
 import { useLoading } from "../../../../../context/LoadingContext/useLoading";
 
 // Type imports
-import { ALL_STYLES, ALL_OPENAI_QUALITYS } from "../../../../../types/export";
-import { useCallback, useEffect } from "react";
+import { ALL_OPENAI_QUALITYS } from "../../../../../types/export";
 
-const OpenAISettingsSection = () => {
+interface Props {
+  /** When false, hides the Quality picker. The hero entry widget passes false to
+   *  keep the home-page form minimal; the Studio Generate modal leaves it visible. */
+  showQuality?: boolean;
+}
+
+/** Quality options annotated with their display-only token cost as a subtitle
+ *  (e.g. "High" → "3 tokens"), so the premium is visible while choosing. */
+const QUALITY_OPTIONS = ALL_OPENAI_QUALITYS.map((quality) => ({
+  ...quality,
+  description: `${quality.tokenCost} token${quality.tokenCost === 1 ? "" : "s"}`,
+}));
+
+const OpenAISettingsSection = ({ showQuality = true }: Props) => {
   const { selectedAsset } = useAssetType();
   const { settings, updateSetting, resetToDefaults } = useOpenAISettings();
   const { isGenerating } = useLoading();
-
-  const [isAdvanceTabOpen, setIsAdvanceTabOpen] = useState<boolean>(false);
 
   // Reset settings when asset type changes
   useEffect(() => {
@@ -35,43 +44,23 @@ const OpenAISettingsSection = () => {
 
   return (
     <div className="form-group">
-      {/* Style */}
-      <DefaultDropDown
-        onChange={(index: number) =>
-          changeSetting("style", ALL_STYLES[index].style)
-        }
-        options={ALL_STYLES}
-        value={ALL_STYLES.findIndex((style) => settings.style === style.style)}
-        disabled={isGenerating}>
-        Style
-      </DefaultDropDown>
-
       <AiPromptInput
         onSubmit={(prompt) => changeSetting("prompt", prompt)}
         disabled={isGenerating}
       />
 
-      <AdvanceDropDownButton
-        isAdvanceTabOpen={isAdvanceTabOpen}
-        setIsAdvanceTabOpen={setIsAdvanceTabOpen}
-        isGenerating={isGenerating}
-      />
-
-      {isAdvanceTabOpen && (
-        <>
-          {/* Quality */}
-          <DefaultDropDown
-            onChange={(index: number) =>
-              changeSetting("quality", ALL_OPENAI_QUALITYS[index].quality)
-            }
-            options={ALL_OPENAI_QUALITYS}
-            value={ALL_OPENAI_QUALITYS.findIndex(
-              (quality) => settings.quality === quality.quality
-            )}
-            disabled={isGenerating}>
-            Quality
-          </DefaultDropDown>
-        </>
+      {showQuality && (
+        <DefaultDropDown
+          onChange={(index: number) =>
+            changeSetting("quality", QUALITY_OPTIONS[index].quality)
+          }
+          options={QUALITY_OPTIONS}
+          value={QUALITY_OPTIONS.findIndex(
+            (quality) => settings.quality === quality.quality
+          )}
+          disabled={isGenerating}>
+          Quality
+        </DefaultDropDown>
       )}
     </div>
   );

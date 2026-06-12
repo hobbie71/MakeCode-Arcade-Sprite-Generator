@@ -1,5 +1,6 @@
 // Context import
 import { useError } from "../context/ErrorContext/useError";
+import IconButton from "./IconButton";
 
 const Error = () => {
   const { error, setError } = useError();
@@ -8,7 +9,7 @@ const Error = () => {
 
   return (
     <div className="fixed top-4 right-4 z-50 max-w-md">
-      <div className="bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center justify-between">
+      <div className="bg-danger text-on-accent px-4 py-3 rounded-lg shadow-lg flex items-center justify-between">
         <div className="flex items-center">
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -19,9 +20,11 @@ const Error = () => {
           </svg>
           <span className="text-sm font-medium">{error}</span>
         </div>
-        <button
+        <IconButton
+          size="sm"
           onClick={() => setError(null)}
-          className="ml-4 text-white hover:text-gray-200 focus:outline-none">
+          aria-label="Dismiss error"
+          className="ml-4 text-on-accent hover:bg-ink/10">
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
@@ -29,7 +32,7 @@ const Error = () => {
               clipRule="evenodd"
             />
           </svg>
-        </button>
+        </IconButton>
       </div>
     </div>
   );

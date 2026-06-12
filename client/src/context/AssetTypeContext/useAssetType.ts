@@ -5,5 +5,6 @@ export const useAssetType = () => {
   const context = useContext(AssetTypeContext);
   if (!context)
     throw new Error("useAssetType must be inside <AssetTypeProvider>");
-  return context;
+  const { value: selectedAsset, setValue: setSelectedAsset } = context;
+  return { selectedAsset, setSelectedAsset };
 };

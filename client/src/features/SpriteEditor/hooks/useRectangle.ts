@@ -1,89 +1,12 @@
-import { useCallback, useRef } from "react";
+import { useShapeTool } from "./useShapeTool";
+import {
+  getSquareCoordinates,
+  getFilledSquareCoordinates,
+} from "../libs/getShapeCoordinates";
 
-// Hook imports
-import { useCanvasPreview } from "./useCanvasPreview";
-import { useSpriteData } from "./useSpriteData";
-
-// Lib imports
-import { getSquareCoordinates } from "../libs/getShapeCoordinates";
-import { drawPixelsOnCanvas } from "../libs/drawPixelOnCanvas";
-
-// Utils imports
-import { getStrokeCoordinates } from "../utils/getStrokeCoordinates";
-
-// Context imports
-import { useCanvas } from "../../../context/CanvasContext/useCanvas";
-import { useColorSelected } from "../contexts/ColorSelectedContext/useColorSelected";
-import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
-import { useStrokeSize } from "../contexts/StrokeSizeContext/useStrokeSize";
-
-// Type imports
-import type { Coordinates } from "../../../types/pixel";
-import { PIXEL_SIZE } from "../constants/canvas";
-
-export const useRectangle = () => {
-  const { canvasRef } = useCanvas();
-  const { color } = useColorSelected();
-  const { palette } = usePaletteSelected();
-  const { drawSquarePreview, drawDotPreview } = useCanvasPreview();
-  const { setSpriteDataCoordinates, commitSpriteData } = useSpriteData();
-  const { strokeSize } = useStrokeSize();
-
-  const startCoordinates = useRef<Coordinates | null>(null);
-
-  const handlePointerDown = useCallback(
-    (start: Coordinates) => {
-      startCoordinates.current = start;
-      drawDotPreview(start);
-    },
-    [drawDotPreview]
-  );
-
-  const handlePointerMove = useCallback(
-    (end: Coordinates) => {
-      if (!startCoordinates.current) return;
-
-      drawSquarePreview(startCoordinates.current, end);
-    },
-    [drawSquarePreview]
-  );
-
-  const handlePointerUp = useCallback(
-    (end: Coordinates) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      if (!startCoordinates.current) return;
-
-      const coordinates = getSquareCoordinates(startCoordinates.current, end);
-      drawPixelsOnCanvas(
-        canvas,
-        coordinates,
-        color,
-        palette,
-        PIXEL_SIZE,
-        strokeSize
-      );
-
-      // Apply stroke size to each coordinate for sprite data
-      const allStrokeCoordinates: Coordinates[] = [];
-      coordinates.forEach((coord) => {
-        const strokeCoords = getStrokeCoordinates(coord, strokeSize);
-        allStrokeCoordinates.push(...strokeCoords);
-      });
-
-      setSpriteDataCoordinates(allStrokeCoordinates, color);
-      commitSpriteData();
-    },
-    [
-      canvasRef,
-      color,
-      palette,
-      setSpriteDataCoordinates,
-      commitSpriteData,
-      strokeSize,
-    ]
-  );
-
-  return { handlePointerDown, handlePointerMove, handlePointerUp };
-};
+export const useRectangle = () =>
+  useShapeTool({
+    previewKey: "drawSquarePreview",
+    getOutlineCoordinates: getSquareCoordinates,
+    getFilledCoordinates: getFilledSquareCoordinates,
+  });

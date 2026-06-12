@@ -22,7 +22,7 @@ describe("routing", () => {
 });
 
 describe("request validation (422 before any upstream call)", () => {
-  test("openai: missing settings.assetType/style", async () => {
+  test("openai: missing settings.assetType", async () => {
     const res = await app.request("/generate-image/openai", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

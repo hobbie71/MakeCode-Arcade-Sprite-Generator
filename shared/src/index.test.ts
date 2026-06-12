@@ -3,8 +3,6 @@ import {
   // enums
   AssetType,
   AssetTypeSchema,
-  Style,
-  StyleSchema,
   OpenAIQuality,
   OpenAIQualitySchema,
   // palette
@@ -22,10 +20,8 @@ import {
 describe("barrel index re-exports", () => {
   test("re-exports the enum schemas and enum objects", () => {
     expect(AssetTypeSchema).toBeDefined();
-    expect(StyleSchema).toBeDefined();
     expect(OpenAIQualitySchema).toBeDefined();
     expect(AssetType.Sprite).toBe("sprite");
-    expect(Style.Retro).toBe("retro");
     expect(OpenAIQuality.Medium).toBe("medium");
   });
 

@@ -1,38 +1,7 @@
-import { createContext, useState, useMemo } from "react";
-import type { Dispatch, SetStateAction } from "react";
 import { AssetType } from "../../types/export";
+import { createStateContext } from "../createStateContext";
 
-type AssetTypeContextType = {
-  selectedAsset: AssetType;
-  setSelectedAsset: Dispatch<SetStateAction<AssetType>>;
-};
+const { Context: AssetTypeContext, Provider: AssetTypeProvider } =
+  createStateContext<AssetType>(AssetType.Sprite);
 
-const AssetTypeContext = createContext<undefined | AssetTypeContextType>(
-  undefined
-);
-
-export const AssetTypeProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [selectedAsset, setSelectedAsset] = useState<AssetType>(
-    AssetType.Sprite
-  );
-
-  const contextValue = useMemo(
-    () => ({
-      selectedAsset,
-      setSelectedAsset,
-    }),
-    [selectedAsset]
-  );
-
-  return (
-    <AssetTypeContext.Provider value={contextValue}>
-      {children}
-    </AssetTypeContext.Provider>
-  );
-};
-
-export { AssetTypeContext };
+export { AssetTypeContext, AssetTypeProvider };

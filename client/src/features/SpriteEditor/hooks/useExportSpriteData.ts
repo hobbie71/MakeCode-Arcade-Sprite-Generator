@@ -11,6 +11,7 @@ import { drawPixelOnCanvasTransparent } from "../libs/drawPixelOnCanvas";
 
 // Type imports
 import { ImageExportFormats } from "../../../types/export";
+import { MakeCodeColor } from "../../../types/color";
 import { PIXEL_SIZE } from "../constants/canvas";
 
 export const useExportSpriteData = () => {
@@ -19,18 +20,29 @@ export const useExportSpriteData = () => {
   const { palette } = usePaletteSelected();
   const { strokeSize } = useStrokeSize();
 
-  const exportSpriteToImage = useCallback(
-    (format: ImageExportFormats) => {
+  /**
+   * Render sprite data to a data URL (used for previews + downloads). Defaults to
+   * the live editor sprite, but callers can pass explicit data + dimensions to
+   * render an arbitrary matrix — e.g. the Resize & Process modal previewing a
+   * *pending* resize of a hand-drawn sprite without touching the editor.
+   */
+  const getSpriteDataUrl = useCallback(
+    (
+      format: ImageExportFormats = ImageExportFormats.PNG,
+      data: MakeCodeColor[][] = spriteData,
+      cols: number = width,
+      rows: number = height
+    ): string => {
       const exportCanvas = document.createElement("canvas");
       const ctx = exportCanvas.getContext("2d");
-      if (!ctx) return;
+      if (!ctx) return "";
 
-      exportCanvas.width = width * PIXEL_SIZE;
-      exportCanvas.height = height * PIXEL_SIZE;
+      exportCanvas.width = cols * PIXEL_SIZE;
+      exportCanvas.height = rows * PIXEL_SIZE;
 
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const color = spriteData[y][x];
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const color = data[y]?.[x] ?? MakeCodeColor.TRANSPARENT;
           drawPixelOnCanvasTransparent(
             exportCanvas,
             { x, y },
@@ -42,15 +54,22 @@ export const useExportSpriteData = () => {
         }
       }
 
-      // Export in desired format
-      const url = exportCanvas.toDataURL(`image/${format}`);
+      return exportCanvas.toDataURL(`image/${format}`);
+    },
+    [height, width, spriteData, palette, strokeSize]
+  );
+
+  const exportSpriteToImage = useCallback(
+    (format: ImageExportFormats) => {
+      const url = getSpriteDataUrl(format);
+      if (!url) return;
       const link = document.createElement("a");
       link.href = url;
       link.download = "my-sprite"; // file name
       link.click();
       link.remove();
     },
-    [height, width, spriteData, palette, strokeSize]
+    [getSpriteDataUrl]
   );
 
   const getImgCode = useCallback((): string => {
@@ -64,13 +83,9 @@ export const useExportSpriteData = () => {
     return result;
   }, [spriteData]);
 
-  const getJavaScriptCode = useCallback((): string => {
-    return `const mySprite = sprites.create(${getImgCode()}, SpriteKind.Player)`;
-  }, [getImgCode]);
-
-  const getPythonCode = useCallback((): string => {
-    return `my_sprite = arcade_sprites.create_sprite(${getImgCode().replace("img", "").replace("`", '"""').replace("`", '"""')}, sprite_kind="Player")`;
-  }, [getImgCode]);
-
-  return { getImgCode, exportSpriteToImage, getJavaScriptCode, getPythonCode };
+  return {
+    getImgCode,
+    exportSpriteToImage,
+    getSpriteDataUrl,
+  };
 };

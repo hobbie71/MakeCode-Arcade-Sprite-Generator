@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useMemo, useRef, useEffect } from "react";
 
 // Type imports
 import type { Coordinates } from "../../../types/pixel";
@@ -15,10 +15,11 @@ import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected
 import { usePencil } from "./usePencil";
 import { useEraser } from "./useEraser";
 import { useFill } from "./useFill";
+import { useEyedropper } from "./useEyedropper";
 import { useLine } from "./useLine";
 import { useRectangle } from "./useRectangle";
 import { useCircle } from "./useCircle";
-// import { useSelect } from "./useSelect";
+import { useSelectTool } from "./useSelectTool";
 import { EditorTools } from "../../../types/tools";
 import { useCanvasPreview } from "./useCanvasPreview";
 import { MakeCodeColor } from "../../../types/color";
@@ -48,6 +49,7 @@ export const useMouseHandler = () => {
     handlePointerUp: handleEraserUp,
   } = useEraser();
   const { handlePointerDown: handleFillDown } = useFill();
+  const { handlePointerDown: handleEyedropperDown } = useEyedropper();
   const {
     handlePointerDown: handleLineDown,
     handlePointerMove: handleLineMove,
@@ -63,11 +65,65 @@ export const useMouseHandler = () => {
     handlePointerMove: handleCircleMove,
     handlePointerUp: handleCircleUp,
   } = useCircle();
-  // const {
-  //   handlePointerDown: handleSelectDown,
-  //   handlePointerMove: handleSelectMove,
-  //   handlePointerUp: handleSelectUp,
-  // } = useSelect();
+  const { handlePointerDown: handleSelectDown, updateHoverCursor } =
+    useSelectTool();
+
+  // Per-tool gesture dispatch. Select and Pan are absent on purpose: Select
+  // runs its whole gesture on window listeners, Pan never draws.
+  const downHandlerByTool = useMemo<
+    Partial<Record<EditorTools, (coordinates: Coordinates) => void>>
+  >(
+    () => ({
+      [EditorTools.Pencil]: handlePencilDown,
+      [EditorTools.Eraser]: handleEraserDown,
+      [EditorTools.Fill]: handleFillDown,
+      [EditorTools.Eyedropper]: handleEyedropperDown,
+      [EditorTools.Line]: handleLineDown,
+      [EditorTools.Rectangle]: handleRectangleDown,
+      [EditorTools.Circle]: handleCircleDown,
+    }),
+    [
+      handlePencilDown,
+      handleEraserDown,
+      handleFillDown,
+      handleEyedropperDown,
+      handleLineDown,
+      handleRectangleDown,
+      handleCircleDown,
+    ]
+  );
+
+  const moveHandlerByTool = useMemo<
+    Partial<Record<EditorTools, (coordinates: Coordinates) => void>>
+  >(
+    () => ({
+      [EditorTools.Pencil]: handlePencilMove,
+      [EditorTools.Eraser]: handleEraserMove,
+      [EditorTools.Line]: handleLineMove,
+      [EditorTools.Rectangle]: handleRectangleMove,
+      [EditorTools.Circle]: handleCircleMove,
+    }),
+    [
+      handlePencilMove,
+      handleEraserMove,
+      handleLineMove,
+      handleRectangleMove,
+      handleCircleMove,
+    ]
+  );
+
+  // Shape tools only commit when released in bounds; pencil/eraser commit
+  // whatever was already drawn, so their up handlers take no coordinates.
+  const shapeUpHandlerByTool = useMemo<
+    Partial<Record<EditorTools, (coordinates: Coordinates) => void>>
+  >(
+    () => ({
+      [EditorTools.Line]: handleLineUp,
+      [EditorTools.Rectangle]: handleRectangleUp,
+      [EditorTools.Circle]: handleCircleUp,
+    }),
+    [handleLineUp, handleRectangleUp, handleCircleUp]
+  );
 
   // Helper to ensure we ignore coordinates that fall outside the sprite bounds
   const isInsideBounds = useCallback(
@@ -93,10 +149,27 @@ export const useMouseHandler = () => {
     [mouseCoordinates, setMouseCoordinates]
   );
 
+  // Null when the canvas is unmounted — callers bail without touching state.
+  const getEventCoordinates = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>): Coordinates | null => {
+      const canvas = canvasRef.current;
+      if (!canvas) return null;
+      return getCanvasCoordinates(canvas, e, zoom);
+    },
+    [canvasRef, zoom]
+  );
+
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
+
+      // Select owns its whole gesture via window listeners (drags must keep
+      // tracking outside the sprite) — don't enter the canvas-element flow.
+      if (tool === EditorTools.Select) {
+        handleSelectDown(e);
+        return;
+      }
 
       isMouseDownRef.current = true;
       isDrawing.current = true;
@@ -104,35 +177,9 @@ export const useMouseHandler = () => {
 
       const coordinates = getCanvasCoordinates(canvas, e, zoom);
       startCoordinates.current = coordinates;
-      if (tool === EditorTools.Pencil) {
-        handlePencilDown(coordinates);
-      } else if (tool === EditorTools.Eraser) {
-        handleEraserDown(coordinates);
-      } else if (tool === EditorTools.Fill) {
-        handleFillDown(coordinates);
-      } else if (tool === EditorTools.Line) {
-        handleLineDown(coordinates);
-      } else if (tool === EditorTools.Rectangle) {
-        handleRectangleDown(coordinates);
-      } else if (tool === EditorTools.Circle) {
-        handleCircleDown(coordinates);
-      } else if (tool === EditorTools.Select) {
-        //   handleSelectDown(coordinates);
-      }
+      downHandlerByTool[tool]?.(coordinates);
     },
-    [
-      canvasRef,
-      zoom,
-      tool,
-      handlePencilDown,
-      handleEraserDown,
-      handleFillDown,
-      handleLineDown,
-      handleRectangleDown,
-      handleCircleDown,
-      // handleSelectDown,
-      clearPreview,
-    ]
+    [canvasRef, zoom, tool, downHandlerByTool, handleSelectDown, clearPreview]
   );
 
   // Finalize drawing (used by normal mouseUp and global mouseup outside canvas)
@@ -144,49 +191,35 @@ export const useMouseHandler = () => {
 
       if (tool === EditorTools.Pencil) {
         handlePencilUp();
-      } else if (tool === EditorTools.Eraser) {
+        return;
+      }
+      if (tool === EditorTools.Eraser) {
         handleEraserUp();
-      } else if (tool === EditorTools.Line) {
-        if (coordinates && isInsideBounds(coordinates))
-          handleLineUp(coordinates);
-      } else if (tool === EditorTools.Rectangle) {
-        if (coordinates && isInsideBounds(coordinates))
-          handleRectangleUp(coordinates);
-      } else if (tool === EditorTools.Circle) {
-        if (coordinates && isInsideBounds(coordinates))
-          handleCircleUp(coordinates);
-      } else if (tool === EditorTools.Select) {
-        // handleSelectUp(coordinates);
+        return;
+      }
+
+      const shapeUp = shapeUpHandlerByTool[tool];
+      if (shapeUp && coordinates && isInsideBounds(coordinates)) {
+        shapeUp(coordinates);
       }
     },
-    [
-      tool,
-      handlePencilUp,
-      handleEraserUp,
-      handleLineUp,
-      handleRectangleUp,
-      handleCircleUp,
-      isInsideBounds,
-    ]
+    [tool, handlePencilUp, handleEraserUp, shapeUpHandlerByTool, isInsideBounds]
   );
 
   const handleMouseUp = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+      const coordinates = getEventCoordinates(e);
+      if (!coordinates) return;
 
-      const coordinates = getCanvasCoordinates(canvas, e, zoom);
       finalizeDrawing(coordinates);
     },
-    [canvasRef, zoom, finalizeDrawing]
+    [getEventCoordinates, finalizeDrawing]
   );
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const coordinates = getCanvasCoordinates(canvas, e, zoom);
+      const coordinates = getEventCoordinates(e);
+      if (!coordinates) return;
 
       // Ignore moves outside the logical pixel grid to avoid drawing glitches
       if (!isInsideBounds(coordinates)) {
@@ -201,12 +234,23 @@ export const useMouseHandler = () => {
         return;
       }
 
-      // Draw dot preview if Left Mouse Button not down AND tool is not fill
+      // Select draws no dot preview; hovering only updates cursor feedback
+      // (move over the selection, crosshair elsewhere). Gestures themselves
+      // run on window listeners owned by useSelectTool.
+      if (tool === EditorTools.Select) {
+        updateHoverCursor(e);
+        updateMousePosition(coordinates);
+        return;
+      }
+
+      // Draw dot preview if Left Mouse Button not down AND the tool paints a
+      // pixel on press. Fill, Eyedropper and Pan don't, so a colored preview dot
+      // would be misleading. (Select already returned above.)
       if (
         !isMouseDownRef.current &&
         !isDrawing.current &&
         tool !== EditorTools.Fill &&
-        tool !== EditorTools.Select &&
+        tool !== EditorTools.Eyedropper &&
         tool !== EditorTools.Pan
       ) {
         // if eraser draw clear preview
@@ -221,45 +265,27 @@ export const useMouseHandler = () => {
       updateMousePosition(coordinates);
 
       // Handle drawing/dragging
-      if (tool === EditorTools.Pencil) {
-        handlePencilMove(coordinates);
-      } else if (tool === EditorTools.Eraser) {
-        handleEraserMove(coordinates);
-      } else if (tool === EditorTools.Line) {
-        handleLineMove(coordinates);
-      } else if (tool === EditorTools.Rectangle) {
-        handleRectangleMove(coordinates);
-      } else if (tool === EditorTools.Circle) {
-        handleCircleMove(coordinates);
-      } else if (tool === EditorTools.Select) {
-        // handleSelectMove(coordinates);
-      }
+      moveHandlerByTool[tool]?.(coordinates);
     },
     [
-      canvasRef,
-      zoom,
+      getEventCoordinates,
       tool,
       mouseCoordinates,
       drawDotPreview,
       updateMousePosition,
-      handlePencilMove,
-      handleEraserMove,
-      handleLineMove,
-      handleRectangleMove,
-      handleCircleMove,
+      updateHoverCursor,
+      moveHandlerByTool,
       isInsideBounds,
-      // handleSelectMove,
     ]
   );
 
   const handleMouseEnter = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const coordinates = getCanvasCoordinates(canvas, e, zoom);
+      const coordinates = getEventCoordinates(e);
+      if (!coordinates) return;
       updateMousePosition(coordinates);
     },
-    [canvasRef, zoom, updateMousePosition]
+    [getEventCoordinates, updateMousePosition]
   );
 
   const handleMouseLeave = useCallback(() => {

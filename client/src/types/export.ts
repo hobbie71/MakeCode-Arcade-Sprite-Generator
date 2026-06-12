@@ -4,12 +4,11 @@
 // OpenAI-only. The cross-wire enums + request/response types live in the shared
 // package and are re-exported here so existing `../types/export` imports across
 // the client keep working unchanged.
-import { AssetType, Style, OpenAIQuality } from "@makespritecode/shared";
+import { AssetType, OpenAIQuality } from "@makespritecode/shared";
 
-export { AssetType, Style, OpenAIQuality };
+export { AssetType, OpenAIQuality };
 export type {
   Size,
-  BaseGenerationSettings,
   OpenAIGenerationSettings,
   OpenAISpriteRequest,
   ModerationResponse,
@@ -26,29 +25,6 @@ export enum ImageExportFormats {
   WEBP = "webp",
 }
 
-export const ALL_IMAGE_EXPORT_FORMATS = [
-  { name: "PNG", format: ImageExportFormats.PNG },
-  { name: "JPEG", format: ImageExportFormats.JPEG },
-  { name: "WEBP", format: ImageExportFormats.WEBP },
-];
-
-// =============================================================================
-// CODE EXPORT FORMATS (UI-only)
-// =============================================================================
-
-/** Supported code export formats for sprites */
-export enum CodeExportFormats {
-  SPRITE_EDITOR = "sprite-editor",
-  JAVASCRIPT = "javascript",
-  PYTHON = "python",
-}
-
-export const ALL_CODE_EXPORT_FORMATS = [
-  { name: "Sprite Editor", format: CodeExportFormats.SPRITE_EDITOR },
-  { name: "Javascript", format: CodeExportFormats.JAVASCRIPT },
-  { name: "Python", format: CodeExportFormats.PYTHON },
-];
-
 // =============================================================================
 // ASSET TYPES — UI selection catalog (AssetType enum from shared)
 // =============================================================================
@@ -64,23 +40,33 @@ export const ALL_ASSETS_TYPE: AssetType[] = [
 // AI MODELS (UI-only; OpenAI-only)
 // =============================================================================
 
-/** Available AI models for sprite generation */
+/** UI-only model selector. The real OpenAI model id is set server-side, so this
+ *  stays version-neutral and never needs bumping when the backend model changes. */
 export enum AiModel {
-  GPTImage1 = "gpt-image-1",
+  GPTImage = "gpt-image",
 }
-
-/** AI model options with display names */
-export const ALL_AI_MODELS = [{ name: "GPTImage1-5", model: AiModel.GPTImage1 }];
 
 // =============================================================================
 // OPENAI quality catalog (OpenAIQuality enum from shared)
 // =============================================================================
 
-/** OpenAI quality options with display names */
+/** OpenAI quality options with display names and their (display-only) token cost.
+ *  `tokenCost` is UI-only — there is no real token economy yet (ADR-0006); High
+ *  is priced higher because it costs significantly more to generate.
+ *
+ *  High is temporarily disabled: generation is currently free (no ads / rewarded
+ *  video yet) and High costs significantly more per image. Re-add the High row
+ *  once a token/ad economy gates the cost. The OpenAIQuality.High enum value is
+ *  intentionally kept in shared so the server still accepts it. */
 export const ALL_OPENAI_QUALITYS = [
-  { name: "Low", quality: OpenAIQuality.Low },
-  { name: "Medium", quality: OpenAIQuality.Medium },
+  { name: "Low", quality: OpenAIQuality.Low, tokenCost: 1 },
+  { name: "Medium", quality: OpenAIQuality.Medium, tokenCost: 1 },
+  // { name: "High", quality: OpenAIQuality.High, tokenCost: 3 },
 ];
+
+/** Display-only token cost for a quality (defaults to 1 if unknown). */
+export const getQualityTokenCost = (quality: OpenAIQuality): number =>
+  ALL_OPENAI_QUALITYS.find((q) => q.quality === quality)?.tokenCost ?? 1;
 
 // =============================================================================
 // GENERATION METHODS (UI-only)
@@ -90,38 +76,13 @@ export const ALL_OPENAI_QUALITYS = [
 export enum GenerationMethod {
   ImageToSprite = "image",
   TextToSprite = "text",
+  /** Start from an empty canvas at the chosen size (no AI, no upload). */
+  BlankCanvas = "blank",
 }
-
-/** Available generation methods */
-export const generationMethods: GenerationMethod[] = [
-  GenerationMethod.TextToSprite,
-  GenerationMethod.ImageToSprite,
-];
-
-// =============================================================================
-// STYLE catalog (Style enum from shared)
-// =============================================================================
-
-/** Style options with display names */
-export const ALL_STYLES = [
-  { name: "Retro", style: Style.Retro },
-  { name: "Chibi", style: Style.Chibi },
-  { name: "Isometric", style: Style.Isometric },
-  { name: "Minimalist", style: Style.Minimalist },
-  { name: "Modern", style: Style.Modern },
-  { name: "Anime", style: Style.Anime },
-];
 
 // =============================================================================
 // POST-PROCESSING & EXPORT SETTINGS (UI-only)
 // =============================================================================
-
-/** Settings for image export processing */
-export type ImageExportSettings = {
-  removeBackground: boolean;
-  cropEdges: boolean;
-  tolerance: number;
-};
 
 /** Cropping options for post-processing */
 export enum Crop {
@@ -130,23 +91,9 @@ export enum Crop {
   Fill = "fill",
 }
 
-/** Crop options with display names */
-export const ALL_CROP_OPTIONS = [
-  { name: "None", option: Crop.None },
-  { name: "Edges", option: Crop.Edges },
-  { name: "Fill", option: Crop.Fill },
-];
-
 /** Settings for post-processing generated images */
 export type PostProcessingSettings = {
   removeBackground: boolean;
   crop: Crop;
   tolerance: number;
-};
-
-/** Default settings for text-to-sprite generation */
-export const DEFAULT_TEXT_TO_SPRITE_SETTINGS: ImageExportSettings = {
-  removeBackground: false,
-  cropEdges: false,
-  tolerance: 30,
 };

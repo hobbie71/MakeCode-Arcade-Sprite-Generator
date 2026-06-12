@@ -5,5 +5,6 @@ export const useToolSelected = () => {
   const context = useContext(ToolSelectedContext);
   if (!context)
     throw new Error("useToolSelected must be inside <ToolSelectedProvider>");
-  return context;
+  const { value: tool, setValue: setTool } = context;
+  return { tool, setTool };
 };

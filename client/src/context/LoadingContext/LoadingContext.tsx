@@ -41,7 +41,7 @@ export const LoadingProvider: React.FC<LoadingProviderProps> = ({
       startGeneration,
       stopGeneration,
     }),
-    [isGenerating, generationMessage]
+    [isGenerating, generationMessage],
   );
 
   return (

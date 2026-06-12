@@ -2,7 +2,6 @@
   "settings": {
     "prompt": "a cute green dragon",
     "assetType": "sprite",
-    "style": "retro",
     "quality": "low"
   },
   "size": { "width": 16, "height": 16 },
