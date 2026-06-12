@@ -1,25 +1,7 @@
-import { createContext, useState, useMemo } from "react";
-import type { Dispatch, SetStateAction } from "react";
+import { createStateContext } from "../../../../context/createStateContext";
 
-type GridContextType = {
-  /** Whether the per-pixel grid overlay is drawn on the canvas. Default off. */
-  showGrid: boolean;
-  setShowGrid: Dispatch<SetStateAction<boolean>>;
-};
+/** Whether the per-pixel grid overlay is drawn on the canvas. Default off. */
+const { Context: GridContext, Provider: GridProvider } =
+  createStateContext<boolean>(false);
 
-const GridContext = createContext<undefined | GridContextType>(undefined);
-
-export const GridProvider = ({ children }: { children: React.ReactNode }) => {
-  const [showGrid, setShowGrid] = useState<boolean>(false);
-
-  const contextValue = useMemo(
-    () => ({ showGrid, setShowGrid }),
-    [showGrid]
-  );
-
-  return (
-    <GridContext.Provider value={contextValue}>{children}</GridContext.Provider>
-  );
-};
-
-export { GridContext };
+export { GridContext, GridProvider };

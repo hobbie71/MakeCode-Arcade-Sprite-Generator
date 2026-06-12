@@ -5,5 +5,6 @@ export const usePixelPerfect = () => {
   const context = useContext(PixelPerfectContext);
   if (!context)
     throw new Error("usePixelPerfect must be inside <PixelPerfectProvider>");
-  return context;
+  const { value: pixelPerfect, setValue: setPixelPerfect } = context;
+  return { pixelPerfect, setPixelPerfect };
 };

@@ -5,5 +5,6 @@ export const useShapeMode = () => {
   const context = useContext(ShapeModeContext);
   if (!context)
     throw new Error("useShapeMode must be inside <ShapeModeProvider>");
-  return context;
+  const { value: shapeMode, setValue: setShapeMode } = context;
+  return { shapeMode, setShapeMode };
 };

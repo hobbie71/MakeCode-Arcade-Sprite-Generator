@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
+import { useCloseOnOutsideClick } from "../../../hooks/useCloseOnOutsideClick";
+
 export type PopoverMenuItem = {
   key: string;
   label: React.ReactNode;
@@ -53,17 +55,7 @@ export default function PopoverMenu({
     if (returnFocus) triggerRef.current?.focus();
   }, []);
 
-  // Close on outside click.
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onPointerDown);
-    return () => document.removeEventListener("mousedown", onPointerDown);
-  }, [open]);
+  useCloseOnOutsideClick(rootRef, open, () => setOpen(false));
 
   // On open, move focus to the selected row (or the first one).
   useEffect(() => {

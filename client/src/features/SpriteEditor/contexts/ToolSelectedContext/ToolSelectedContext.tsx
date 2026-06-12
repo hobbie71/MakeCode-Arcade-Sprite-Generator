@@ -1,30 +1,7 @@
-import { createContext, useState, useMemo } from "react";
-import type { Dispatch, SetStateAction } from "react";
 import { EditorTools } from "../../../../types/tools";
+import { createStateContext } from "../../../../context/createStateContext";
 
-type ToolSelectedType = {
-  tool: EditorTools;
-  setTool: Dispatch<SetStateAction<EditorTools>>;
-};
+const { Context: ToolSelectedContext, Provider: ToolSelectedProvider } =
+  createStateContext<EditorTools>(EditorTools.Pencil);
 
-const ToolSelectedContext = createContext<undefined | ToolSelectedType>(
-  undefined
-);
-
-export const ToolSelectedProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [tool, setTool] = useState<EditorTools>(EditorTools.Pencil);
-
-  const contextValue = useMemo(() => ({ tool, setTool }), [tool]);
-
-  return (
-    <ToolSelectedContext.Provider value={contextValue}>
-      {children}
-    </ToolSelectedContext.Provider>
-  );
-};
-
-export { ToolSelectedContext };
+export { ToolSelectedContext, ToolSelectedProvider };

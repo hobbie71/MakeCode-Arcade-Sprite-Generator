@@ -6,5 +6,6 @@ export const useRightDock = () => {
   if (context === undefined) {
     throw new Error("useRightDock must be used within a RightDockProvider");
   }
-  return context;
+  const { value: activeSection, setValue: setActiveSection } = context;
+  return { activeSection, setActiveSection };
 };

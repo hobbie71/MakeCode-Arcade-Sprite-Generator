@@ -5,5 +5,6 @@ export const useFillOptions = () => {
   const context = useContext(FillOptionsContext);
   if (!context)
     throw new Error("useFillOptions must be inside <FillOptionsProvider>");
-  return context;
+  const { value: fillAll, setValue: setFillAll } = context;
+  return { fillAll, setFillAll };
 };

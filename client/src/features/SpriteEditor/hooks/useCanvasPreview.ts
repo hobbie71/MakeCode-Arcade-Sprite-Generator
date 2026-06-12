@@ -27,6 +27,11 @@ import { PIXEL_SIZE } from "../constants/canvas";
 import type { Coordinates } from "../../../types/pixel";
 import type { MakeCodeColor } from "../../../types/color";
 
+type GetShapeCoordinates = (
+  start: Coordinates,
+  end: Coordinates
+) => Coordinates[];
+
 export const useCanvasPreview = () => {
   const { previewCanvasRef } = usePreviewCanvas();
   const { color } = useColorSelected();
@@ -63,14 +68,19 @@ export const useCanvasPreview = () => {
     [clearPreview, previewCanvasRef, color, palette, strokeSize]
   );
 
-  const drawLinePreview = useCallback(
-    (startCoordinates: Coordinates, endCoordinates: Coordinates) => {
+  // Shared body of the shape previews; not exported from the hook.
+  const drawShapePreview = useCallback(
+    (
+      getCoordinates: GetShapeCoordinates,
+      startCoordinates: Coordinates,
+      endCoordinates: Coordinates
+    ) => {
       const canvas = previewCanvasRef.current;
       if (!canvas) return;
 
       clearPreview();
 
-      const coordinates = getLineCoordinates(startCoordinates, endCoordinates);
+      const coordinates = getCoordinates(startCoordinates, endCoordinates);
       drawPixelsOnCanvas(
         canvas,
         coordinates,
@@ -83,50 +93,34 @@ export const useCanvasPreview = () => {
     [clearPreview, color, palette, previewCanvasRef, strokeSize]
   );
 
+  const drawLinePreview = useCallback(
+    (startCoordinates: Coordinates, endCoordinates: Coordinates) =>
+      drawShapePreview(getLineCoordinates, startCoordinates, endCoordinates),
+    [drawShapePreview]
+  );
+
   const drawSquarePreview = useCallback(
-    (startCoordinates: Coordinates, endCoordinates: Coordinates) => {
-      const canvas = previewCanvasRef.current;
-      if (!canvas) return;
-
-      clearPreview();
-
-      const coordinates =
+    (startCoordinates: Coordinates, endCoordinates: Coordinates) =>
+      drawShapePreview(
         shapeMode === "fill"
-          ? getFilledSquareCoordinates(startCoordinates, endCoordinates)
-          : getSquareCoordinates(startCoordinates, endCoordinates);
-      drawPixelsOnCanvas(
-        canvas,
-        coordinates,
-        color,
-        palette,
-        PIXEL_SIZE,
-        strokeSize
-      );
-    },
-    [clearPreview, color, palette, previewCanvasRef, strokeSize, shapeMode]
+          ? getFilledSquareCoordinates
+          : getSquareCoordinates,
+        startCoordinates,
+        endCoordinates
+      ),
+    [drawShapePreview, shapeMode]
   );
 
   const drawCirclePreview = useCallback(
-    (startCoordinates: Coordinates, endCoordinates: Coordinates) => {
-      const canvas = previewCanvasRef.current;
-      if (!canvas) return;
-
-      clearPreview();
-
-      const coordinates =
+    (startCoordinates: Coordinates, endCoordinates: Coordinates) =>
+      drawShapePreview(
         shapeMode === "fill"
-          ? getFilledCircleCoordinates(startCoordinates, endCoordinates)
-          : getCircleCoordinates(startCoordinates, endCoordinates);
-      drawPixelsOnCanvas(
-        canvas,
-        coordinates,
-        color,
-        palette,
-        PIXEL_SIZE,
-        strokeSize
-      );
-    },
-    [clearPreview, color, palette, previewCanvasRef, strokeSize, shapeMode]
+          ? getFilledCircleCoordinates
+          : getCircleCoordinates,
+        startCoordinates,
+        endCoordinates
+      ),
+    [drawShapePreview, shapeMode]
   );
 
   return {

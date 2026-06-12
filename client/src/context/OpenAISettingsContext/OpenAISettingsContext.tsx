@@ -1,49 +1,21 @@
-import React, { createContext, useReducer, useCallback, useMemo } from "react";
+import React, { createContext } from "react";
 import type { ReactNode } from "react";
 import { AssetType } from "../../types/export";
 import type { OpenAIGenerationSettings } from "../../types/export";
+import type { SettingsContextValue } from "../settingsContext";
+import {
+  createSettingsReducer,
+  useSettingsContextValue,
+} from "../settingsContext";
 import { getDefaultOpenAISettings } from "./getDefaultSettings";
 
-// Action types
-type OpenAISettingsAction =
-  | {
-      type: "UPDATE_SETTING";
-      key: keyof OpenAIGenerationSettings;
-      value: OpenAIGenerationSettings[keyof OpenAIGenerationSettings];
-    }
-  | { type: "RESET_TO_DEFAULTS"; assetType: AssetType };
-
-// Reducer
-const openAISettingsReducer = (
-  state: OpenAIGenerationSettings,
-  action: OpenAISettingsAction
-): OpenAIGenerationSettings => {
-  switch (action.type) {
-    case "UPDATE_SETTING":
-      return {
-        ...state,
-        [action.key]: action.value,
-      };
-    case "RESET_TO_DEFAULTS":
-      // Preserve the current prompt when resetting to defaults
-      return getDefaultOpenAISettings(action.assetType, state.prompt);
-    default:
-      return state;
-  }
-};
-
-// Context type
-type OpenAISettingsContextType = {
-  settings: OpenAIGenerationSettings;
-  updateSetting: <K extends keyof OpenAIGenerationSettings>(
-    key: K,
-    value: OpenAIGenerationSettings[K]
-  ) => void;
-  resetToDefaults: (assetType: AssetType) => void;
-};
+// Preserve the current prompt when resetting to defaults
+const openAISettingsReducer = createSettingsReducer<OpenAIGenerationSettings>(
+  (assetType, state) => getDefaultOpenAISettings(assetType, state.prompt)
+);
 
 const OpenAISettingsContext = createContext<
-  OpenAISettingsContextType | undefined
+  SettingsContextValue<OpenAIGenerationSettings> | undefined
 >(undefined);
 
 // Provider props
@@ -56,32 +28,9 @@ export const OpenAISettingsProvider: React.FC<OpenAISettingsProviderProps> = ({
   children,
   initialAssetType = AssetType.Sprite,
 }) => {
-  const [settings, dispatch] = useReducer(
+  const value = useSettingsContextValue(
     openAISettingsReducer,
     getDefaultOpenAISettings(initialAssetType)
-  );
-
-  const updateSetting = useCallback(
-    <K extends keyof OpenAIGenerationSettings>(
-      key: K,
-      value: OpenAIGenerationSettings[K]
-    ) => {
-      dispatch({ type: "UPDATE_SETTING", key, value });
-    },
-    []
-  );
-
-  const resetToDefaults = useCallback((assetType: AssetType) => {
-    dispatch({ type: "RESET_TO_DEFAULTS", assetType });
-  }, []);
-
-  const value = useMemo(
-    () => ({
-      settings,
-      updateSetting,
-      resetToDefaults,
-    }),
-    [settings, updateSetting, resetToDefaults]
   );
 
   return (

@@ -9,5 +9,6 @@ export const useMouseCoordinates = () => {
       "useMouseCoordinates must be used within a MouseCoordinatesProvider"
     );
 
-  return context;
+  const { value: mouseCoordinates, setValue: setMouseCoordinates } = context;
+  return { mouseCoordinates, setMouseCoordinates };
 };

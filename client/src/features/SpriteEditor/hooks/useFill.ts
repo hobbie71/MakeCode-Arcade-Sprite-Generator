@@ -58,6 +58,9 @@ export const useFill = () => {
       }
 
       // Otherwise a 4-connected contiguous flood of the clicked region.
+      const isInBounds = ({ x, y }: Coordinates) =>
+        x >= 0 && x < width && y >= 0 && y < height;
+
       const stack: Coordinates[] = [startCoordinates];
       const visited = new Set<string>();
 
@@ -65,29 +68,14 @@ export const useFill = () => {
         const current = stack.pop()!;
         const key = `${current.x},${current.y}`;
 
-        // Skip if already visited or out of bounds
-        if (
-          visited.has(key) ||
-          current.x < 0 ||
-          current.x >= width ||
-          current.y < 0 ||
-          current.y >= height
-        ) {
-          continue;
-        }
+        // Skip if already visited, out of bounds, or not the target color
+        if (visited.has(key) || !isInBounds(current)) continue;
+        if (spriteData[current.y][current.x] !== targetColor) continue;
 
-        // Skip if current pixel is not the target color
-        if (spriteData[current.y][current.x] !== targetColor) {
-          continue;
-        }
-
-        // Mark as visited
         visited.add(key);
-
-        // Fill the current pixel
         paint(current.x, current.y);
 
-        // Add orthogonal neighbors
+        // Continue the flood through the orthogonal neighbors
         stack.push(
           { x: current.x + 1, y: current.y }, // Right
           { x: current.x - 1, y: current.y }, // Left

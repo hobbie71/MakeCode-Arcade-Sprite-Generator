@@ -86,17 +86,12 @@ export const usePencil = () => {
     [removeCornerIfNeeded]
   );
 
-  const handlePointerDown = useCallback(
+  // Stamp a single stroke point: paint the canvas, record the affected pixels
+  // in sprite data, and (when pixel-perfect) extend the stroke path.
+  const paintStrokePoint = useCallback(
     (coordinates: Coordinates) => {
       if (!canvasRef.current) return;
 
-      if (ppActive()) {
-        // Snapshot the canvas state so removed corners restore correctly.
-        originalDataRef.current = getCurrentSpriteData().map((row) => [...row]);
-        strokePathRef.current = [];
-      }
-
-      // Draw the initial pixel
       drawPixelsOnCanvas(
         canvasRef.current,
         [coordinates],
@@ -111,9 +106,6 @@ export const usePencil = () => {
       setSpriteDataCoordinates(strokeCoordinates, color);
 
       if (ppActive()) pushPathPixel(coordinates);
-
-      // Store the current position as the previous position
-      previousCoordinates.current = coordinates;
     },
     [
       canvasRef,
@@ -122,9 +114,26 @@ export const usePencil = () => {
       setSpriteDataCoordinates,
       strokeSize,
       ppActive,
-      getCurrentSpriteData,
       pushPathPixel,
     ]
+  );
+
+  const handlePointerDown = useCallback(
+    (coordinates: Coordinates) => {
+      if (!canvasRef.current) return;
+
+      if (ppActive()) {
+        // Snapshot the canvas state so removed corners restore correctly.
+        originalDataRef.current = getCurrentSpriteData().map((row) => [...row]);
+        strokePathRef.current = [];
+      }
+
+      paintStrokePoint(coordinates);
+
+      // Store the current position as the previous position
+      previousCoordinates.current = coordinates;
+    },
+    [canvasRef, ppActive, getCurrentSpriteData, paintStrokePoint]
   );
 
   const handlePointerMove = useCallback(
@@ -164,19 +173,7 @@ export const usePencil = () => {
         }
       } else {
         // Fallback: just draw the current pixel if no previous position
-        drawPixelsOnCanvas(
-          canvasRef.current,
-          [coordinates],
-          color,
-          palette,
-          PIXEL_SIZE,
-          strokeSize
-        );
-
-        const strokeCoordinates = getStrokeCoordinates(coordinates, strokeSize);
-        setSpriteDataCoordinates(strokeCoordinates, color);
-
-        if (ppActive()) pushPathPixel(coordinates);
+        paintStrokePoint(coordinates);
       }
 
       // Update previous position
@@ -190,6 +187,7 @@ export const usePencil = () => {
       strokeSize,
       ppActive,
       pushPathPixel,
+      paintStrokePoint,
     ]
   );
 

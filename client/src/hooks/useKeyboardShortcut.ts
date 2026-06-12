@@ -10,6 +10,22 @@ export interface KeyboardShortcut {
   preventDefault?: boolean;
 }
 
+const isTypingTarget = (target: HTMLElement): boolean =>
+  target.tagName === "INPUT" ||
+  target.tagName === "TEXTAREA" ||
+  target.isContentEditable;
+
+// Each modifier must be held when required and released when not
+const matchesShortcut = (
+  event: KeyboardEvent,
+  shortcut: KeyboardShortcut
+): boolean =>
+  event.key.toLowerCase() === shortcut.key.toLowerCase() &&
+  event.ctrlKey === Boolean(shortcut.ctrl) &&
+  event.shiftKey === Boolean(shortcut.shift) &&
+  event.altKey === Boolean(shortcut.alt) &&
+  event.metaKey === Boolean(shortcut.meta);
+
 export const useKeyboardShortcut = (
   shortcuts: KeyboardShortcut[],
   enabled: boolean = true
@@ -23,28 +39,19 @@ export const useKeyboardShortcut = (
 
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     // Don't trigger shortcuts when user is typing in an input
-    const target = event.target as HTMLElement;
-    if (
-      target.tagName === "INPUT" ||
-      target.tagName === "TEXTAREA" ||
-      target.isContentEditable
-    ) {
+    if (isTypingTarget(event.target as HTMLElement)) {
       return;
     }
 
     shortcutsRef.current.forEach((shortcut) => {
-      const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase();
-      const ctrlMatch = shortcut.ctrl ? event.ctrlKey : !event.ctrlKey;
-      const shiftMatch = shortcut.shift ? event.shiftKey : !event.shiftKey;
-      const altMatch = shortcut.alt ? event.altKey : !event.altKey;
-      const metaMatch = shortcut.meta ? event.metaKey : !event.metaKey;
-
-      if (keyMatch && ctrlMatch && shiftMatch && altMatch && metaMatch) {
-        if (shortcut.preventDefault !== false) {
-          event.preventDefault();
-        }
-        shortcut.callback(event);
+      if (!matchesShortcut(event, shortcut)) {
+        return;
       }
+
+      if (shortcut.preventDefault !== false) {
+        event.preventDefault();
+      }
+      shortcut.callback(event);
     });
   }, []);
 

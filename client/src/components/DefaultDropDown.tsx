@@ -7,6 +7,8 @@ import {
   type ReactNode,
 } from "react";
 
+import { useCloseOnOutsideClick } from "../hooks/useCloseOnOutsideClick";
+
 /**
  * Option shape: every option needs a `name` (the label / type-ahead key) plus
  * whatever payload `T` the caller threads through (e.g. `{ type }`, `{ quality }`,
@@ -54,22 +56,6 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
     <path
       d="m6 8 4 4 4-4"
       strokeWidth={1.6}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg
-    className="h-[18px] w-[18px] shrink-0 text-accent"
-    viewBox="0 0 20 20"
-    fill="none"
-    stroke="currentColor"
-    aria-hidden="true">
-    <path
-      d="m5 10.5 3.5 3.5L15 7"
-      strokeWidth={1.85}
       strokeLinecap="round"
       strokeLinejoin="round"
     />
@@ -144,17 +130,7 @@ const DefaultDropDown = <T,>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, activeIndex]);
 
-  // Close on outside click.
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: MouseEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onPointerDown);
-    return () => document.removeEventListener("mousedown", onPointerDown);
-  }, [open]);
+  useCloseOnOutsideClick(containerRef, open, () => setOpen(false));
 
   // Clear any pending type-ahead timer on unmount.
   useEffect(
@@ -232,6 +208,57 @@ const DefaultDropDown = <T,>({
     }
   };
 
+  const renderOption = (option: DropdownOption<T>, index: number) => {
+    const isSelected = index === value;
+    const isActive = index === activeIndex;
+    return (
+      <li
+        key={option.name}
+        id={optionId(index)}
+        role="option"
+        aria-selected={isSelected}
+        onClick={() => commit(index)}
+        onMouseEnter={() => setActiveIndex(index)}
+        className={`flex cursor-pointer items-center gap-3 rounded-chip px-2.5 py-2 ${
+          isSelected
+            ? "bg-accent-soft ring-2 ring-accent-ring"
+            : isActive
+              ? "bg-surface-hover"
+              : ""
+        }`}>
+        {option.icon && (
+          <span
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-chip ${
+              isSelected
+                ? "bg-accent-soft-2 text-accent"
+                : "bg-surface-sunken text-ink-muted"
+            }`}>
+            {option.icon}
+          </span>
+        )}
+        {!option.icon && option.swatches && (
+          <SwatchTile colors={option.swatches} />
+        )}
+
+        <span className="min-w-0 flex-1">
+          <span
+            className={`block truncate text-sm ${
+              isSelected
+                ? "font-semibold text-accent"
+                : "font-medium text-ink"
+            }`}>
+            {option.name}
+          </span>
+          {option.description && (
+            <span className="mt-0.5 block truncate text-xs text-ink-muted">
+              {option.description}
+            </span>
+          )}
+        </span>
+      </li>
+    );
+  };
+
   return (
     <div
       ref={containerRef}
@@ -291,54 +318,7 @@ const DefaultDropDown = <T,>({
             className={`absolute top-full z-50 mt-1.5 max-h-72 w-max min-w-full max-w-[20rem] overflow-auto rounded-card border border-line bg-surface-raised p-1.5 shadow-lg focus:outline-none ${
               stacked ? "left-0" : "right-0"
             }`}>
-            {options.map((option, index) => {
-              const isSelected = index === value;
-              const isActive = index === activeIndex;
-              return (
-                <li
-                  key={option.name}
-                  id={optionId(index)}
-                  role="option"
-                  aria-selected={isSelected}
-                  onClick={() => commit(index)}
-                  onMouseEnter={() => setActiveIndex(index)}
-                  className={`flex cursor-pointer items-center gap-3 rounded-chip px-2.5 py-2 ${
-                    isActive ? "bg-surface-hover" : ""
-                  }`}>
-                  {option.icon && (
-                    <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-chip ${
-                        isSelected
-                          ? "bg-accent-soft text-accent"
-                          : "bg-surface-sunken text-ink-muted"
-                      }`}>
-                      {option.icon}
-                    </span>
-                  )}
-                  {!option.icon && option.swatches && (
-                    <SwatchTile colors={option.swatches} />
-                  )}
-
-                  <span className="min-w-0 flex-1">
-                    <span
-                      className={`block truncate text-sm ${
-                        isSelected
-                          ? "font-semibold text-accent"
-                          : "font-medium text-ink"
-                      }`}>
-                      {option.name}
-                    </span>
-                    {option.description && (
-                      <span className="mt-0.5 block truncate text-xs text-ink-muted">
-                        {option.description}
-                      </span>
-                    )}
-                  </span>
-
-                  {isSelected && <CheckIcon />}
-                </li>
-              );
-            })}
+            {options.map(renderOption)}
           </ul>
         )}
       </div>
