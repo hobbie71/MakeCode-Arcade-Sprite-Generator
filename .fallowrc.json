@@ -1,4 +1,28 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
-  "entry": ["client/index.html", "client/src/main.tsx"]
+  "entry": [
+    "client/index.html",
+    "client/src/main.tsx",
+    // Dev server launched by the client package.json "dev" script.
+    "client/dev-server.ts",
+    // Production static server — Docker CMD in client/Dockerfile.
+    "client/serve.ts"
+  ],
+  "ignorePatterns": [
+    // Vendored Google AdSense helper scripts (incl. minified errorProtectionMessage.js).
+    "client/public/**",
+    // Design-reference assets (CSS token references), not part of the app build.
+    "docs/**",
+    // VS Code Tailwind IntelliSense helper, intentionally orphan.
+    "client/src/tailwind-intellisense.css"
+  ],
+  "ignoreUnresolvedImports": [
+    // Script tags in client/index.html resolved at runtime from public/.
+    "/adBlockingRecovery.js",
+    "/errorProtectionMessage.js"
+  ],
+  "duplicates": {
+    // Semantic mode also catches clones with renamed variables (vs. the "mild" default).
+    "mode": "semantic"
+  }
 }

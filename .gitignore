@@ -4,6 +4,12 @@ dist/
 .env
 *.log
 
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Fallow cache
+.fallow/
+
 # Python
 __pycache__/
 *.pyc
