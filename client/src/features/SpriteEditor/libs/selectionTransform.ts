@@ -2,6 +2,17 @@ import { MakeCodeColor } from "../../../types/color";
 import { createMask, maskGet, maskSet } from "./selectionMask";
 import type { SelectionMask } from "./selectionMask";
 
+/** Map a destination cell center back to a source cell, honoring a flip. */
+const sourceIndex = (
+  dest: number,
+  destSize: number,
+  srcSize: number,
+  flip: boolean
+): number => {
+  const src = Math.min(srcSize - 1, Math.floor((dest * srcSize) / destSize));
+  return flip ? srcSize - 1 - src : src;
+};
+
 /**
  * Nearest-neighbor resample of the lifted basis (pixels + mask) into a target
  * w×h, honoring horizontal/vertical flips. Always sampling from the ORIGINAL
@@ -27,12 +38,9 @@ export const deriveFloatingPixels = (
 
   for (let y = 0; y < h; y++) {
     const row: MakeCodeColor[] = [];
-    // Map destination cell center back to a source cell.
-    let sy = Math.min(srcH - 1, Math.floor((y * srcH) / h));
-    if (flipY) sy = srcH - 1 - sy;
+    const sy = sourceIndex(y, h, srcH, flipY);
     for (let x = 0; x < w; x++) {
-      let sx = Math.min(srcW - 1, Math.floor((x * srcW) / w));
-      if (flipX) sx = srcW - 1 - sx;
+      const sx = sourceIndex(x, w, srcW, flipX);
       const selected = maskGet(basisMask, sx, sy);
       maskSet(mask, x, y, selected);
       row.push(
@@ -48,28 +56,6 @@ export const deriveFloatingPixels = (
 };
 
 // ---- Lossless ops folded into the basis (no resampling) -------------------
-
-export const flipDataH = (data: MakeCodeColor[][]): MakeCodeColor[][] =>
-  data.map((row) => [...row].reverse());
-
-export const flipDataV = (data: MakeCodeColor[][]): MakeCodeColor[][] =>
-  [...data].reverse().map((row) => [...row]);
-
-export const flipMaskH = (mask: SelectionMask): SelectionMask => {
-  const out = createMask(mask.width, mask.height);
-  for (let y = 0; y < mask.height; y++)
-    for (let x = 0; x < mask.width; x++)
-      maskSet(out, mask.width - 1 - x, y, maskGet(mask, x, y));
-  return out;
-};
-
-export const flipMaskV = (mask: SelectionMask): SelectionMask => {
-  const out = createMask(mask.width, mask.height);
-  for (let y = 0; y < mask.height; y++)
-    for (let x = 0; x < mask.width; x++)
-      maskSet(out, x, mask.height - 1 - y, maskGet(mask, x, y));
-  return out;
-};
 
 /** Rotate clockwise 90°: result is height×width of the source. */
 export const rotateData90 = (data: MakeCodeColor[][]): MakeCodeColor[][] => {

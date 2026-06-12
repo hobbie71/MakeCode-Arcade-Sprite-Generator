@@ -119,10 +119,6 @@ export const maskFromFlood = (
 };
 
 /**
- * Combine an incoming tool-produced mask with the existing selection.
- * "replace" ignores the base; "add"/"subtract" are the Shift/Alt drag modes.
- */
-/**
  * Mask from a freehand/lasso path (a list of sampled pixel points). The outline
  * is densified with Bresenham and closed back to the start, rasterized into a
  * 1px-padded scratch grid; the exterior is flood-filled from the padded corner
@@ -139,15 +135,7 @@ export const maskFromLassoPath = (
   const mask = createMask(width, height);
   if (path.length === 0) return mask;
 
-  // Outline pixels: densify between consecutive samples + close the loop.
-  const outline: Coordinates[] = [];
-  for (let i = 0; i < path.length; i++) {
-    const a = path[i];
-    const b = path[(i + 1) % path.length];
-    const seg = getLineCoordinates(a, b);
-    // Drop the duplicated segment endpoint shared with the next segment's start.
-    for (let j = 0; j < seg.length - 1; j++) outline.push(seg[j]);
-  }
+  const outline = densifyClosedOutline(path);
 
   // Stamp outline into the selection (clamped) and into a padded scratch grid
   // (pw×ph, offset by +1) so the exterior wraps fully around the shape.
@@ -163,7 +151,36 @@ export const maskFromLassoPath = (
     if (sx >= 0 && sy >= 0 && sx < pw && sy < ph) isOutline[sy * pw + sx] = 1;
   }
 
-  // Flood the exterior from the padded corner (always outside the outline).
+  const outside = floodExterior(isOutline, pw, ph);
+
+  // Interior = not exterior. Map padded scratch back to canvas coords.
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (!outside[(y + 1) * pw + (x + 1)]) mask.bits[y * width + x] = 1;
+    }
+  }
+  return mask;
+};
+
+/** Outline pixels: densify between consecutive samples + close the loop. */
+const densifyClosedOutline = (path: Coordinates[]): Coordinates[] => {
+  const outline: Coordinates[] = [];
+  for (let i = 0; i < path.length; i++) {
+    const a = path[i];
+    const b = path[(i + 1) % path.length];
+    const seg = getLineCoordinates(a, b);
+    // Drop the duplicated segment endpoint shared with the next segment's start.
+    for (let j = 0; j < seg.length - 1; j++) outline.push(seg[j]);
+  }
+  return outline;
+};
+
+/** Flood the exterior from the padded corner (always outside the outline). */
+const floodExterior = (
+  isOutline: Uint8Array,
+  pw: number,
+  ph: number
+): Uint8Array => {
   const outside = new Uint8Array(pw * ph);
   const stack: number[] = [0];
   while (stack.length > 0) {
@@ -177,16 +194,13 @@ export const maskFromLassoPath = (
     if (y + 1 < ph) stack.push(idx + pw);
     if (y - 1 >= 0) stack.push(idx - pw);
   }
-
-  // Interior = not exterior. Map padded scratch back to canvas coords.
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      if (!outside[(y + 1) * pw + (x + 1)]) mask.bits[y * width + x] = 1;
-    }
-  }
-  return mask;
+  return outside;
 };
 
+/**
+ * Combine an incoming tool-produced mask with the existing selection.
+ * "replace" ignores the base; "add"/"subtract" are the Shift/Alt drag modes.
+ */
 export const combineMasks = (
   base: SelectionMask | null,
   incoming: SelectionMask,

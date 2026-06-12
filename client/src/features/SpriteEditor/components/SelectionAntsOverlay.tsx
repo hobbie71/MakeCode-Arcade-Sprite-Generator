@@ -8,6 +8,8 @@ import {
   boundsToRect,
   handlePosition,
 } from "../libs/selectionHitTest";
+import { beginOverlayFrame } from "../libs/overlayCanvas";
+import { useRedrawOnCanvasResize } from "../hooks/useRedrawOnCanvasResize";
 
 interface Props {
   width: number;
@@ -73,34 +75,20 @@ const SelectionAntsOverlay = ({ width, height, offset, zoom }: Props) => {
   }, [draft]);
 
   const draw = useCallback(() => {
-    const ants = antsRef.current;
-    const parent = ants?.parentElement;
-    const main = canvasRef.current;
-    if (!ants || !parent || !main) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    const bw = Math.round(parent.clientWidth * dpr);
-    const bh = Math.round(parent.clientHeight * dpr);
-    if (ants.width !== bw) ants.width = bw;
-    if (ants.height !== bh) ants.height = bh;
-
-    const ctx = ants.getContext("2d");
-    if (!ctx) return;
-    ctx.clearRect(0, 0, ants.width, ants.height);
+    const frame = beginOverlayFrame(antsRef.current, canvasRef.current);
+    if (!frame) return;
+    const { ctx, dpr } = frame;
 
     const path = draftPath ?? floatingOutline ?? maskOutline;
     if (!path) return;
 
     // Sprite box in this overlay's device pixels (same scheme as GridOverlay).
-    const mr = main.getBoundingClientRect();
-    const pr = parent.getBoundingClientRect();
-    const left = (mr.left - pr.left) * dpr;
-    const top = (mr.top - pr.top) * dpr;
-    const cell = (mr.width * dpr) / width; // device px per sprite px (square)
+    const { left, top, w, h } = frame.box;
+    const cell = w / width; // device px per sprite px (square)
 
     ctx.save();
     ctx.translate(left, top);
-    ctx.scale(cell, (mr.height * dpr) / height);
+    ctx.scale(cell, h / height);
     if (path === floatingOutline && floating) {
       ctx.translate(floating.rect.x, floating.rect.y);
     }
@@ -125,7 +113,7 @@ const SelectionAntsOverlay = ({ width, height, offset, zoom }: Props) => {
     // Resize handles — screen-space squares at the bounds corners + edge
     // midpoints, drawn only for a settled selection/float (not mid-draw).
     if (!draftPath && bounds) {
-      const cellY = (mr.height * dpr) / height;
+      const cellY = h / height;
       const rect = boundsToRect(bounds);
       const size = HANDLE_CSS_PX * dpr;
       const accent =
@@ -162,15 +150,7 @@ const SelectionAntsOverlay = ({ width, height, offset, zoom }: Props) => {
     draw();
   }, [draw, offset, zoom]);
 
-  // Redraw once the sprite canvas's box settles after a resize (GridOverlay's
-  // trick — React effects can run before layout settles).
-  useEffect(() => {
-    const main = canvasRef.current;
-    if (!main || typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => draw());
-    ro.observe(main);
-    return () => ro.disconnect();
-  }, [draw, canvasRef]);
+  useRedrawOnCanvasResize(canvasRef, draw);
 
   // March only while something is on screen.
   useEffect(() => {

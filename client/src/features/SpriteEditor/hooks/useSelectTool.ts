@@ -38,6 +38,16 @@ import type { Coordinates } from "../../../types/pixel";
 /** Client-pixel movement below this is a click, not a drag (MakeCode uses 3). */
 const DRAG_THRESHOLD_PX = 3;
 
+/** Has the pointer moved past the click/drag threshold since the press? */
+const isDragPastThreshold = (
+  ev: MouseEvent,
+  start: { startClientX: number; startClientY: number }
+): boolean =>
+  Math.max(
+    Math.abs(ev.clientX - start.startClientX),
+    Math.abs(ev.clientY - start.startClientY)
+  ) > DRAG_THRESHOLD_PX;
+
 type SelectGesture =
   | {
       kind: "draw-rect";
@@ -164,187 +174,169 @@ export const useSelectTool = () => {
     [canvasRef, bounds, isInsideSelection]
   );
 
-  const handlePointerDown = useCallback(
-    (e: React.MouseEvent) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      if (e.button !== 0) return;
-      if (gestureRef.current) return;
-
-      const start = getCanvasCoordinates(canvas, e, zoomRef.current);
-      const startFloat = getCanvasPointFloat(canvas, e, zoomRef.current);
-      const inBounds =
-        start.x >= 0 && start.y >= 0 && start.x < width && start.y < height;
-      const combine: MaskCombineMode = e.shiftKey
-        ? "add"
-        : e.altKey
-          ? "subtract"
-          : "replace";
-      const plainPress = combine === "replace";
-
-      const install = (
-        onMove: (ev: MouseEvent) => void,
-        onUp: (ev: MouseEvent) => void
-      ) => {
-        const up = (ev: MouseEvent) => {
-          removeListenersRef.current?.();
-          onUp(ev);
-        };
-        window.addEventListener("mousemove", onMove);
-        window.addEventListener("mouseup", up);
-        removeListenersRef.current = () => {
-          window.removeEventListener("mousemove", onMove);
-          window.removeEventListener("mouseup", up);
-          removeListenersRef.current = null;
-        };
+  /** Window-level listeners for the life of one gesture (see hook docblock). */
+  const installGestureListeners = useCallback(
+    (onMove: (ev: MouseEvent) => void, onUp: (ev: MouseEvent) => void) => {
+      const up = (ev: MouseEvent) => {
+        removeListenersRef.current?.();
+        onUp(ev);
       };
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", up);
+      removeListenersRef.current = () => {
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", up);
+        removeListenersRef.current = null;
+      };
+    },
+    []
+  );
 
-      // A resize handle takes priority over everything (incl. modifiers, which
-      // mean aspect-lock here, not add/subtract). Lift lazily, then drag the
-      // grabbed edge; flips come from the signed-rect math.
-      const handle = bounds
-        ? hitTestHandle(startFloat, boundsToRect(bounds), zoomRef.current)
-        : null;
-      if (handle) {
-        const startFlipX = floating?.flipX ?? false;
-        const startFlipY = floating?.flipY ?? false;
-        const rect = liftSelection();
-        if (!rect) return;
-        gestureRef.current = {
-          kind: "resize",
-          handle,
-          startRect: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
-          startFlipX,
-          startFlipY,
-        };
-        install(
-          (ev) => {
-            const g = gestureRef.current;
-            if (g?.kind !== "resize") return;
-            const fp = getCanvasPointFloat(canvas, ev, zoomRef.current);
-            const res = computeResizeRect(
-              g.startRect,
-              g.handle,
-              fp,
-              g.startFlipX,
-              g.startFlipY,
-              ev.shiftKey,
-              width,
-              height
-            );
-            // flushSync for the same reason as the move gesture: raw-listener
-            // updates must commit synchronously to stay live during the drag.
-            flushSync(() => setFloatingTransform(res.rect, res.flipX, res.flipY));
-          },
-          () => {
-            gestureRef.current = null;
+  // Lift lazily, then drag the grabbed edge; flips come from the signed-rect
+  // math.
+  const startResizeGesture = useCallback(
+    (canvas: HTMLCanvasElement, handle: HandleId) => {
+      const startFlipX = floating?.flipX ?? false;
+      const startFlipY = floating?.flipY ?? false;
+      const rect = liftSelection();
+      if (!rect) return;
+      gestureRef.current = {
+        kind: "resize",
+        handle,
+        startRect: { x: rect.x, y: rect.y, w: rect.w, h: rect.h },
+        startFlipX,
+        startFlipY,
+      };
+      installGestureListeners(
+        (ev) => {
+          const g = gestureRef.current;
+          if (g?.kind !== "resize") return;
+          const fp = getCanvasPointFloat(canvas, ev, zoomRef.current);
+          const res = computeResizeRect(
+            g.startRect,
+            g.handle,
+            fp,
+            g.startFlipX,
+            g.startFlipY,
+            ev.shiftKey,
+            width,
+            height
+          );
+          // flushSync for the same reason as the move gesture: raw-listener
+          // updates must commit synchronously to stay live during the drag.
+          flushSync(() => setFloatingTransform(res.rect, res.flipX, res.flipY));
+        },
+        () => {
+          gestureRef.current = null;
+        }
+      );
+    },
+    [floating, liftSelection, width, height, setFloatingTransform, installGestureListeners]
+  );
+
+  // Move the selection under the pointer (lifting lazily first).
+  const startMoveGesture = useCallback(
+    (canvas: HTMLCanvasElement, start: Coordinates) => {
+      const rect = liftSelection();
+      if (!rect) return;
+      gestureRef.current = {
+        kind: "move",
+        grabDX: start.x - rect.x,
+        grabDY: start.y - rect.y,
+      };
+      installGestureListeners(
+        (ev) => {
+          const g = gestureRef.current;
+          if (g?.kind !== "move") return;
+          // Unclamped: the float may be dragged partly/fully off-canvas.
+          const p = getCanvasCoordinates(canvas, ev, zoomRef.current);
+          // flushSync: this runs in a raw window listener, and React 18 won't
+          // flush the update until its next render — which, when the gesture
+          // didn't lift (already floating), never comes, so the float would
+          // appear frozen. Forcing a synchronous commit keeps the drag live.
+          flushSync(() => setFloatingPosition(p.x - g.grabDX, p.y - g.grabDY));
+        },
+        () => {
+          gestureRef.current = null;
+        }
+      );
+    },
+    [liftSelection, setFloatingPosition, installGestureListeners]
+  );
+
+  // Lasso mode: trace a freehand path, Bresenham-filling gaps between
+  // samples; the closed polygon rasterizes to a mask on release.
+  const startLassoGesture = useCallback(
+    (
+      canvas: HTMLCanvasElement,
+      e: React.MouseEvent,
+      start: Coordinates,
+      combine: MaskCombineMode
+    ) => {
+      gestureRef.current = {
+        kind: "draw-lasso",
+        combine,
+        path: [start],
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        dragged: false,
+      };
+      installGestureListeners(
+        (ev) => {
+          const g = gestureRef.current;
+          if (g?.kind !== "draw-lasso") return;
+          if (!g.dragged) {
+            if (!isDragPastThreshold(ev, g)) return;
+            g.dragged = true;
+            beginDraft({ kind: "lasso", path: g.path });
           }
-        );
-        return;
-      }
-
-      // Click on the stage outside the sprite (and off any handle): anchor a
-      // float / deselect.
-      if (!inBounds) {
-        if (floating) commitFloating();
-        clearSelection();
-        return;
-      }
-
-      // Plain press inside the selection: move it (lifting lazily first).
-      if (plainPress && isInsideSelection(start)) {
-        const rect = liftSelection();
-        if (!rect) return;
-        gestureRef.current = {
-          kind: "move",
-          grabDX: start.x - rect.x,
-          grabDY: start.y - rect.y,
-        };
-        install(
-          (ev) => {
-            const g = gestureRef.current;
-            if (g?.kind !== "move") return;
-            // Unclamped: the float may be dragged partly/fully off-canvas.
-            const p = getCanvasCoordinates(canvas, ev, zoomRef.current);
-            // flushSync: this runs in a raw window listener, and React 18 won't
-            // flush the update until its next render — which, when the gesture
-            // didn't lift (already floating), never comes, so the float would
-            // appear frozen. Forcing a synchronous commit keeps the drag live.
-            flushSync(() => setFloatingPosition(p.x - g.grabDX, p.y - g.grabDY));
-          },
-          () => {
-            gestureRef.current = null;
+          const p = clampToCanvas(
+            getCanvasCoordinates(canvas, ev, zoomRef.current)
+          );
+          const last = g.path[g.path.length - 1];
+          if (last.x === p.x && last.y === p.y) return;
+          // Fill the gap so fast drags don't leave a broken outline.
+          const seg = getLineCoordinates(last, p);
+          for (let i = 1; i < seg.length; i++) g.path.push(seg[i]);
+          updateDraft({ kind: "lasso", path: [...g.path] });
+        },
+        () => {
+          const g = gestureRef.current;
+          gestureRef.current = null;
+          if (g?.kind !== "draw-lasso") return;
+          // A plain click (no drag) deselects.
+          if (!g.dragged) {
+            clearSelection();
+            return;
           }
-        );
-        return;
-      }
+          commitDraftAsMask(
+            maskFromLassoPath(width, height, g.path),
+            g.combine
+          );
+        }
+      );
+    },
+    [
+      width,
+      height,
+      beginDraft,
+      updateDraft,
+      commitDraftAsMask,
+      clearSelection,
+      clampToCanvas,
+      installGestureListeners,
+    ]
+  );
 
-      // Anything else starts a new selection; an active float anchors first.
-      if (floating) commitFloating();
-
-      // Wand mode resolves on the click itself — no drag. The flood mask
-      // combines with the current selection via the Shift/Alt modifiers.
-      if (mode === "wand") {
-        commitDraftAsMask(
-          maskFromFlood(spriteData, width, height, start, wandContiguous),
-          combine
-        );
-        return;
-      }
-
-      // Lasso mode: trace a freehand path, Bresenham-filling gaps between
-      // samples; the closed polygon rasterizes to a mask on release.
-      if (mode === "lasso") {
-        gestureRef.current = {
-          kind: "draw-lasso",
-          combine,
-          path: [start],
-          startClientX: e.clientX,
-          startClientY: e.clientY,
-          dragged: false,
-        };
-        install(
-          (ev) => {
-            const g = gestureRef.current;
-            if (g?.kind !== "draw-lasso") return;
-            if (!g.dragged) {
-              const moved = Math.max(
-                Math.abs(ev.clientX - g.startClientX),
-                Math.abs(ev.clientY - g.startClientY)
-              );
-              if (moved <= DRAG_THRESHOLD_PX) return;
-              g.dragged = true;
-              beginDraft({ kind: "lasso", path: g.path });
-            }
-            const p = clampToCanvas(
-              getCanvasCoordinates(canvas, ev, zoomRef.current)
-            );
-            const last = g.path[g.path.length - 1];
-            if (last.x === p.x && last.y === p.y) return;
-            // Fill the gap so fast drags don't leave a broken outline.
-            const seg = getLineCoordinates(last, p);
-            for (let i = 1; i < seg.length; i++) g.path.push(seg[i]);
-            updateDraft({ kind: "lasso", path: [...g.path] });
-          },
-          () => {
-            const g = gestureRef.current;
-            gestureRef.current = null;
-            if (g?.kind !== "draw-lasso") return;
-            // A plain click (no drag) deselects.
-            if (!g.dragged) {
-              clearSelection();
-              return;
-            }
-            commitDraftAsMask(
-              maskFromLassoPath(width, height, g.path),
-              g.combine
-            );
-          }
-        );
-        return;
-      }
-
-      const gesture: SelectGesture = {
+  // Rect marquee: the default drag-out selection.
+  const startRectGesture = useCallback(
+    (
+      canvas: HTMLCanvasElement,
+      e: React.MouseEvent,
+      start: Coordinates,
+      combine: MaskCombineMode
+    ) => {
+      gestureRef.current = {
         kind: "draw-rect",
         anchor: start,
         combine,
@@ -352,18 +344,12 @@ export const useSelectTool = () => {
         startClientY: e.clientY,
         dragged: false,
       };
-      gestureRef.current = gesture;
-
-      install(
+      installGestureListeners(
         (ev) => {
           const g = gestureRef.current;
           if (g?.kind !== "draw-rect") return;
           if (!g.dragged) {
-            const moved = Math.max(
-              Math.abs(ev.clientX - g.startClientX),
-              Math.abs(ev.clientY - g.startClientY)
-            );
-            if (moved <= DRAG_THRESHOLD_PX) return;
+            if (!isDragPastThreshold(ev, g)) return;
             g.dragged = true;
             // The draft only appears once the press becomes a real drag, so a
             // plain click never flashes a one-pixel marquee.
@@ -396,6 +382,80 @@ export const useSelectTool = () => {
       );
     },
     [
+      width,
+      height,
+      beginDraft,
+      updateDraft,
+      commitDraftAsMask,
+      clearSelection,
+      clampToCanvas,
+      installGestureListeners,
+    ]
+  );
+
+  const handlePointerDown = useCallback(
+    (e: React.MouseEvent) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      if (e.button !== 0) return;
+      if (gestureRef.current) return;
+
+      const start = getCanvasCoordinates(canvas, e, zoomRef.current);
+      const startFloat = getCanvasPointFloat(canvas, e, zoomRef.current);
+      const inBounds =
+        start.x >= 0 && start.y >= 0 && start.x < width && start.y < height;
+      const combine: MaskCombineMode = e.shiftKey
+        ? "add"
+        : e.altKey
+          ? "subtract"
+          : "replace";
+      const plainPress = combine === "replace";
+
+      // A resize handle takes priority over everything (incl. modifiers, which
+      // mean aspect-lock here, not add/subtract).
+      const handle = bounds
+        ? hitTestHandle(startFloat, boundsToRect(bounds), zoomRef.current)
+        : null;
+      if (handle) {
+        startResizeGesture(canvas, handle);
+        return;
+      }
+
+      // Click on the stage outside the sprite (and off any handle): anchor a
+      // float / deselect.
+      if (!inBounds) {
+        if (floating) commitFloating();
+        clearSelection();
+        return;
+      }
+
+      // Plain press inside the selection: move it.
+      if (plainPress && isInsideSelection(start)) {
+        startMoveGesture(canvas, start);
+        return;
+      }
+
+      // Anything else starts a new selection; an active float anchors first.
+      if (floating) commitFloating();
+
+      // Wand mode resolves on the click itself — no drag. The flood mask
+      // combines with the current selection via the Shift/Alt modifiers.
+      if (mode === "wand") {
+        commitDraftAsMask(
+          maskFromFlood(spriteData, width, height, start, wandContiguous),
+          combine
+        );
+        return;
+      }
+
+      if (mode === "lasso") {
+        startLassoGesture(canvas, e, start, combine);
+        return;
+      }
+
+      startRectGesture(canvas, e, start, combine);
+    },
+    [
       canvasRef,
       width,
       height,
@@ -405,15 +465,13 @@ export const useSelectTool = () => {
       wandContiguous,
       spriteData,
       isInsideSelection,
-      liftSelection,
-      setFloatingPosition,
-      setFloatingTransform,
       commitFloating,
-      beginDraft,
-      updateDraft,
       commitDraftAsMask,
       clearSelection,
-      clampToCanvas,
+      startResizeGesture,
+      startMoveGesture,
+      startLassoGesture,
+      startRectGesture,
     ]
   );
 

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { useGrid } from "../contexts/GridContext/useGrid";
 import { useCanvas } from "../../../context/CanvasContext/useCanvas";
+import { beginOverlayFrame } from "../libs/overlayCanvas";
+import { useRedrawOnCanvasResize } from "../hooks/useRedrawOnCanvasResize";
 
 interface Props {
   width: number;
@@ -44,33 +46,14 @@ const GridOverlay = ({ width, height, offset, zoom }: Props) => {
 
   const draw = useCallback(() => {
     const grid = gridRef.current;
-    const parent = grid?.parentElement;
-    const main = canvasRef.current;
-    if (!grid || !parent || !main) return;
+    if (!grid) return;
 
-    const dpr = window.devicePixelRatio || 1;
-
-    // Backing store covers the visible stage in device pixels (bounded by the
-    // viewport, so it stays small even at high zoom on large sprites).
-    const bw = Math.round(parent.clientWidth * dpr);
-    const bh = Math.round(parent.clientHeight * dpr);
-    if (grid.width !== bw) grid.width = bw;
-    if (grid.height !== bh) grid.height = bh;
-
-    const ctx = grid.getContext("2d");
-    if (!ctx) return;
-    ctx.clearRect(0, 0, grid.width, grid.height);
+    const frame = beginOverlayFrame(grid, canvasRef.current);
+    if (!frame) return;
     if (!showGrid) return;
 
-    // The rendered sprite's box, expressed in this overlay's device pixels. The
-    // overlay fills the (border/padding-free) container, so the parent's top-left
-    // is the overlay's origin.
-    const mr = main.getBoundingClientRect();
-    const pr = parent.getBoundingClientRect();
-    const left = (mr.left - pr.left) * dpr;
-    const top = (mr.top - pr.top) * dpr;
-    const w = mr.width * dpr;
-    const h = mr.height * dpr;
+    const { ctx } = frame;
+    const { left, top, w, h } = frame.box;
 
     ctx.strokeStyle = "#3f3f46";
     ctx.lineWidth = 1; // one device pixel — a crisp hairline at any zoom
@@ -108,16 +91,7 @@ const GridOverlay = ({ width, height, offset, zoom }: Props) => {
     draw();
   }, [draw, offset, zoom]);
 
-  // Redraw once the sprite canvas's box settles after a resize, independent of
-  // React's effect timing. Set up once per canvas (draw only changes on
-  // size/toggle), so panning doesn't churn the observer.
-  useEffect(() => {
-    const main = canvasRef.current;
-    if (!main || typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => draw());
-    ro.observe(main);
-    return () => ro.disconnect();
-  }, [draw, canvasRef]);
+  useRedrawOnCanvasResize(canvasRef, draw);
 
   return (
     <canvas

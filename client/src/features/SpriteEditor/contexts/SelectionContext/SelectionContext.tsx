@@ -46,21 +46,21 @@ import { setSelectionInterruptListener } from "../../libs/selectionInterrupt";
  * mutates the sprite; the lift is lazy — it happens on the first move, nudge,
  * resize, or flip.
  */
-export type SelectionPhase = "idle" | "drawing" | "selected" | "floating";
+type SelectionPhase = "idle" | "drawing" | "selected" | "floating";
 
-export type SelectionDraft =
+type SelectionDraft =
   | { kind: "rect"; anchor: Coordinates; head: Coordinates }
   | { kind: "lasso"; path: Coordinates[] };
 
 /** Doc-space placement of the floating buffer; w/h ≥ 1. */
-export interface FloatRect {
+interface FloatRect {
   x: number;
   y: number;
   w: number;
   h: number;
 }
 
-export interface FloatingSelection {
+interface FloatingSelection {
   /**
    * The pixels as originally lifted (TRANSPARENT outside the mask), plus the
    * local-space mask of which cells belong to the selection. Resizes always
@@ -137,6 +137,97 @@ const SelectionContext = createContext<undefined | SelectionContextType>(
 
 const clone = (data: MakeCodeColor[][]): MakeCodeColor[][] =>
   data.map((row) => [...row]);
+
+/**
+ * Cut the masked pixels into a tight float basis (TRANSPARENT outside the
+ * mask), leaving a transparent hole in the returned sprite copy.
+ */
+const extractMaskedRegion = (
+  spriteData: MakeCodeColor[][],
+  mask: SelectionMask,
+  b: MaskBounds
+): {
+  basisData: MakeCodeColor[][];
+  basisMask: SelectionMask;
+  cut: MakeCodeColor[][];
+  rect: FloatRect;
+} => {
+  const w0 = b.maxX - b.minX + 1;
+  const h0 = b.maxY - b.minY + 1;
+  const basisMask = createMask(w0, h0);
+  const basisData: MakeCodeColor[][] = [];
+  const cut = clone(spriteData);
+  for (let y = 0; y < h0; y++) {
+    const row: MakeCodeColor[] = [];
+    for (let x = 0; x < w0; x++) {
+      const sx = b.minX + x;
+      const sy = b.minY + y;
+      if (maskGet(mask, sx, sy)) {
+        maskSet(basisMask, x, y, true);
+        row.push(spriteData[sy]?.[sx] ?? MakeCodeColor.TRANSPARENT);
+        if (cut[sy]) cut[sy][sx] = MakeCodeColor.TRANSPARENT;
+      } else {
+        row.push(MakeCodeColor.TRANSPARENT);
+      }
+    }
+    basisData.push(row);
+  }
+  return {
+    basisData,
+    basisMask,
+    cut,
+    rect: { x: b.minX, y: b.minY, w: w0, h: h0 },
+  };
+};
+
+/**
+ * Stamp the float onto a sprite copy. Off-canvas cells are clipped (MakeCode
+ * behavior) and transparent float cells don't punch holes (transparent
+ * apply). Also returns the doc-space mask of the committed region.
+ */
+const mergeFloatingIntoSprite = (
+  spriteData: MakeCodeColor[][],
+  pixels: { data: MakeCodeColor[][]; mask: SelectionMask },
+  origin: { x: number; y: number },
+  width: number,
+  height: number
+): { merged: MakeCodeColor[][]; docMask: SelectionMask } => {
+  const merged = clone(spriteData);
+  const docMask = createMask(width, height);
+  for (let y = 0; y < pixels.data.length; y++) {
+    for (let x = 0; x < (pixels.data[y]?.length ?? 0); x++) {
+      if (!maskGet(pixels.mask, x, y)) continue;
+      const dx = origin.x + x;
+      const dy = origin.y + y;
+      if (dx < 0 || dy < 0 || dx >= width || dy >= height) continue;
+      maskSet(docMask, dx, dy, true);
+      const color = pixels.data[y][x];
+      if (color !== MakeCodeColor.TRANSPARENT) merged[dy][dx] = color;
+    }
+  }
+  return { merged, docMask };
+};
+
+/** Clear the masked cells to TRANSPARENT; null when nothing changed. */
+const clearMaskedPixels = (
+  spriteData: MakeCodeColor[][],
+  mask: SelectionMask,
+  width: number,
+  height: number
+): MakeCodeColor[][] | null => {
+  const next = clone(spriteData);
+  let changed = false;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (!maskGet(mask, x, y)) continue;
+      if (next[y]?.[x] !== MakeCodeColor.TRANSPARENT) {
+        next[y][x] = MakeCodeColor.TRANSPARENT;
+        changed = true;
+      }
+    }
+  }
+  return changed ? next : null;
+};
 
 export const SelectionProvider = ({
   children,
@@ -221,13 +312,18 @@ export const SelectionProvider = ({
     setMask(null);
   }, []);
 
-  const hardReset = useCallback(() => {
-    setDraft(null);
-    setMask(null);
+  /** Drop the float buffer and its restore points. */
+  const discardFloat = useCallback(() => {
     setFloating(null);
     preLiftDataRef.current = null;
     preLiftMaskRef.current = null;
   }, []);
+
+  const hardReset = useCallback(() => {
+    setDraft(null);
+    setMask(null);
+    discardFloat();
+  }, [discardFloat]);
 
   const liftSelection = useCallback((): FloatRect | null => {
     if (floating) return floating.rect;
@@ -235,26 +331,11 @@ export const SelectionProvider = ({
     const b = maskBounds(mask);
     if (!b) return null;
 
-    const w0 = b.maxX - b.minX + 1;
-    const h0 = b.maxY - b.minY + 1;
-    const basisMask = createMask(w0, h0);
-    const basisData: MakeCodeColor[][] = [];
-    const cut = clone(spriteData);
-    for (let y = 0; y < h0; y++) {
-      const row: MakeCodeColor[] = [];
-      for (let x = 0; x < w0; x++) {
-        const sx = b.minX + x;
-        const sy = b.minY + y;
-        if (maskGet(mask, sx, sy)) {
-          maskSet(basisMask, x, y, true);
-          row.push(spriteData[sy]?.[sx] ?? MakeCodeColor.TRANSPARENT);
-          if (cut[sy]) cut[sy][sx] = MakeCodeColor.TRANSPARENT;
-        } else {
-          row.push(MakeCodeColor.TRANSPARENT);
-        }
-      }
-      basisData.push(row);
-    }
+    const { basisData, basisMask, cut, rect } = extractMaskedRegion(
+      spriteData,
+      mask,
+      b
+    );
 
     preLiftDataRef.current = clone(spriteData);
     preLiftMaskRef.current = mask;
@@ -262,7 +343,6 @@ export const SelectionProvider = ({
     // (ADR-0007 decision 3); the pre-lift state is already history's top.
     writeSprite(cut);
 
-    const rect: FloatRect = { x: b.minX, y: b.minY, w: w0, h: h0 };
     setFloating({ basisData, basisMask, rect, flipX: false, flipY: false });
     setMask(null);
     return rect;
@@ -333,30 +413,17 @@ export const SelectionProvider = ({
 
   const commitFloating = useCallback(() => {
     if (!floating || !floatingPixels) return;
-    const merged = clone(spriteData);
-    const docMask = createMask(width, height);
-    const { data, mask: localMask } = floatingPixels;
-    const { x: ox, y: oy } = floating.rect;
-
-    for (let y = 0; y < data.length; y++) {
-      for (let x = 0; x < (data[y]?.length ?? 0); x++) {
-        if (!maskGet(localMask, x, y)) continue;
-        const dx = ox + x;
-        const dy = oy + y;
-        // Off-canvas cells are clipped on commit (MakeCode behavior).
-        if (dx < 0 || dy < 0 || dx >= width || dy >= height) continue;
-        maskSet(docMask, dx, dy, true);
-        const color = data[y][x];
-        // Transparent apply: transparent float cells don't punch holes.
-        if (color !== MakeCodeColor.TRANSPARENT) merged[dy][dx] = color;
-      }
-    }
+    const { merged, docMask } = mergeFloatingIntoSprite(
+      spriteData,
+      floatingPixels,
+      floating.rect,
+      width,
+      height
+    );
 
     writeSprite(merged);
     pushSnapshot(merged);
-    setFloating(null);
-    preLiftDataRef.current = null;
-    preLiftMaskRef.current = null;
+    discardFloat();
     // The committed region stays selected so it can be re-grabbed.
     setMask(maskIsEmpty(docMask) ? null : docMask);
   }, [
@@ -367,6 +434,7 @@ export const SelectionProvider = ({
     height,
     writeSprite,
     pushSnapshot,
+    discardFloat,
   ]);
 
   const cancelFloating = useCallback(() => {
@@ -374,39 +442,34 @@ export const SelectionProvider = ({
     if (preLiftDataRef.current) writeSprite(clone(preLiftDataRef.current));
     // Restore the selection where it was lifted from (paste floats have none).
     setMask(preLiftMaskRef.current);
-    setFloating(null);
-    preLiftDataRef.current = null;
-    preLiftMaskRef.current = null;
-  }, [floating, writeSprite]);
+    discardFloat();
+  }, [floating, writeSprite, discardFloat]);
 
   const deleteSelection = useCallback(() => {
     if (floating) {
       // The lift already left the hole; deleting just discards the buffer and
       // commits the hole as one entry.
       pushSnapshot(spriteData);
-      setFloating(null);
-      preLiftDataRef.current = null;
-      preLiftMaskRef.current = null;
+      discardFloat();
       setMask(null);
       return;
     }
     if (!mask) return;
-    const next = clone(spriteData);
-    let changed = false;
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        if (!maskGet(mask, x, y)) continue;
-        if (next[y]?.[x] !== MakeCodeColor.TRANSPARENT) {
-          next[y][x] = MakeCodeColor.TRANSPARENT;
-          changed = true;
-        }
-      }
-    }
-    if (!changed) return;
+    const next = clearMaskedPixels(spriteData, mask, width, height);
+    if (!next) return;
     writeSprite(next);
     pushSnapshot(next);
     // Keep the mask — the cleared region stays selected (Aseprite behavior).
-  }, [floating, mask, spriteData, width, height, writeSprite, pushSnapshot]);
+  }, [
+    floating,
+    mask,
+    spriteData,
+    width,
+    height,
+    writeSprite,
+    pushSnapshot,
+    discardFloat,
+  ]);
 
   const nudge = useCallback(
     (dx: number, dy: number) => {

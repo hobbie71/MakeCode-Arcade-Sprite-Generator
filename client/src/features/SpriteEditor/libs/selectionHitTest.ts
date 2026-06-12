@@ -124,6 +124,32 @@ export interface ResizeResult {
 }
 
 /**
+ * One axis of a handle drag: the grabbed edge follows the pointer (snapped to
+ * integer grid lines, clamped to the canvas), the anchor edge stays put, and
+ * crossing the anchor flips the axis.
+ */
+const resizeAxis = (
+  side: number,
+  anchor: number,
+  startPos: number,
+  startSize: number,
+  startFlip: boolean,
+  pointer: number,
+  canvasSize: number
+): { pos: number; size: number; flip: boolean } => {
+  if (side === 0) return { pos: startPos, size: startSize, flip: startFlip };
+  const moved = Math.max(0, Math.min(canvasSize, Math.round(pointer)));
+  let signed = moved - anchor;
+  if (signed === 0) signed = side; // keep ≥1 in the grab direction
+  return {
+    pos: Math.min(anchor, moved),
+    size: Math.max(1, Math.abs(signed)),
+    // Edge flipped if it crossed to the opposite side of its anchor.
+    flip: startFlip !== (signed * side < 0),
+  };
+};
+
+/**
  * New floating rect from a handle drag. The opposite edge stays anchored; the
  * grabbed edge(s) follow the pointer (snapped to integer grid lines). Dragging
  * a grabbed edge past its anchor flips that axis (signed-rect model, Aseprite)
@@ -147,44 +173,38 @@ export const computeResizeRect = (
   const anchorX = sx === 1 ? startRect.x : startRect.x + startRect.w;
   const anchorY = sy === 1 ? startRect.y : startRect.y + startRect.h;
 
-  let left: number;
-  let width: number;
-  let flipX = startFlipX;
-  if (sx === 0) {
-    left = startRect.x;
-    width = startRect.w;
-  } else {
-    const movedX = Math.max(0, Math.min(canvasW, Math.round(pointer.x)));
-    let signed = movedX - anchorX;
-    if (signed === 0) signed = sx; // keep ≥1 in the grab direction
-    // Edge flipped if it crossed to the opposite side of its anchor.
-    flipX = startFlipX !== (signed * sx < 0);
-    left = Math.min(anchorX, movedX);
-    width = Math.max(1, Math.abs(signed));
-  }
+  const ax = resizeAxis(
+    sx,
+    anchorX,
+    startRect.x,
+    startRect.w,
+    startFlipX,
+    pointer.x,
+    canvasW
+  );
+  const ay = resizeAxis(
+    sy,
+    anchorY,
+    startRect.y,
+    startRect.h,
+    startFlipY,
+    pointer.y,
+    canvasH
+  );
 
-  let top: number;
-  let height: number;
-  let flipY = startFlipY;
-  if (sy === 0) {
-    top = startRect.y;
-    height = startRect.h;
-  } else {
-    const movedY = Math.max(0, Math.min(canvasH, Math.round(pointer.y)));
-    let signed = movedY - anchorY;
-    if (signed === 0) signed = sy;
-    flipY = startFlipY !== (signed * sy < 0);
-    top = Math.min(anchorY, movedY);
-    height = Math.max(1, Math.abs(signed));
-  }
-
+  let top = ay.pos;
+  let height = ay.size;
   // Aspect lock only makes sense when both axes move (a corner handle).
   if (lockAspect && sx !== 0 && sy !== 0 && startRect.h !== 0) {
     const aspect = startRect.w / startRect.h;
     // Drive height from width, then re-extend from the anchor corner.
-    height = Math.max(1, Math.round(width / aspect));
+    height = Math.max(1, Math.round(ax.size / aspect));
     top = sy === 1 ? anchorY : anchorY - height;
   }
 
-  return { rect: { x: left, y: top, w: width, h: height }, flipX, flipY };
+  return {
+    rect: { x: ax.pos, y: top, w: ax.size, h: height },
+    flipX: ax.flip,
+    flipY: ay.flip,
+  };
 };
