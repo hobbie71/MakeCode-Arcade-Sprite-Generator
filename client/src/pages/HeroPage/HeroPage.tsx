@@ -50,8 +50,10 @@ export default function HeroPage() {
     navigate("/studio");
   };
 
-  // Upload/generate on the hero stages a source (no canvas commit) and routes
-  // into the studio asking it to open Resize & Process for that source.
+  // Upload/generate on the hero hands off to the studio's Resize & Process for
+  // the staged source. Uploads stage synchronously (source ready on arrival);
+  // AI generation fires this the instant it BEGINS, so we route in first and the
+  // studio shows the loading overlay, then opens Resize once generation lands.
   const enterStudioWithResize = () => {
     markVisited();
     navigate("/studio", { state: { openResize: true } });
@@ -136,6 +138,7 @@ export default function HeroPage() {
 
         <HeroEntryWidget
           onStaged={enterStudioWithResize}
+          onGenerateStart={enterStudioWithResize}
           onBlank={enterStudio}
         />
       </section>

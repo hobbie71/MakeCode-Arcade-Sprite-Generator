@@ -30,10 +30,16 @@ export default function GallerySprite({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const grid = useMemo(
-    () => (isValidMakeCodeSprite(literal) ? parseMakeCodeSprite(literal) : null),
-    [literal]
-  );
+  const grid = useMemo(() => {
+    // Examples may be authored as a full MakeCode literal (img`...`) OR as
+    // bare pixel rows — both are documented as valid in examples.data.ts. The
+    // shared validator only accepts the wrapped form (it stays strict to guard
+    // the editor's paste path), so wrap bare rows here before validating.
+    const trimmed = literal.trim();
+    if (!trimmed) return null;
+    const text = trimmed.startsWith("img`") ? trimmed : `img\`${trimmed}\``;
+    return isValidMakeCodeSprite(text) ? parseMakeCodeSprite(text) : null;
+  }, [literal]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

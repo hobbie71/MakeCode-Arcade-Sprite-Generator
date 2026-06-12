@@ -1,12 +1,16 @@
 import { MakeCodeColor } from "../types/color";
+import { MAX_LENGTH } from "../types/pixel";
 
 /**
  * Valid MakeCode color characters
  */
 const VALID_MAKECODE_COLORS = new Set(Object.values(MakeCodeColor));
 
-// MakeCode supports sprite dimensions from 1x1 to 128x128
-const MAX_SPRITE_DIMENSION = 128;
+// MakeCode sprites range from 1×1 up to 512×512; the full-screen Arcade
+// background is 160×120. Mirror the editor's real bound (MAX_LENGTH) so
+// backgrounds validate — both when pasted into the studio and when rendered in
+// the home-page gallery. A hard-coded 128 here silently rejected 160-wide art.
+const MAX_SPRITE_DIMENSION = MAX_LENGTH;
 
 /**
  * Extracts the trimmed, non-empty pixel rows from a MakeCode sprite string,

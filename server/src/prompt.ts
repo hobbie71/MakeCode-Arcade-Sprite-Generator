@@ -25,7 +25,11 @@ function styleHeader(assetType: AssetType): string {
   return (
     `You are generating a pixel-art ${assetType} for a 2D video game. ` +
     `Use clean, bold shapes with crisp edges and flat color fills — ` +
-    `no anti-aliasing, no soft or painterly shading, no photorealism.`
+    `no anti-aliasing, no soft or painterly shading, no photorealism. ` +
+    `Keep the design simple and the textures simple: favor a few large, ` +
+    `readable shapes over fine detail, and minimal, low-detail textures ` +
+    `over busy or intricate patterns — the low pixel resolution cannot ` +
+    `resolve complex designs.`
   );
 }
 

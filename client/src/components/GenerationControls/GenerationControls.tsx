@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import Button from "../Button";
 import SegmentedControl, { type SegmentOption } from "../SegmentedControl";
 import OpenAISettingsSection from "../../features/InputSection/GenerationMethodSection/TextToSpriteSection/components/OpenAISettingsSection";
@@ -6,7 +5,6 @@ import ImageUploadForm from "../../features/InputSection/GenerationMethodSection
 import AssetOptionsSelection from "../../features/InputSection/components/AssetOptionsSelection";
 import { useGenerationMethod } from "../../context/GenerationMethodContext/useGenerationMethod";
 import { useLoading } from "../../context/LoadingContext/useLoading";
-import { useError } from "../../context/ErrorContext/useError";
 import { useToken } from "../../context/TokenContext/useToken";
 import { useCanvasSize } from "../../context/CanvasSizeContext/useCanvasSize";
 import { useSprite } from "../../context/SpriteContext/useSprite";
@@ -43,10 +41,16 @@ const STUDIO_TABS: SegmentOption<GenerationMethod>[] = [
 ];
 
 interface Props {
-  /** Fired once a source image has been STAGED (an AI generation completed, or a
-   *  file was uploaded) — never commits to the canvas here. studio → open Resize
-   *  & Process; hero → navigate to the studio and open Resize & Process there. */
+  /** Fired once a source image has been STAGED synchronously (a file was
+   *  uploaded) — never commits to the canvas here. studio → open Resize &
+   *  Process; hero → navigate to the studio and open Resize & Process there.
+   *  AI generation does NOT fire this (it is async — see onGenerateStart). */
   onStaged?: () => void;
+  /** Fired the instant an AI generation BEGINS (before the loading overlay is
+   *  shown). The hero uses it to route into the studio first, so the overlay —
+   *  and the eventual Resize & Process hand-off — happen there, not on the hero.
+   *  Omitted on the studio, which already hosts the overlay. */
+  onGenerateStart?: () => void;
   /** Fired after a blank canvas is created (hero "Draw Blank" tab only) — hero
    *  navigates to the studio. Omitted on surfaces without the blank tab. */
   onBlank?: () => void;
@@ -67,13 +71,13 @@ interface Props {
  */
 export default function GenerationControls({
   onStaged,
+  onGenerateStart,
   onBlank,
   surface = "hero",
 }: Props) {
   const isHero = surface === "hero";
   const { selectedMethod, setSelectedMethod } = useGenerationMethod();
   const { isGenerating } = useLoading();
-  const { error } = useError();
   const { canGenerate, watchAdToEarnToken } = useToken();
   const { settings } = useOpenAISettings();
   const { width, height } = useCanvasSize();
@@ -95,15 +99,6 @@ export default function GenerationControls({
     !isHero && selectedMethod === GenerationMethod.BlankCanvas
       ? GenerationMethod.TextToSprite
       : selectedMethod;
-
-  // An AI generation runs async (validate → OpenAI → cache source); fire onStaged
-  // on the isGenerating true→false transition (no error). Upload/blank are sync
-  // and call their handlers directly, so this effect only ever covers AI.
-  const wasGenerating = useRef(false);
-  useEffect(() => {
-    if (wasGenerating.current && !isGenerating && !error) onStaged?.();
-    wasGenerating.current = isGenerating;
-  }, [isGenerating, error, onStaged]);
 
   const startBlankCanvas = () => {
     const blank: MakeCodeColor[][] = Array.from({ length: height }, () =>
@@ -128,9 +123,17 @@ export default function GenerationControls({
           variant="primary"
           className="w-full"
           isLoading={isGenerating}
-          onClick={() =>
-            generateAIImageAndConvertToSprite({ commit: false }).catch(() => {})
-          }
+          onClick={() => {
+            // Notify the host BEFORE kicking off so the hero can route into the
+            // studio in the same commit the overlay turns on — the loading state
+            // (and the eventual Resize hand-off) lands in the studio, not here.
+            // Only when there's actually a prompt: an empty one fails validation
+            // and stays put (the prompt is committed on blur, which the click's
+            // mousedown triggers, so settings.prompt is current here — the same
+            // value the generation itself reads).
+            if (settings.prompt.trim()) onGenerateStart?.();
+            generateAIImageAndConvertToSprite({ commit: false }).catch(() => {});
+          }}
         >
           ✦ Generate sprite
         </Button>

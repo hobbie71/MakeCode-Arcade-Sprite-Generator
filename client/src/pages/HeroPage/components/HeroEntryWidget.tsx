@@ -8,15 +8,18 @@ import GenerationControls from "../../../components/GenerationControls/Generatio
  */
 export default function HeroEntryWidget({
   onStaged,
+  onGenerateStart,
   onBlank,
 }: {
   onStaged: () => void;
+  onGenerateStart: () => void;
   onBlank: () => void;
 }) {
   return (
     <div className="w-full rounded-modal border border-line bg-surface-raised p-5 shadow-lg sm:p-6">
       <GenerationControls
         onStaged={onStaged}
+        onGenerateStart={onGenerateStart}
         onBlank={onBlank}
         surface="hero"
       />
