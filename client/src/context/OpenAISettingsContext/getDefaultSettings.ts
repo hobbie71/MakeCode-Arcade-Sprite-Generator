@@ -6,18 +6,11 @@ export const getDefaultOpenAISettings = (
   assetType: AssetType,
   preservePrompt?: string
 ): OpenAIGenerationSettings => {
-  let settings: OpenAIGenerationSettings = {
+  const settings: OpenAIGenerationSettings = {
     prompt: preservePrompt || "",
     assetType,
-    quality: OpenAIQuality.Low,
+    quality: OpenAIQuality.Medium,
   };
-
-  if (assetType === AssetType.Background) {
-    settings = {
-      ...settings,
-      quality: OpenAIQuality.Medium,
-    };
-  }
 
   return settings;
 };

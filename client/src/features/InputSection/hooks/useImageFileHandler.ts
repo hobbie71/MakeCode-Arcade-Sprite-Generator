@@ -195,7 +195,7 @@ export const useImageFileHandler = () => {
       startGeneration("Validating Prompt");
 
       let response;
-      if (selectedModel === AiModel.GPTImage1) {
+      if (selectedModel === AiModel.GPTImage) {
         const prompt = openAISettings.prompt;
 
         const isValid = await validatePrompt(prompt, setError);

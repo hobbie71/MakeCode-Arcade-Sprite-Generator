@@ -40,9 +40,10 @@ export const ALL_ASSETS_TYPE: AssetType[] = [
 // AI MODELS (UI-only; OpenAI-only)
 // =============================================================================
 
-/** Available AI models for sprite generation */
+/** UI-only model selector. The real OpenAI model id is set server-side, so this
+ *  stays version-neutral and never needs bumping when the backend model changes. */
 export enum AiModel {
-  GPTImage1 = "gpt-image-1",
+  GPTImage = "gpt-image",
 }
 
 // =============================================================================
@@ -51,11 +52,16 @@ export enum AiModel {
 
 /** OpenAI quality options with display names and their (display-only) token cost.
  *  `tokenCost` is UI-only — there is no real token economy yet (ADR-0006); High
- *  is priced higher because it costs significantly more to generate. */
+ *  is priced higher because it costs significantly more to generate.
+ *
+ *  High is temporarily disabled: generation is currently free (no ads / rewarded
+ *  video yet) and High costs significantly more per image. Re-add the High row
+ *  once a token/ad economy gates the cost. The OpenAIQuality.High enum value is
+ *  intentionally kept in shared so the server still accepts it. */
 export const ALL_OPENAI_QUALITYS = [
   { name: "Low", quality: OpenAIQuality.Low, tokenCost: 1 },
   { name: "Medium", quality: OpenAIQuality.Medium, tokenCost: 1 },
-  { name: "High", quality: OpenAIQuality.High, tokenCost: 3 },
+  // { name: "High", quality: OpenAIQuality.High, tokenCost: 3 },
 ];
 
 /** Display-only token cost for a quality (defaults to 1 if unknown). */

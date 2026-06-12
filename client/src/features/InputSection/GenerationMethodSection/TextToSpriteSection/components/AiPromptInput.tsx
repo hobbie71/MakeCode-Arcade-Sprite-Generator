@@ -61,7 +61,7 @@ const AiPromptInput = ({ onSubmit, disabled = false }: Props) => {
         placeholder={
           disabled
             ? "Loading..."
-            : 'Describe your sprite in detail — subject, pose, colors, outfit, expression and view. e.g. "a cheerful blue ninja with a dark hood and a raised steel katana, facing forward, bold black outline, retro 8-bit"'
+            : 'Describe your sprite in detail. e.g. "a cheerful blue ninja with a dark hood and a raised steel katana, facing forward, bold black outline, retro 8-bit"'
         }
         onKeyDown={handleKeyDown}
         onBlur={() => handleUserSubmit()}
