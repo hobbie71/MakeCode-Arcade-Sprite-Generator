@@ -3,7 +3,7 @@
 
 /** Replicates the Python CORS_ORIGINS parsing: a JSON array literal (with single
  *  or double quotes), else a comma-separated list, else []. */
-export function parseCorsOrigins(raw: string | undefined): string[] {
+function parseCorsOrigins(raw: string | undefined): string[] {
   if (!raw) return [];
   try {
     if (raw.startsWith("[") && raw.endsWith("]")) {
