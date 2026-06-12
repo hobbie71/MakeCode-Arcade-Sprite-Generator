@@ -1,5 +1,26 @@
 import { type Coordinates } from "../../../types/pixel";
 
+const getBounds = (start: Coordinates, end: Coordinates) => ({
+  minX: Math.min(start.x, end.x),
+  maxX: Math.max(start.x, end.x),
+  minY: Math.min(start.y, end.y),
+  maxY: Math.max(start.y, end.y),
+});
+
+const getCircleGeometry = (start: Coordinates, end: Coordinates) => {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+
+  return {
+    centerX: start.x,
+    centerY: start.y,
+    radius: Math.round(Math.sqrt(dx * dx + dy * dy)),
+  };
+};
+
+const dedupeCoordinates = (coordinates: Coordinates[]): Coordinates[] =>
+  Array.from(new Map(coordinates.map((c) => [`${c.x},${c.y}`, c])).values());
+
 export const getLineCoordinates = (
   start: Coordinates,
   end: Coordinates
@@ -37,10 +58,7 @@ export const getSquareCoordinates = (
 ): Coordinates[] => {
   const coordinates: Coordinates[] = [];
 
-  const minX = Math.min(start.x, end.x);
-  const maxX = Math.max(start.x, end.x);
-  const minY = Math.min(start.y, end.y);
-  const maxY = Math.max(start.y, end.y);
+  const { minX, maxX, minY, maxY } = getBounds(start, end);
 
   // Top edge
   coordinates.push(
@@ -59,12 +77,7 @@ export const getSquareCoordinates = (
     ...getLineCoordinates({ x: minX, y: maxY }, { x: minX, y: minY })
   );
 
-  // Remove duplicate coordinates
-  const uniqueCoordinates = Array.from(
-    new Map(coordinates.map((c) => [`${c.x},${c.y}`, c])).values()
-  );
-
-  return uniqueCoordinates;
+  return dedupeCoordinates(coordinates);
 };
 
 export const getFilledSquareCoordinates = (
@@ -73,10 +86,7 @@ export const getFilledSquareCoordinates = (
 ): Coordinates[] => {
   const coordinates: Coordinates[] = [];
 
-  const minX = Math.min(start.x, end.x);
-  const maxX = Math.max(start.x, end.x);
-  const minY = Math.min(start.y, end.y);
-  const maxY = Math.max(start.y, end.y);
+  const { minX, maxX, minY, maxY } = getBounds(start, end);
 
   for (let y = minY; y <= maxY; y++) {
     for (let x = minX; x <= maxX; x++) {
@@ -93,12 +103,7 @@ export const getCircleCoordinates = (
 ): Coordinates[] => {
   const coordinates: Coordinates[] = [];
 
-  // Calculate center and radius
-  const centerX = start.x;
-  const centerY = start.y;
-  const dx = end.x - start.x;
-  const dy = end.y - start.y;
-  const radius = Math.round(Math.sqrt(dx * dx + dy * dy));
+  const { centerX, centerY, radius } = getCircleGeometry(start, end);
 
   if (radius === 0) {
     coordinates.push({ x: centerX, y: centerY });
@@ -132,12 +137,7 @@ export const getCircleCoordinates = (
     }
   }
 
-  // Remove duplicate coordinates
-  const uniqueCoordinates = Array.from(
-    new Map(coordinates.map((c) => [`${c.x},${c.y}`, c])).values()
-  );
-
-  return uniqueCoordinates;
+  return dedupeCoordinates(coordinates);
 };
 
 export const getFilledCircleCoordinates = (
@@ -146,11 +146,7 @@ export const getFilledCircleCoordinates = (
 ): Coordinates[] => {
   const coordinates: Coordinates[] = [];
 
-  const centerX = start.x;
-  const centerY = start.y;
-  const dx = end.x - start.x;
-  const dy = end.y - start.y;
-  const radius = Math.round(Math.sqrt(dx * dx + dy * dy));
+  const { centerX, centerY, radius } = getCircleGeometry(start, end);
 
   if (radius === 0) {
     coordinates.push({ x: centerX, y: centerY });
