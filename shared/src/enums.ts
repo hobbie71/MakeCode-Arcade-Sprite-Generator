@@ -13,11 +13,3 @@ export enum AssetType {
   Animation = "animation",
 }
 export const AssetTypeSchema = z.enum(AssetType);
-
-/** Quality settings for OpenAI generation. */
-export enum OpenAIQuality {
-  Low = "low",
-  Medium = "medium",
-  High = "high",
-}
-export const OpenAIQualitySchema = z.enum(OpenAIQuality);

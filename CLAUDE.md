@@ -54,7 +54,7 @@ Critical boundary: **only the wire contract belongs in `shared/`.** UI-only meta
 **Server (`server/src/`).** `index.ts` exports a Bun server default (`{ port, hostname, fetch: app.fetch }`); the Hono app is in `app.ts`. Three routes:
 
 - `GET /` — version/info JSON.
-- `POST /generate-image/openai` — body `OpenAISpriteRequest` (`{ settings: { prompt, assetType, style, quality }, size: { width, height }, palette }`) → `{ image_data, width, height }`, where `image_data` is a `data:image/png;base64,...` URL the client renders directly.
+- `POST /generate-image/openai` — body `OpenAISpriteRequest` (`{ settings: { prompt, assetType }, size: { width, height }, palette }`) → `{ image_data, width, height }`, where `image_data` is a `data:image/png;base64,...` URL the client renders directly. Generation quality is forced to `"low"` server-side (Medium/High were removed — no longer offered in the UI or carried on the wire).
 - `POST /moderation/moderate` — body `{ prompt }` → `{ is_appropriate, flagged, categories, category_scores }`.
 
 Supporting modules: `openai.ts` (`generateOpenAISprite`, `moderatePrompt` — the OpenAI calls), `moderation-logic.ts` (`applyModerationOverride`, pure logic that adjusts OpenAI's raw moderation verdict — unit-tested independently of the network), `prompt.ts` (prompt construction), `size.ts` (sprite sizing), `config.ts` (env parsing). The generation flow is **moderate-then-generate**: the client checks a prompt before triggering a paid image call.

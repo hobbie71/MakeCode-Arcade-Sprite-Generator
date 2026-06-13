@@ -4,9 +4,9 @@
 // OpenAI-only. The cross-wire enums + request/response types live in the shared
 // package and are re-exported here so existing `../types/export` imports across
 // the client keep working unchanged.
-import { AssetType, OpenAIQuality } from "@makespritecode/shared";
+import { AssetType } from "@makespritecode/shared";
 
-export { AssetType, OpenAIQuality };
+export { AssetType };
 export type {
   Size,
   OpenAIGenerationSettings,
@@ -46,27 +46,10 @@ export enum AiModel {
   GPTImage = "gpt-image",
 }
 
-// =============================================================================
-// OPENAI quality catalog (OpenAIQuality enum from shared)
-// =============================================================================
-
-/** OpenAI quality options with display names and their (display-only) token cost.
- *  `tokenCost` is UI-only — there is no real token economy yet (ADR-0006); High
- *  is priced higher because it costs significantly more to generate.
- *
- *  High is temporarily disabled: generation is currently free (no ads / rewarded
- *  video yet) and High costs significantly more per image. Re-add the High row
- *  once a token/ad economy gates the cost. The OpenAIQuality.High enum value is
- *  intentionally kept in shared so the server still accepts it. */
-export const ALL_OPENAI_QUALITYS = [
-  { name: "Low", quality: OpenAIQuality.Low, tokenCost: 1 },
-  { name: "Medium", quality: OpenAIQuality.Medium, tokenCost: 1 },
-  // { name: "High", quality: OpenAIQuality.High, tokenCost: 3 },
-];
-
-/** Display-only token cost for a quality (defaults to 1 if unknown). */
-export const getQualityTokenCost = (quality: OpenAIQuality): number =>
-  ALL_OPENAI_QUALITYS.find((q) => q.quality === quality)?.tokenCost ?? 1;
+/** Display-only token cost per generation. Generation quality is forced to
+ *  "low" server-side (Medium/High were removed), so every generation costs the
+ *  same. There is no real token economy yet (ADR-0006). */
+export const GENERATION_TOKEN_COST = 1;
 
 // =============================================================================
 // GENERATION METHODS (UI-only)

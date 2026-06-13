@@ -3,8 +3,6 @@ import {
   // enums
   AssetType,
   AssetTypeSchema,
-  OpenAIQuality,
-  OpenAIQualitySchema,
   // palette
   MakeCodePaletteSchema,
   // wire
@@ -20,9 +18,7 @@ import {
 describe("barrel index re-exports", () => {
   test("re-exports the enum schemas and enum objects", () => {
     expect(AssetTypeSchema).toBeDefined();
-    expect(OpenAIQualitySchema).toBeDefined();
     expect(AssetType.Sprite).toBe("sprite");
-    expect(OpenAIQuality.Medium).toBe("medium");
   });
 
   test("re-exports the palette schema", () => {

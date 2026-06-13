@@ -10,7 +10,7 @@ import { useCanvasSize } from "../../context/CanvasSizeContext/useCanvasSize";
 import { useSprite } from "../../context/SpriteContext/useSprite";
 import { useOpenAISettings } from "../../context/OpenAISettingsContext/useOpenAISettings";
 import { useImageFileHandler } from "../../features/InputSection/hooks/useImageFileHandler";
-import { GenerationMethod, getQualityTokenCost } from "../../types/export";
+import { GenerationMethod, GENERATION_TOKEN_COST } from "../../types/export";
 import { MakeCodeColor } from "../../types/color";
 
 /** Small filled lightning bolt for the speed estimate (matches the solid ★). */
@@ -55,7 +55,7 @@ interface Props {
    *  navigates to the studio. Omitted on surfaces without the blank tab. */
   onBlank?: () => void;
   /** Which host renders this widget. Both surfaces share the SAME generate/upload
-   *  experience (AI: prompt + quality + asset type, no size; Upload: dropzone +
+   *  experience (AI: prompt + asset type, no size; Upload: dropzone +
    *  button; both STAGE a source then hand off to Resize & Process). The only
    *  difference is "hero" adds the extra Draw Blank tab. */
   surface?: Surface;
@@ -89,8 +89,9 @@ export default function GenerationControls({
     stageSource,
   } = useImageFileHandler();
 
-  // Display-only token cost for the selected quality (no real economy — ADR-0006).
-  const tokenCost = getQualityTokenCost(settings.quality);
+  // Display-only token cost per generation (no real economy — ADR-0006). Quality
+  // is forced to "low" server-side, so every generation costs the same.
+  const tokenCost = GENERATION_TOKEN_COST;
 
   // Only the hero has a Draw Blank tab. If the shared GenerationMethod context is
   // still on Blank (e.g. it was chosen on the hero before navigating in), fall
@@ -186,7 +187,7 @@ export default function GenerationControls({
 
       {/* Method-specific input */}
       {activeMethod === GenerationMethod.TextToSprite && (
-        <OpenAISettingsSection showQuality />
+        <OpenAISettingsSection />
       )}
       {activeMethod === GenerationMethod.ImageToSprite && (
         <ImageUploadForm onFile={handleUpload} />

@@ -1,10 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import {
-  AssetType,
-  AssetTypeSchema,
-  OpenAIQuality,
-  OpenAIQualitySchema,
-} from "./enums";
+import { AssetType, AssetTypeSchema } from "./enums";
 
 describe("AssetType", () => {
   test("enum members carry the wire string values", () => {
@@ -21,14 +16,5 @@ describe("AssetType", () => {
     }
     expect(AssetTypeSchema.safeParse("spaceship").success).toBe(false);
     expect(AssetTypeSchema.safeParse("Sprite").success).toBe(false); // case-sensitive
-  });
-});
-
-describe("OpenAIQuality", () => {
-  test("low, medium and high are valid; unknown strings are rejected", () => {
-    expect(OpenAIQualitySchema.parse(OpenAIQuality.Low)).toBe("low");
-    expect(OpenAIQualitySchema.parse(OpenAIQuality.Medium)).toBe("medium");
-    expect(OpenAIQualitySchema.parse(OpenAIQuality.High)).toBe("high");
-    expect(OpenAIQualitySchema.safeParse("ultra").success).toBe(false);
   });
 });
