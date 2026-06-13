@@ -1,0 +1,72 @@
+name: Fallow
+
+# Codebase-intelligence gate. On every pull request, two fallow jobs run:
+#
+#   audit    — dead-code + complexity + duplication, scoped to the PR's changed
+#              files, failing only on issues THIS PR introduces (gate: new-only)
+#              so pre-existing debt never blocks a merge. Findings surface inline
+#              on the diff and in a sticky PR summary comment.
+#
+#   security — surfaces security candidates (tainted sinks, secret/PII logging,
+#              etc.), failing only on candidates introduced on the PR's changed
+#              lines (security-gate: new). These are candidates for review, not
+#              confirmed vulnerabilities.
+#
+# Semantic duplicate detection is inherited from .fallowrc.json
+# (duplicates.mode: "semantic"), which fallow reads automatically — no flag here.
+#
+# The fallow-rs/fallow action installs the fallow binary itself; fallow is a
+# static analyzer that reads source + package.json directly, so no Bun/Node
+# toolchain or `bun install` step is required.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# Cancel superseded runs on the same PR so a fresh push doesn't pile up jobs.
+concurrency:
+  group: fallow-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # checkout + read the diff via `gh pr diff`
+  pull-requests: write # post inline annotations + the sticky summary comment
+
+jobs:
+  audit:
+    name: Audit changed files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # audit auto-scopes to the PR base SHA; full history is required for
+          # the changed-files diff (auto-changed-since needs fetch-depth: 0).
+          fetch-depth: 0
+
+      - name: Fallow audit
+        uses: fallow-rs/fallow@v2
+        with:
+          command: audit
+          gate: new-only # fail only on findings this PR introduces
+          fail-on-issues: true
+          annotations: true # inline findings on the PR diff
+          comment: true # sticky summary comment on the PR
+
+  security:
+    name: Security candidates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # security-gate: new diffs the PR's changed lines against the base,
+          # so full history is required (same reason as the audit job).
+          fetch-depth: 0
+
+      - name: Fallow security gate
+        uses: fallow-rs/fallow@v2
+        with:
+          command: security
+          security-gate: new # fail only on candidates introduced by this PR
+          annotations: true # inline candidate flags on the PR diff
