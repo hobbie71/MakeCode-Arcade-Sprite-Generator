@@ -1,0 +1,48 @@
+name: Fallow
+
+# Codebase-intelligence gate. On every pull request, fallow runs its `audit`
+# (dead-code + complexity + duplication) scoped to the PR's changed files and
+# fails the check only on issues THIS PR introduces (gate: new-only) — so
+# pre-existing debt never blocks a merge. Findings are surfaced inline on the
+# diff and summarized in a sticky PR comment.
+#
+# Semantic duplicate detection is inherited from .fallowrc.json
+# (duplicates.mode: "semantic"), which fallow reads automatically — no flag here.
+#
+# The fallow-rs/fallow action installs the fallow binary itself; fallow is a
+# static analyzer that reads source + package.json directly, so no Bun/Node
+# toolchain or `bun install` step is required.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# Cancel superseded runs on the same PR so a fresh push doesn't pile up jobs.
+concurrency:
+  group: fallow-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # checkout + read the diff via `gh pr diff`
+  pull-requests: write # post inline annotations + the sticky summary comment
+
+jobs:
+  audit:
+    name: Audit changed files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # audit auto-scopes to the PR base SHA; full history is required for
+          # the changed-files diff (auto-changed-since needs fetch-depth: 0).
+          fetch-depth: 0
+
+      - name: Fallow audit
+        uses: fallow-rs/fallow@v2
+        with:
+          command: audit
+          gate: new-only # fail only on findings this PR introduces
+          fail-on-issues: true
+          annotations: true # inline findings on the PR diff
+          comment: true # sticky summary comment on the PR
