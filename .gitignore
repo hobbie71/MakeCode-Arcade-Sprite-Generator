@@ -19,5 +19,10 @@ __pycache__/
 # macOS
 .DS_Store
 
-# Claude Code
-.claude/
+# Claude Code — share the root fallow pre-commit gate; keep all other config local
+**/.claude/
+!/.claude/
+/.claude/*
+!/.claude/settings.json
+!/.claude/hooks/
+/.claude/settings.local.json
