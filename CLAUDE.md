@@ -64,7 +64,7 @@ Supporting modules: `openai.ts` (`generateOpenAISprite`, `moderatePrompt` — th
 ## Toolchain gotchas
 
 - **Bun's bundler replaced Vite (ADR-0003).** There is no Vite config. The client build is `client/build.ts` (a `bun build` script) plus `client/external-public.plugin.ts` (a Bun plugin) and `client/serve.ts`; the HTML entry is `client/index.html`; Bun-specific settings are in `client/bunfig.toml`. Tailwind is compiled separately by the `css:build`/`css:dev` scripts into `src/tailwind.gen.css` (**generated — don't edit**). CSS must be plain CSS, not Sass — Bun's lightningcss bundler does not process `.scss`.
-- **Stale Python leftovers.** The backend was migrated from FastAPI/Python to Hono/Bun. `server/app/` (only `__pycache__` remains), `server/.venv/`, and the root `.venv/` are dead artifacts of the old stack — ignore them; the live server is entirely under `server/src/`. Several source comments reference the Python originals (e.g. "parity with the FastAPI ..."). PixelLab and background-removal features from the old backend were dropped (OpenAI-only now).
+- **Python is fully gone.** The backend was migrated from FastAPI/Python to Hono/Bun, and the dead Python artifacts (the old `server/app/` FastAPI source tree, `server/.venv/`, and the root `.venv/`) were deleted 2026-06-13. The live server is entirely under `server/src/`. A few source comments still reference the Python originals (e.g. "parity with the FastAPI ..."). PixelLab and background-removal features from the old backend were dropped (OpenAI-only now).
 
 ## Deployment (Render.com)
 
