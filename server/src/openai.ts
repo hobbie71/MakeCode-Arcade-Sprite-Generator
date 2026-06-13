@@ -34,11 +34,11 @@ export async function generateOpenAISprite(
     // The SDK's `size` union predates gpt-image-2's arbitrary resolutions; the
     // API accepts any valid "WxH" string, so we assert past the stale literal type.
     size: finalSize as OpenAI.Images.ImageGenerateParams["size"],
+    // Quality is forced to "low" for every generation: it is more than good
+    // enough for pixel-art sprites and significantly cheaper. Medium/High were
+    // removed entirely (no longer offered in the UI or carried on the wire).
+    quality: "low",
   };
-  // Only set quality when non-blank, matching the Python guard.
-  if (settings.quality && settings.quality.trim()) {
-    params.quality = settings.quality as OpenAI.Images.ImageGenerateParams["quality"];
-  }
 
   const response = await client().images.generate(params);
   const b64 = response.data?.[0]?.b64_json;

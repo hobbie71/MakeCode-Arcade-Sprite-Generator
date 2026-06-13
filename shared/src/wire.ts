@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AssetTypeSchema, OpenAIQualitySchema, OpenAIQuality } from "./enums";
+import { AssetTypeSchema } from "./enums";
 import { MakeCodePaletteSchema } from "./palette";
 
 /** Canvas size for sprite generation. */
@@ -16,10 +16,12 @@ export const BaseGenerationSettingsSchema = z.object({
 });
 export type BaseGenerationSettings = z.infer<typeof BaseGenerationSettingsSchema>;
 
-/** OpenAI-specific generation settings. */
-export const OpenAIGenerationSettingsSchema = BaseGenerationSettingsSchema.extend({
-  quality: OpenAIQualitySchema.default(OpenAIQuality.Medium),
-});
+/** OpenAI-specific generation settings. Quality is no longer part of the wire
+ *  contract — the server always generates at "low" (see openai.ts), so there is
+ *  nothing OpenAI-specific to carry beyond the base settings today. Kept as a
+ *  distinct named schema so the client/server keep their existing imports and a
+ *  future OpenAI-only field has a home. */
+export const OpenAIGenerationSettingsSchema = BaseGenerationSettingsSchema;
 export type OpenAIGenerationSettings = z.infer<typeof OpenAIGenerationSettingsSchema>;
 
 /** Request body for POST /generate-image/openai. */

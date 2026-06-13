@@ -67,7 +67,7 @@ export default function TokenModal({ isOpen, onClose }: Props) {
   //     onClose={onClose}
   //     size="md"
   //     title="Generation tokens"
-  //     subtitle="Each AI generation uses 1 token. High quality uses 3."
+  //     subtitle="Each AI generation uses 1 token."
   //   >
   //     {/* Current balance */}
   //     <div className="flex items-center gap-4 rounded-card border border-accent-border bg-accent-soft p-4">

@@ -8,7 +8,7 @@ import {
   GenerateImageResponseSchema,
   ModerationResponseSchema,
 } from "./wire";
-import { AssetType, OpenAIQuality } from "./enums";
+import { AssetType } from "./enums";
 
 describe("SizeSchema", () => {
   test("accepts integer width/height", () => {
@@ -73,25 +73,13 @@ describe("OpenAIGenerationSettingsSchema", () => {
     assetType: AssetType.Tile,
   };
 
-  test("defaults quality to medium when omitted", () => {
+  test("accepts a valid settings object", () => {
+    expect(OpenAIGenerationSettingsSchema.parse(base)).toEqual(base);
+  });
+
+  test("does NOT carry a quality field (forced to low server-side)", () => {
     const parsed = OpenAIGenerationSettingsSchema.parse(base);
-    expect(parsed.quality).toBe(OpenAIQuality.Medium);
-    expect(parsed.quality).toBe("medium");
-  });
-
-  test("respects an explicit low quality", () => {
-    const parsed = OpenAIGenerationSettingsSchema.parse({
-      ...base,
-      quality: OpenAIQuality.Low,
-    });
-    expect(parsed.quality).toBe("low");
-  });
-
-  test("rejects an invalid quality value (e.g. ultra)", () => {
-    expect(
-      OpenAIGenerationSettingsSchema.safeParse({ ...base, quality: "ultra" })
-        .success,
-    ).toBe(false);
+    expect("quality" in parsed).toBe(false);
   });
 
   test("inherits base validation (rejects bad assetType)", () => {
@@ -107,7 +95,6 @@ describe("OpenAISpriteRequestSchema", () => {
     settings: {
       prompt: "a green slime",
       assetType: AssetType.Sprite,
-      quality: OpenAIQuality.Low,
     },
     size: { width: 16, height: 16 },
     palette: { ".": "rgba(0,0,0,0)", "1": "#FFFFFF" },
@@ -118,15 +105,6 @@ describe("OpenAISpriteRequestSchema", () => {
     expect(parsed.settings.prompt).toBe("a green slime");
     expect(parsed.size).toEqual({ width: 16, height: 16 });
     expect(parsed.palette["1"]).toBe("#FFFFFF");
-  });
-
-  test("applies the quality default within nested settings", () => {
-    const { quality, ...settingsNoQuality } = validRequest.settings;
-    const parsed = OpenAISpriteRequestSchema.parse({
-      ...validRequest,
-      settings: settingsNoQuality,
-    });
-    expect(parsed.settings.quality).toBe("medium");
   });
 
   test("rejects when settings is missing", () => {

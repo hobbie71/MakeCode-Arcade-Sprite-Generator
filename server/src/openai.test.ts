@@ -3,7 +3,7 @@ import type {
   MakeCodePalette,
   OpenAIGenerationSettings,
 } from "@makespritecode/shared";
-import { AssetType, OpenAIQuality } from "@makespritecode/shared";
+import { AssetType } from "@makespritecode/shared";
 import { getOpenAIFinalSize } from "./size";
 
 // ---------------------------------------------------------------------------
@@ -68,7 +68,6 @@ const palette: MakeCodePalette = {
 const baseSettings: OpenAIGenerationSettings = {
   prompt: "a cute green dragon",
   assetType: AssetType.Sprite,
-  quality: OpenAIQuality.Low,
 };
 
 beforeEach(() => {
@@ -111,26 +110,14 @@ describe("generateOpenAISprite", () => {
     expect(typeof params.prompt).toBe("string");
     // Prompt is built from settings -> contains the user prompt text.
     expect(params.prompt).toContain("a cute green dragon");
+    // Quality is always forced to "low" (Medium/High were removed).
+    expect(params.quality).toBe("low");
   });
 
-  test("sets quality when non-blank", async () => {
-    await generateOpenAISprite(
-      { ...baseSettings, quality: "high" as OpenAIGenerationSettings["quality"] },
-      { width: 16, height: 16 },
-      palette,
-    );
+  test("always forces quality to low", async () => {
+    await generateOpenAISprite(baseSettings, { width: 32, height: 32 }, palette);
     const params = imagesGenerateCalls[0] as { quality?: string };
-    expect(params.quality).toBe("high");
-  });
-
-  test("omits quality when blank/whitespace (matches the Python guard)", async () => {
-    await generateOpenAISprite(
-      { ...baseSettings, quality: "   " as OpenAIGenerationSettings["quality"] },
-      { width: 16, height: 16 },
-      palette,
-    );
-    const params = imagesGenerateCalls[0] as Record<string, unknown>;
-    expect("quality" in params).toBe(false);
+    expect(params.quality).toBe("low");
   });
 
   test("throws when OpenAI returns no image data", async () => {
