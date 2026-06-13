@@ -1,10 +1,16 @@
 name: Fallow
 
-# Codebase-intelligence gate. On every pull request, fallow runs its `audit`
-# (dead-code + complexity + duplication) scoped to the PR's changed files and
-# fails the check only on issues THIS PR introduces (gate: new-only) — so
-# pre-existing debt never blocks a merge. Findings are surfaced inline on the
-# diff and summarized in a sticky PR comment.
+# Codebase-intelligence gate. On every pull request, two fallow jobs run:
+#
+#   audit    — dead-code + complexity + duplication, scoped to the PR's changed
+#              files, failing only on issues THIS PR introduces (gate: new-only)
+#              so pre-existing debt never blocks a merge. Findings surface inline
+#              on the diff and in a sticky PR summary comment.
+#
+#   security — surfaces security candidates (tainted sinks, secret/PII logging,
+#              etc.), failing only on candidates introduced on the PR's changed
+#              lines (security-gate: new). These are candidates for review, not
+#              confirmed vulnerabilities.
 #
 # Semantic duplicate detection is inherited from .fallowrc.json
 # (duplicates.mode: "semantic"), which fallow reads automatically — no flag here.
@@ -46,3 +52,21 @@ jobs:
           fail-on-issues: true
           annotations: true # inline findings on the PR diff
           comment: true # sticky summary comment on the PR
+
+  security:
+    name: Security candidates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # security-gate: new diffs the PR's changed lines against the base,
+          # so full history is required (same reason as the audit job).
+          fetch-depth: 0
+
+      - name: Fallow security gate
+        uses: fallow-rs/fallow@v2
+        with:
+          command: security
+          security-gate: new # fail only on candidates introduced by this PR
+          annotations: true # inline candidate flags on the PR diff
