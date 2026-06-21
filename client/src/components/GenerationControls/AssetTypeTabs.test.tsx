@@ -53,4 +53,27 @@ describe("AssetTypeTabs", () => {
     expect(screen.getByTestId("removeBg").textContent).toBe("false");
     expect(screen.getByTestId("crop").textContent).toBe(Crop.Fill);
   });
+
+  it("surface=studio skips the mount apply but applies on explicit tab change", async () => {
+    renderWithProviders(
+      <>
+        <AssetTypeTabs surface="studio" />
+        <Probe />
+      </>
+    );
+
+    // After mount, canvas size should still be the context default (16x16), NOT 64x64.
+    // The studio skips the mount apply to avoid resampling a live editor.
+    expect(screen.getByTestId("size").textContent).toBe("16x16");
+
+    // An explicit tab change MUST still apply the preset.
+    fireEvent.click(screen.getByRole("radio", { name: "Background" }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("size").textContent).toBe("160x120");
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("removeBg").textContent).toBe("false");
+    });
+  });
 });

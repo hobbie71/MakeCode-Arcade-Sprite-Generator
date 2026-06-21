@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import SegmentedControl, { type SegmentOption } from "../SegmentedControl";
 import { useAssetType } from "../../context/AssetTypeContext/useAssetType";
 import { useApplyAssetPreset } from "../../hooks/useApplyAssetPreset";
@@ -12,21 +12,37 @@ const ASSET_TABS: SegmentOption<AssetType>[] = ALL_ASSETS_TYPE.map((type) => ({
   label: cap(type),
 }));
 
+interface Props {
+  /** "hero" applies the preset on mount (no live editor to disturb) so a fresh
+   *  Sprite gets its 64×64 default. "studio" skips the mount apply: the tabs sit
+   *  in the Generate modal over a live editor whose size IS CanvasSizeContext, so
+   *  applying on open would resample in-progress artwork. Studio applies only on
+   *  an explicit user tab change. */
+  surface?: "hero" | "studio";
+}
+
 /**
- * Top-level asset-type selector (Sprite / Background / Tile). Picking a type is
- * the first choice in the generation flow: the effect applies that type's preset
- * (size + fit + background-removal) so generation, upload, and Resize & Process
- * all use the right defaults. Lives in the generation surface only — it sets the
- * NEXT sprite's target, never the live editor canvas.
+ * Top-level asset-type selector (Sprite / Background / Tile). Picking a type
+ * applies that type's preset (size + fit + background-removal) so generation,
+ * upload, and Resize & Process use the right defaults. Lives in the generation
+ * surface only.
  */
-export default function AssetTypeTabs() {
+export default function AssetTypeTabs({ surface = "hero" }: Props) {
   const { selectedAsset, setSelectedAsset } = useAssetType();
   const applyAssetPreset = useApplyAssetPreset();
   const { isGenerating } = useLoading();
 
-  // Single apply path: any time the selected type changes (including initial
-  // mount), push its preset into the shared contexts.
+  // In the studio the tabs sit over a live editor whose dimensions ARE
+  // CanvasSizeContext, so applying on mount would resample the current sprite.
+  // Skip the first (mount) run there; the hero has no live editor and applies on
+  // mount to seed the default size.
+  const skipMountRef = useRef(surface === "studio");
+
   useEffect(() => {
+    if (skipMountRef.current) {
+      skipMountRef.current = false;
+      return;
+    }
     applyAssetPreset(selectedAsset);
   }, [selectedAsset, applyAssetPreset]);
 

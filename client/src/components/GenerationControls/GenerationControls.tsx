@@ -65,7 +65,7 @@ interface Props {
  * Shared generation UI used by BOTH the hero entry widget and the studio Generate
  * modal — identical experience on both, except the hero adds a Draw Blank tab.
  * Composes the existing primitives (OpenAISettingsSection, ImageUploadForm,
- * AssetOptionsSelection) behind tabs, plus a token indicator and a context-aware
+ * AssetTypeTabs) behind tabs, plus a token indicator and a context-aware
  * primary button. Generate and Upload always STAGE a source image (the canvas is
  * untouched) and fire onStaged; the host decides where Resize & Process opens.
  */
@@ -177,7 +177,7 @@ export default function GenerationControls({
     <div className="space-y-4">
       {/* Asset type — the first choice; drives the per-type preset. Shown on all
           input methods and both surfaces. */}
-      <AssetTypeTabs />
+      <AssetTypeTabs surface={surface} />
 
       {/* Tabs — hero adds Draw Blank; studio is AI + Upload only. */}
       <SegmentedControl
