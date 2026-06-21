@@ -21,7 +21,7 @@ interface Props {
   onClose: () => void;
 }
 
-const PRESETS = [16, 24, 32, 48, 64, 80, 96, 120];
+const PRESETS = [8, 16, 24, 32, 48, 64, 80, 96, 120];
 const CROP_MODES: { label: string; value: Crop }[] = [
   { label: "None", value: Crop.None },
   { label: "Trim edges", value: Crop.Edges },
