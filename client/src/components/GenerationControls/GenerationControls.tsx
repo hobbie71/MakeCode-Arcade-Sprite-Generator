@@ -2,7 +2,7 @@ import Button from "../Button";
 import SegmentedControl, { type SegmentOption } from "../SegmentedControl";
 import OpenAISettingsSection from "../../features/InputSection/GenerationMethodSection/TextToSpriteSection/components/OpenAISettingsSection";
 import ImageUploadForm from "../../features/InputSection/GenerationMethodSection/ImageToSpriteSection/components/ImageUploadForm";
-import AssetOptionsSelection from "../../features/InputSection/components/AssetOptionsSelection";
+import AssetTypeTabs from "./AssetTypeTabs";
 import { useGenerationMethod } from "../../context/GenerationMethodContext/useGenerationMethod";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useToken } from "../../context/TokenContext/useToken";
@@ -175,6 +175,10 @@ export default function GenerationControls({
 
   return (
     <div className="space-y-4">
+      {/* Asset type — the first choice; drives the per-type preset. Shown on all
+          input methods and both surfaces. */}
+      <AssetTypeTabs />
+
       {/* Tabs — hero adds Draw Blank; studio is AI + Upload only. */}
       <SegmentedControl
         options={isHero ? HERO_TABS : STUDIO_TABS}
@@ -196,12 +200,6 @@ export default function GenerationControls({
         <p className="text-sm text-ink-muted">
           Start from an empty canvas and draw your sprite pixel by pixel.
         </p>
-      )}
-
-      {/* Asset type — AI Generate tab only (no size; final dimensions are chosen
-          in Resize & Process). Identical on both surfaces. */}
-      {activeMethod === GenerationMethod.TextToSprite && (
-        <AssetOptionsSelection showSize={false} />
       )}
 
       {renderPrimary()}

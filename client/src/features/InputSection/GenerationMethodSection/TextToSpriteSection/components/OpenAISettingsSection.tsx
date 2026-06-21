@@ -1,24 +1,17 @@
-import { useEffect } from "react";
-
 // Component imports
 import AiPromptInput from "../components/AiPromptInput";
 
 // Hooks imports
 import { useOpenAISettings } from "../../../../../context/OpenAISettingsContext/useOpenAISettings";
-import { useAssetType } from "../../../../../context/AssetTypeContext/useAssetType";
 import { useLoading } from "../../../../../context/LoadingContext/useLoading";
 
 /** Text-to-sprite input. Generation quality is forced to "low" server-side
- *  (Medium/High were removed), so there is no quality picker — just the prompt. */
+ *  (Medium/High were removed), so there is no quality picker — just the prompt.
+ *  Per-asset-type settings (incl. the OpenAI `assetType`) are reset centrally by
+ *  AssetTypeTabs → useApplyAssetPreset, so this section no longer resets them. */
 const OpenAISettingsSection = () => {
-  const { selectedAsset } = useAssetType();
-  const { updateSetting, resetToDefaults } = useOpenAISettings();
+  const { updateSetting } = useOpenAISettings();
   const { isGenerating } = useLoading();
-
-  // Reset settings when asset type changes
-  useEffect(() => {
-    resetToDefaults(selectedAsset);
-  }, [selectedAsset, resetToDefaults]);
 
   return (
     <div className="form-group">

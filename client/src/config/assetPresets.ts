@@ -12,7 +12,7 @@ export interface AssetPreset {
   postProcessing: PostProcessingSettings;
 }
 
-export const ASSET_PRESETS: Partial<Record<AssetType, AssetPreset>> = {
+const ASSET_PRESETS: Partial<Record<AssetType, AssetPreset>> = {
   [AssetType.Sprite]: {
     defaultSize: { width: 64, height: 64 },
     postProcessing: { removeBackground: true, crop: Crop.Edges, tolerance: 30 },
