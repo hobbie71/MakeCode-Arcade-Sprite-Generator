@@ -1,6 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-
-import { useCloseOnOutsideClick } from "../../../hooks/useCloseOnOutsideClick";
+import { useRovingFocusMenu } from "./useRovingFocusMenu";
 
 export type PopoverMenuItem = {
   key: string;
@@ -41,65 +39,15 @@ export default function PopoverMenu({
   align = "right",
   className = "relative",
 }: PopoverMenuProps) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
-
   // Flattened, ordered rows (presets then footer) — keyboard navigation treats
   // them as one sequence even though a divider sits between.
   const rows = footer ? [...items, footer] : items;
 
-  const close = useCallback((returnFocus = true) => {
-    setOpen(false);
-    if (returnFocus) triggerRef.current?.focus();
-  }, []);
-
-  useCloseOnOutsideClick(rootRef, open, () => setOpen(false));
-
-  // On open, move focus to the selected row (or the first one).
-  useEffect(() => {
-    if (!open) return;
-    const selectedIndex = rows.findIndex((r) => r.selected);
-    itemRefs.current[selectedIndex >= 0 ? selectedIndex : 0]?.focus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  const focusRow = (index: number) => {
-    const count = rows.length;
-    itemRefs.current[((index % count) + count) % count]?.focus();
-  };
-
-  const handleItemKeyDown = (
-    e: React.KeyboardEvent<HTMLButtonElement>,
-    index: number
-  ) => {
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        focusRow(index + 1);
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        focusRow(index - 1);
-        break;
-      case "Home":
-        e.preventDefault();
-        focusRow(0);
-        break;
-      case "End":
-        e.preventDefault();
-        focusRow(rows.length - 1);
-        break;
-      case "Escape":
-        e.preventDefault();
-        close();
-        break;
-      case "Tab":
-        close(false);
-        break;
-    }
-  };
+  const { open, setOpen, close, rootRef, triggerRef, itemRefs, handleItemKeyDown } =
+    useRovingFocusMenu({
+      itemCount: rows.length,
+      initialIndex: rows.findIndex((r) => r.selected),
+    });
 
   const renderRow = (item: PopoverMenuItem, index: number, isFooter: boolean) => (
     <button
