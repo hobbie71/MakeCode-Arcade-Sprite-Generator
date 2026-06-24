@@ -31,35 +31,36 @@ const renderModal = (asset: AssetType | null) =>
     </RightDockProvider>
   );
 
+// Open the modal for an asset type, then assert the seeded width + lock state.
+// Returns the width input for any further per-type assertions.
+async function expectSeededSize(
+  asset: AssetType | null,
+  expected: { width: string; locked: boolean }
+) {
+  renderModal(asset);
+  const width = (await screen.findByLabelText("Width")) as HTMLInputElement;
+  await waitFor(() => expect(width.value).toBe(expected.width));
+  expect(width.disabled).toBe(expected.locked);
+  return width;
+}
+
 describe("ResizeProcessModal — asset-type presets", () => {
   it("Background: seeds and locks dimensions to 160×120", async () => {
-    renderModal(AssetType.Background);
-    const width = (await screen.findByLabelText("Width")) as HTMLInputElement;
+    await expectSeededSize(AssetType.Background, { width: "160", locked: true });
     const height = screen.getByLabelText("Height") as HTMLInputElement;
-
-    await waitFor(() => expect(width.value).toBe("160"));
     expect(height.value).toBe("120");
-    expect(width.disabled).toBe(true);
     expect(height.disabled).toBe(true);
     expect(screen.getByText(/Locked to 160×120/)).toBeTruthy();
   });
 
   it("Tile: seeds 16×16, offers a 16/8 toggle, locks the inputs", async () => {
-    renderModal(AssetType.Tile);
-    const width = (await screen.findByLabelText("Width")) as HTMLInputElement;
-
-    await waitFor(() => expect(width.value).toBe("16"));
-    expect(width.disabled).toBe(true);
+    await expectSeededSize(AssetType.Tile, { width: "16", locked: true });
     expect(screen.getByRole("button", { name: "16×16" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "8×8" })).toBeTruthy();
   });
 
   it("Sprite: seeds 64×64 with free (editable) dimensions", async () => {
-    renderModal(AssetType.Sprite);
-    const width = (await screen.findByLabelText("Width")) as HTMLInputElement;
-
-    await waitFor(() => expect(width.value).toBe("64"));
-    expect(width.disabled).toBe(false);
+    await expectSeededSize(AssetType.Sprite, { width: "64", locked: false });
   });
 
   it("clicking a modal tab applies that type's preset", async () => {

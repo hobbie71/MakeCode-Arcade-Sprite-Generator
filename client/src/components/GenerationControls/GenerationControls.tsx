@@ -130,16 +130,20 @@ export default function GenerationControls({
     onStaged?.();
   };
 
-  // Generate (AI): both prompt and asset type are required. The prompt is
+  // Prompt + asset type are both required for AI generation. The prompt is
   // committed on blur, which the click's mousedown triggers, so settings.prompt
   // is current here. Flash + shake whichever is missing (both can fire at once)
-  // and stop — don't spend a generation.
-  const handleGenerate = () => {
+  // and report whether anything was missing.
+  const flagMissingGenerateFields = () => {
     const promptEmpty = !settings.prompt.trim();
     const noAsset = selectedAsset == null;
     if (promptEmpty) setPromptErrorNonce((n) => n + 1);
     if (noAsset) setAssetErrorNonce((n) => n + 1);
-    if (promptEmpty || noAsset) return;
+    return promptEmpty || noAsset;
+  };
+
+  const handleGenerate = () => {
+    if (flagMissingGenerateFields()) return;
     // Notify the host BEFORE kicking off so the hero routes into the studio in
     // the same commit the overlay turns on (loading + Resize hand-off land there).
     onGenerateStart?.();
