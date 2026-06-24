@@ -1,7 +1,7 @@
 // Single source of truth for per-asset-type defaults (client-only — these are UI
-// + post-processing defaults, not wire data). When a tab is selected,
-// useApplyAssetPreset pushes the matching preset into the canvas-size and
-// post-processing contexts. PostProcessingContext's defaults also read from here.
+// + post-processing defaults, not wire data). The generate card's dropdown picks
+// the type; the Resize & Process modal then applies the matching preset (size +
+// fit + background-removal). PostProcessingContext's defaults also read from here.
 import { AssetType, Crop } from "../types/export";
 import type { PostProcessingSettings } from "../types/export";
 
