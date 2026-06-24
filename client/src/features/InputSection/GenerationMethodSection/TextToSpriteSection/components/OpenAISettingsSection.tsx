@@ -5,11 +5,17 @@ import AiPromptInput from "../components/AiPromptInput";
 import { useOpenAISettings } from "../../../../../context/OpenAISettingsContext/useOpenAISettings";
 import { useLoading } from "../../../../../context/LoadingContext/useLoading";
 
+interface Props {
+  /** Bumped by the parent when Generate is clicked with an empty prompt → the
+   *  textarea flashes red + shakes. */
+  errorNonce?: number;
+}
+
 /** Text-to-sprite input. Generation quality is forced to "low" server-side
  *  (Medium/High were removed), so there is no quality picker — just the prompt.
- *  Per-asset-type settings (incl. the OpenAI `assetType`) are reset centrally by
- *  AssetTypeTabs → useApplyAssetPreset, so this section no longer resets them. */
-const OpenAISettingsSection = () => {
+ *  The asset type (incl. the OpenAI `assetType`) is chosen in the AssetTypeSelect
+ *  dropdown beside this input, so this section only owns the prompt. */
+const OpenAISettingsSection = ({ errorNonce = 0 }: Props) => {
   const { updateSetting } = useOpenAISettings();
   const { isGenerating } = useLoading();
 
@@ -18,6 +24,7 @@ const OpenAISettingsSection = () => {
       <AiPromptInput
         onSubmit={(prompt) => updateSetting("prompt", prompt)}
         disabled={isGenerating}
+        errorNonce={errorNonce}
       />
     </div>
   );
