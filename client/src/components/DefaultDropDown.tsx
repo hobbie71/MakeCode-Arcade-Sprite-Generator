@@ -42,6 +42,9 @@ interface DefaultDropDownProps<T> {
    *  label-left / control-right row. Used where the dropdown sits in a
    *  side-by-side field layout (e.g. Asset type beside Size). */
   stacked?: boolean;
+  /** Render the trigger in an error state (red border + ring) — e.g. a required
+   *  dropdown left empty when the user tried to submit. */
+  error?: boolean;
 }
 
 const ChevronIcon = ({ open }: { open: boolean }) => (
@@ -80,6 +83,7 @@ const DefaultDropDown = <T,>({
   className = "",
   disabled = false,
   stacked = false,
+  error = false,
 }: DefaultDropDownProps<T>) => {
   const [open, setOpen] = useState(false);
   // `activeIndex` is the keyboard-highlighted row while the list is open; it is
@@ -298,7 +302,13 @@ const DefaultDropDown = <T,>({
             stacked ? "w-full" : "w-auto min-w-[7rem] max-w-[16rem]"
           } ${
             disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
-          } ${open ? "border-accent ring-2 ring-accent-ring" : ""} ${className}`}>
+          } ${
+            open
+              ? "border-accent ring-2 ring-accent-ring"
+              : error
+                ? "border-danger ring-2 ring-danger-soft"
+                : ""
+          } ${className}`}>
           <span className="min-w-0 flex-1 truncate">
             {selected ? selected.name : (ariaLabel ?? "Select…")}
           </span>

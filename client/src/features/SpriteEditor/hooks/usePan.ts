@@ -7,6 +7,18 @@ import { useToolSelected } from "../contexts/ToolSelectedContext/useToolSelected
 import type { Coordinates } from "../../../types/pixel";
 import { EditorTools } from "../../../types/tools";
 
+/** Swap the element cursor only when it currently reads `from` — keeps the
+ *  grab/grabbing toggle from clobbering a cursor another tool may have set. */
+const swapCursor = (
+  e: React.PointerEvent<HTMLDivElement>,
+  from: string,
+  to: string
+) => {
+  if (e.currentTarget.style.cursor === from) {
+    e.currentTarget.style.cursor = to;
+  }
+};
+
 export const usePan = (
   offset: Coordinates,
   setOffset: (offset: Coordinates) => void
@@ -17,60 +29,45 @@ export const usePan = (
   const lastPanPosition = useRef<Coordinates | null>(null);
   const isMouseDown = useRef<boolean>(false);
 
+  // A drag only pans on the primary pointer with an anchored start — a second
+  // finger resting on the canvas must not re-anchor or move the view.
+  const isPanDragging = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) =>
+      tool === EditorTools.Pan &&
+      e.isPrimary !== false &&
+      isMouseDown.current &&
+      lastPanPosition.current !== null,
+    [tool]
+  );
+
   const handlePointerDown = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (tool !== EditorTools.Pan) return;
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      // Primary pointer only: a second finger must not re-anchor the pan.
+      if (tool !== EditorTools.Pan || e.isPrimary === false) return;
 
       lastPanPosition.current = { x: e.clientX, y: e.clientY };
       isMouseDown.current = true;
-
-      // Update mouse style
-      if (e.currentTarget.style.cursor === "grab") {
-        e.currentTarget.style.cursor = "grabbing";
-      }
+      swapCursor(e, "grab", "grabbing");
     },
     [tool]
   );
   const handlePointerMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (
-        tool !== EditorTools.Pan ||
-        !isMouseDown.current ||
-        !lastPanPosition.current
-      )
-        return;
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!isPanDragging(e) || !lastPanPosition.current) return;
 
       const dx = e.clientX - lastPanPosition.current.x;
       const dy = e.clientY - lastPanPosition.current.y;
       setOffset({ x: offset.x + dx, y: offset.y + dy });
       lastPanPosition.current = { x: e.clientX, y: e.clientY };
     },
-    [offset, setOffset, tool]
+    [isPanDragging, offset, setOffset]
   );
-  const handlePointerUp = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+  const endPan = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
       if (tool !== EditorTools.Pan) return;
 
       isMouseDown.current = false;
-
-      // Update mouse style
-      if (e.currentTarget.style.cursor === "grabbing") {
-        e.currentTarget.style.cursor = "grab";
-      }
-    },
-    [tool]
-  );
-
-  const handlePointerLeave = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (tool !== EditorTools.Pan) return;
-
-      // Update mouse style
-      if (e.currentTarget.style.cursor === "grabbing") {
-        e.currentTarget.style.cursor = "grab";
-      }
-
-      isMouseDown.current = false;
+      swapCursor(e, "grabbing", "grab");
     },
     [tool]
   );
@@ -78,7 +75,8 @@ export const usePan = (
   return {
     handlePointerDown,
     handlePointerMove,
-    handlePointerUp,
-    handlePointerLeave,
+    // Up and leave both end the pan and restore the grab cursor.
+    handlePointerUp: endPan,
+    handlePointerLeave: endPan,
   };
 };

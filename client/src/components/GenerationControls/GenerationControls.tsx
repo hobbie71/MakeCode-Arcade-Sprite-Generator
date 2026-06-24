@@ -1,8 +1,11 @@
+import { useState } from "react";
+
 import Button from "../Button";
 import SegmentedControl, { type SegmentOption } from "../SegmentedControl";
 import OpenAISettingsSection from "../../features/InputSection/GenerationMethodSection/TextToSpriteSection/components/OpenAISettingsSection";
 import ImageUploadForm from "../../features/InputSection/GenerationMethodSection/ImageToSpriteSection/components/ImageUploadForm";
-import AssetOptionsSelection from "../../features/InputSection/components/AssetOptionsSelection";
+import AssetTypeSelect from "./AssetTypeSelect";
+import { useAssetType } from "../../context/AssetTypeContext/useAssetType";
 import { useGenerationMethod } from "../../context/GenerationMethodContext/useGenerationMethod";
 import { useLoading } from "../../context/LoadingContext/useLoading";
 import { useToken } from "../../context/TokenContext/useToken";
@@ -65,7 +68,7 @@ interface Props {
  * Shared generation UI used by BOTH the hero entry widget and the studio Generate
  * modal — identical experience on both, except the hero adds a Draw Blank tab.
  * Composes the existing primitives (OpenAISettingsSection, ImageUploadForm,
- * AssetOptionsSelection) behind tabs, plus a token indicator and a context-aware
+ * AssetTypeSelect) behind tabs, plus a token indicator and a context-aware
  * primary button. Generate and Upload always STAGE a source image (the canvas is
  * untouched) and fire onStaged; the host decides where Resize & Process opens.
  */
@@ -77,7 +80,13 @@ export default function GenerationControls({
 }: Props) {
   const isHero = surface === "hero";
   const { selectedMethod, setSelectedMethod } = useGenerationMethod();
+  const { selectedAsset, setSelectedAsset } = useAssetType();
   const { isGenerating } = useLoading();
+  // Bumped on a failed Generate to flash + shake the offending field(s): the asset
+  // dropdown (no type chosen) and/or the prompt textarea (empty). Both can fire at
+  // once. 0 = no failed attempt yet.
+  const [assetErrorNonce, setAssetErrorNonce] = useState(0);
+  const [promptErrorNonce, setPromptErrorNonce] = useState(0);
   const { canGenerate, watchAdToEarnToken } = useToken();
   const { settings } = useOpenAISettings();
   const { width, height } = useCanvasSize();
@@ -107,14 +116,38 @@ export default function GenerationControls({
     );
     setSpriteData(blank);
     setSourceImage(null); // a blank canvas has no re-processable source
+    setSelectedAsset(null); // no type chosen for a hand-drawn canvas
     onBlank?.();
   };
 
   // Upload (both surfaces): stage the picked file (cache, do NOT paste) and hand
   // off to Resize & Process. No async generation runs, so call onStaged directly.
+  // Clear the asset type — it's an AI-only choice, so an upload must not inherit a
+  // stale type and have the Resize modal apply the wrong preset.
   const handleUpload = (file: File) => {
+    setSelectedAsset(null);
     stageSource(file);
     onStaged?.();
+  };
+
+  // Prompt + asset type are both required for AI generation. The prompt is
+  // committed on blur, which the click's mousedown triggers, so settings.prompt
+  // is current here. Flash + shake whichever is missing (both can fire at once)
+  // and report whether anything was missing.
+  const flagMissingGenerateFields = () => {
+    const promptEmpty = !settings.prompt.trim();
+    const noAsset = selectedAsset == null;
+    if (promptEmpty) setPromptErrorNonce((n) => n + 1);
+    if (noAsset) setAssetErrorNonce((n) => n + 1);
+    return promptEmpty || noAsset;
+  };
+
+  const handleGenerate = () => {
+    if (flagMissingGenerateFields()) return;
+    // Notify the host BEFORE kicking off so the hero routes into the studio in
+    // the same commit the overlay turns on (loading + Resize hand-off land there).
+    onGenerateStart?.();
+    generateAIImageAndConvertToSprite({ commit: false }).catch(() => {});
   };
 
   const renderPrimary = () => {
@@ -124,17 +157,7 @@ export default function GenerationControls({
           variant="primary"
           className="w-full"
           isLoading={isGenerating}
-          onClick={() => {
-            // Notify the host BEFORE kicking off so the hero can route into the
-            // studio in the same commit the overlay turns on — the loading state
-            // (and the eventual Resize hand-off) lands in the studio, not here.
-            // Only when there's actually a prompt: an empty one fails validation
-            // and stays put (the prompt is committed on blur, which the click's
-            // mousedown triggers, so settings.prompt is current here — the same
-            // value the generation itself reads).
-            if (settings.prompt.trim()) onGenerateStart?.();
-            generateAIImageAndConvertToSprite({ commit: false }).catch(() => {});
-          }}
+          onClick={handleGenerate}
         >
           ✦ Generate sprite
         </Button>
@@ -179,7 +202,12 @@ export default function GenerationControls({
       <SegmentedControl
         options={isHero ? HERO_TABS : STUDIO_TABS}
         value={activeMethod}
-        onChange={setSelectedMethod}
+        onChange={(method) => {
+          setSelectedMethod(method);
+          // Clear any pending validation flashes on tab switch.
+          setAssetErrorNonce(0);
+          setPromptErrorNonce(0);
+        }}
         ariaLabel="Generation method"
         stretch
         disabled={isGenerating}
@@ -187,7 +215,7 @@ export default function GenerationControls({
 
       {/* Method-specific input */}
       {activeMethod === GenerationMethod.TextToSprite && (
-        <OpenAISettingsSection />
+        <OpenAISettingsSection errorNonce={promptErrorNonce} />
       )}
       {activeMethod === GenerationMethod.ImageToSprite && (
         <ImageUploadForm onFile={handleUpload} />
@@ -198,10 +226,10 @@ export default function GenerationControls({
         </p>
       )}
 
-      {/* Asset type — AI Generate tab only (no size; final dimensions are chosen
-          in Resize & Process). Identical on both surfaces. */}
+      {/* Asset type — required, AI Generate only. Sits below the prompt; drives
+          type-aware generation and the per-type preset applied in Resize & Process. */}
       {activeMethod === GenerationMethod.TextToSprite && (
-        <AssetOptionsSelection showSize={false} />
+        <AssetTypeSelect errorNonce={assetErrorNonce} />
       )}
 
       {renderPrimary()}

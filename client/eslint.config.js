@@ -16,6 +16,7 @@ const RAW_BUTTON_ALLOWLIST = [
   'src/components/SegmentedControl.tsx', // radiogroup + roving tabindex
   'src/components/DefaultDropDown.tsx', // combobox trigger
   'src/features/SpriteEditor/layout/PopoverMenu.tsx', // menu / menuitemradio
+  'src/features/SpriteEditor/layout/ColorMenu.tsx', // menu / menuitemradio color picker
   'src/features/SpriteEditor/Sidebar/components/ColorIcon.tsx', // color swatch
 ]
 

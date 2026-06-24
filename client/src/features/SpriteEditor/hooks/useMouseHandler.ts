@@ -24,6 +24,15 @@ import { EditorTools } from "../../../types/tools";
 import { useCanvasPreview } from "./useCanvasPreview";
 import { MakeCodeColor } from "../../../types/color";
 
+// Tools that paint nothing on hover: Fill/Eyedropper act on click, Pan moves the
+// view. Select is handled earlier (it shows a cursor, not a dot). Everything else
+// previews the pixel under the pointer.
+const NO_DOT_PREVIEW_TOOLS = new Set<EditorTools>([
+  EditorTools.Fill,
+  EditorTools.Eyedropper,
+  EditorTools.Pan,
+]);
+
 export const useMouseHandler = () => {
   const { mouseCoordinates, setMouseCoordinates } = useMouseCoordinates();
   const { canvasRef } = useCanvas();
@@ -151,7 +160,7 @@ export const useMouseHandler = () => {
 
   // Null when the canvas is unmounted — callers bail without touching state.
   const getEventCoordinates = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>): Coordinates | null => {
+    (e: React.PointerEvent<HTMLCanvasElement>): Coordinates | null => {
       const canvas = canvasRef.current;
       if (!canvas) return null;
       return getCanvasCoordinates(canvas, e, zoom);
@@ -159,10 +168,28 @@ export const useMouseHandler = () => {
     [canvasRef, zoom]
   );
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
+  // Route a press / drag to the active tool, no-op for tools without a handler.
+  const dispatchDown = useCallback(
+    (coordinates: Coordinates) => downHandlerByTool[tool]?.(coordinates),
+    [downHandlerByTool, tool]
+  );
+  const dispatchMove = useCallback(
+    (coordinates: Coordinates) => moveHandlerByTool[tool]?.(coordinates),
+    [moveHandlerByTool, tool]
+  );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
+
+      // Ignore secondary touch points (a second finger resting on the canvas):
+      // only the primary pointer drives a stroke, so a stray finger can't fork
+      // the line between two contact points. (A touch pointer is implicitly
+      // captured by its target on press, so a drag off the canvas edge and back
+      // keeps streaming moves here; the window-level finalize below covers the
+      // mouse case where there is no implicit capture.)
+      if (e.isPrimary === false) return;
 
       // Select owns its whole gesture via window listeners (drags must keep
       // tracking outside the sprite) — don't enter the canvas-element flow.
@@ -177,9 +204,9 @@ export const useMouseHandler = () => {
 
       const coordinates = getCanvasCoordinates(canvas, e, zoom);
       startCoordinates.current = coordinates;
-      downHandlerByTool[tool]?.(coordinates);
+      dispatchDown(coordinates);
     },
-    [canvasRef, zoom, tool, downHandlerByTool, handleSelectDown, clearPreview]
+    [canvasRef, zoom, tool, dispatchDown, handleSelectDown, clearPreview]
   );
 
   // Finalize drawing (used by normal mouseUp and global mouseup outside canvas)
@@ -206,8 +233,9 @@ export const useMouseHandler = () => {
     [tool, handlePencilUp, handleEraserUp, shapeUpHandlerByTool, isInsideBounds]
   );
 
-  const handleMouseUp = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (e.isPrimary === false) return;
       const coordinates = getEventCoordinates(e);
       if (!coordinates) return;
 
@@ -216,71 +244,95 @@ export const useMouseHandler = () => {
     [getEventCoordinates, finalizeDrawing]
   );
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
+  // A move only acts on the primary pointer inside the logical pixel grid;
+  // returns null to bail (off-canvas, unmounted, or out of bounds — which would
+  // otherwise cause drawing glitches).
+  const getInBoundsCoordinates = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>): Coordinates | null => {
+      if (e.isPrimary === false) return null;
       const coordinates = getEventCoordinates(e);
-      if (!coordinates) return;
+      if (!coordinates || !isInsideBounds(coordinates)) return null;
+      return coordinates;
+    },
+    [getEventCoordinates, isInsideBounds]
+  );
 
-      // Ignore moves outside the logical pixel grid to avoid drawing glitches
-      if (!isInsideBounds(coordinates)) {
+  // The pointer was already reported at these coordinates, so a repeat move is
+  // a no-op (avoids redundant state churn and re-dispatch).
+  const isSameAsLast = useCallback(
+    (c: Coordinates) => {
+      const last = mouseCoordinates;
+      return last !== null && c.x === last.x && c.y === last.y;
+    },
+    [mouseCoordinates]
+  );
+
+  // Hovering (not actively drawing) over a painting tool previews the pixel under
+  // the pointer. The no-preview tools leave the canvas untouched, and a held
+  // button means we're drawing, not hovering.
+  const isHoverIdle = useCallback(
+    () =>
+      !isMouseDownRef.current &&
+      !isDrawing.current &&
+      !NO_DOT_PREVIEW_TOOLS.has(tool),
+    [tool]
+  );
+
+  const drawHoverPreview = useCallback(
+    (coordinates: Coordinates) => {
+      // Eraser previews as the transparent "no pixel" colour.
+      if (tool === EditorTools.Eraser) {
+        drawDotPreview(coordinates, MakeCodeColor.TRANSPARENT);
         return;
       }
+      drawDotPreview(coordinates);
+    },
+    [tool, drawDotPreview]
+  );
 
-      // Do nothing if coordinates haven't changed
-      if (
-        coordinates.x === mouseCoordinates?.x &&
-        coordinates.y === mouseCoordinates?.y
-      ) {
-        return;
-      }
-
-      // Select draws no dot preview; hovering only updates cursor feedback
-      // (move over the selection, crosshair elsewhere). Gestures themselves
-      // run on window listeners owned by useSelectTool.
+  // Hover feedback that runs before any drawing dispatch. Returns true when it
+  // owns the move (Select cursor feedback, or a painting tool's preview dot).
+  const handleHover = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>, coordinates: Coordinates) => {
+      // Select draws no dot preview; hovering only updates cursor feedback (move
+      // over the selection, crosshair elsewhere). Gestures themselves run on
+      // window listeners owned by useSelectTool.
       if (tool === EditorTools.Select) {
         updateHoverCursor(e);
         updateMousePosition(coordinates);
-        return;
+        return true;
       }
+      if (isHoverIdle()) {
+        drawHoverPreview(coordinates);
+        return true;
+      }
+      return false;
+    },
+    [tool, updateHoverCursor, updateMousePosition, isHoverIdle, drawHoverPreview]
+  );
 
-      // Draw dot preview if Left Mouse Button not down AND the tool paints a
-      // pixel on press. Fill, Eyedropper and Pan don't, so a colored preview dot
-      // would be misleading. (Select already returned above.)
-      if (
-        !isMouseDownRef.current &&
-        !isDrawing.current &&
-        tool !== EditorTools.Fill &&
-        tool !== EditorTools.Eyedropper &&
-        tool !== EditorTools.Pan
-      ) {
-        // if eraser draw clear preview
-        if (tool === EditorTools.Eraser) {
-          drawDotPreview(coordinates, MakeCodeColor.TRANSPARENT);
-        } else {
-          drawDotPreview(coordinates);
-        }
-        return;
-      }
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      const coordinates = getInBoundsCoordinates(e);
+      if (!coordinates) return;
+      if (isSameAsLast(coordinates)) return;
+      // Hover feedback consumes the move when we're not actively drawing.
+      if (handleHover(e, coordinates)) return;
 
       updateMousePosition(coordinates);
-
-      // Handle drawing/dragging
-      moveHandlerByTool[tool]?.(coordinates);
+      dispatchMove(coordinates);
     },
     [
-      getEventCoordinates,
-      tool,
-      mouseCoordinates,
-      drawDotPreview,
+      getInBoundsCoordinates,
+      isSameAsLast,
+      handleHover,
       updateMousePosition,
-      updateHoverCursor,
-      moveHandlerByTool,
-      isInsideBounds,
+      dispatchMove,
     ]
   );
 
-  const handleMouseEnter = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerEnter = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
       const coordinates = getEventCoordinates(e);
       if (!coordinates) return;
       updateMousePosition(coordinates);
@@ -288,7 +340,7 @@ export const useMouseHandler = () => {
     [getEventCoordinates, updateMousePosition]
   );
 
-  const handleMouseLeave = useCallback(() => {
+  const handlePointerLeave = useCallback(() => {
     // If not actively drawing, clear everything. If drawing, keep the flags so we can resume on re-enter.
     if (!isMouseDownRef.current) {
       startCoordinates.current = null;
@@ -306,19 +358,20 @@ export const useMouseHandler = () => {
   }, [finalizeDrawing]);
 
   useEffect(() => {
-    const handleWindowMouseUp = () => {
+    const handleWindowPointerUp = (e: PointerEvent) => {
+      if (e.isPrimary === false) return;
       if (!isMouseDownRef.current) return;
       finalizeDrawingRef.current(lastCoordinatesRef.current);
     };
-    window.addEventListener("mouseup", handleWindowMouseUp);
-    return () => window.removeEventListener("mouseup", handleWindowMouseUp);
+    window.addEventListener("pointerup", handleWindowPointerUp);
+    return () => window.removeEventListener("pointerup", handleWindowPointerUp);
   }, []);
 
   return {
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseMove,
-    handleMouseEnter,
-    handleMouseLeave,
+    handlePointerDown,
+    handlePointerUp,
+    handlePointerMove,
+    handlePointerEnter,
+    handlePointerLeave,
   };
 };
