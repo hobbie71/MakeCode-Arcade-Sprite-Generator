@@ -21,7 +21,17 @@ interface Props {
   onClose: () => void;
 }
 
-const PRESETS = [16, 24, 32, 48, 64, 80, 96, 120];
+const PRESETS: { w: number; h: number }[] = [
+  { w: 16, h: 16 },
+  { w: 24, h: 24 },
+  { w: 32, h: 32 },
+  { w: 48, h: 48 },
+  { w: 64, h: 64 },
+  { w: 80, h: 80 },
+  { w: 96, h: 96 },
+  { w: 120, h: 120 },
+  { w: 160, h: 120 },
+];
 const CROP_MODES: { label: string; value: Crop }[] = [
   { label: "None", value: Crop.None },
   { label: "Trim edges", value: Crop.Edges },
@@ -127,12 +137,12 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
   }, [isOpen, width, height, settings, runPreview]);
 
   // --- Discrete controls: stage + recompute the preview instantly -----------
-  const applyPreset = (size: number) => {
-    setStagedW(size);
-    setStagedH(size);
-    setWidthText(String(size));
-    setHeightText(String(size));
-    runPreview(size, size, stagedSettings);
+  const applyPreset = (w: number, h: number) => {
+    setStagedW(w);
+    setStagedH(h);
+    setWidthText(String(w));
+    setHeightText(String(h));
+    runPreview(w, h, stagedSettings);
   };
   const applyCrop = (value: Crop) => {
     const next = { ...stagedSettings, crop: value };
@@ -264,15 +274,15 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
               />
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              {PRESETS.map((size) => {
-                const active = stagedW === size && stagedH === size;
+              {PRESETS.map(({ w, h }) => {
+                const active = stagedW === w && stagedH === h;
                 return (
                   <Button
-                    key={size}
+                    key={`${w}x${h}`}
                     variant="chip"
                     pressed={active}
-                    onClick={() => applyPreset(size)}>
-                    {size}
+                    onClick={() => applyPreset(w, h)}>
+                    {w}×{h}
                   </Button>
                 );
               })}
