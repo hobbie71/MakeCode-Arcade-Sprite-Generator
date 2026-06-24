@@ -181,11 +181,11 @@ export const useSelectTool = () => {
         removeListenersRef.current?.();
         onUp(ev);
       };
-      window.addEventListener("mousemove", onMove);
-      window.addEventListener("mouseup", up);
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", up);
       removeListenersRef.current = () => {
-        window.removeEventListener("mousemove", onMove);
-        window.removeEventListener("mouseup", up);
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", up);
         removeListenersRef.current = null;
       };
     },

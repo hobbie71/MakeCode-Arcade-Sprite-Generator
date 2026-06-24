@@ -67,11 +67,11 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   const { initCanvas, redrawCanvas } = useSpriteEditorCanvas(width, height);
 
   const {
-    handleMouseEnter,
-    handleMouseMove,
-    handleMouseLeave,
-    handleMouseDown,
-    handleMouseUp,
+    handlePointerEnter,
+    handlePointerMove,
+    handlePointerLeave,
+    handlePointerDown,
+    handlePointerUp,
   } = useMouseHandler();
 
   const {
@@ -88,7 +88,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
   // handles hanging past the sprite border stay grabbable. Presses on the
   // canvas already reach it through useMouseHandler — skip those to avoid
   // double-dispatch (the canvas mousedown bubbles up to this container).
-  const handleContainerMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleContainerPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     handlePanDown(e);
     if (tool === "select" && e.target !== canvasRef.current) {
       handleSelectDown(e);
@@ -248,12 +248,15 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
       ref={containerRef}
       style={{
         cursor: tool === "pan" ? "grab" : "crosshair",
+        // Pointer-driven drawing/panning: stop the browser from claiming touch
+        // drags as page scroll/pinch-zoom so they reach our handlers instead.
+        touchAction: "none",
       }}
       onPaste={handlePaste}
-      onMouseDown={handleContainerMouseDown}
-      onMouseMove={handlePanMove}
-      onMouseUp={handlePanUp}
-      onMouseLeave={handlePanLeave}
+      onPointerDown={handleContainerPointerDown}
+      onPointerMove={handlePanMove}
+      onPointerUp={handlePanUp}
+      onPointerLeave={handlePanLeave}
       role="application"
       aria-label="Sprite Editor Canvas"
       tabIndex={0}>
@@ -263,11 +266,11 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
         height={height * pixelSize}
         className="absolute"
         tabIndex={-1}
-        onMouseEnter={handleMouseEnter}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
+        onPointerEnter={handlePointerEnter}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerLeave}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
         aria-label={`Sprite canvas ${width} by ${height} pixels, currently using ${tool} tool at ${Math.round(zoom * 100)}% zoom`}
         role="img"
         style={{
@@ -275,6 +278,7 @@ const Canvas = memo(({ pixelSize = PIXEL_SIZE }: Props) => {
           transformOrigin: "50% 50%",
           outline: "none",
           imageRendering: "pixelated",
+          touchAction: "none",
         }}
       />
       <SourceOverlay
