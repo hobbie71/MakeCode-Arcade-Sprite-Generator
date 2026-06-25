@@ -4,6 +4,7 @@ import GlobalProviders from "./providers/GlobalProviders";
 import HeroPage from "./pages/HeroPage/HeroPage";
 import StudioPage from "./pages/StudioPage/StudioPage";
 import PrivacyPage from "./pages/PrivacyPage/PrivacyPage";
+import TermsPage from "./pages/TermsPage/TermsPage";
 import LoadingOverlay from "./components/LoadingOverlay";
 import Error from "./components/Error";
 import { initAyet } from "./ads/ayet";
@@ -26,6 +27,7 @@ function App() {
         <Route path="/" element={<HeroPage />} />
         <Route path="/studio" element={<StudioPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
