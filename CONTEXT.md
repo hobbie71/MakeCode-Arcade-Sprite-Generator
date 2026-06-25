@@ -55,3 +55,23 @@ _Avoid_: Publish, Share, Feature
 **Maker**:
 The person who made and submitted a sprite to the Showcase. Identified publicly by a single first name or nickname only — never a full name — typed in at Submit time and shown on their Submission. No accounts exist; a maker is just a name on a Submission, not a tracked identity.
 _Avoid_: User, author, student (student is the real-world role, not the on-site identity)
+
+## Monetization
+
+> **Status:** v1 monetization is **ad-during-generation** — a non-personalized ad plays while a sprite generates; no credits, no accounts, no server-side ledger. The terms below describe the **deferred credit system**, reserved for the future multi-image / animation features that need metered, bankable usage. Not built in v1 — kept here as the agreed language for when it is.
+
+**Token** _(deferred)_:
+A server-authoritative generation credit. A Device spends one (or more) to run a paid Generate; the server owns the cost table that sets how many a given operation costs (one standard sprite = one). Earned only by completing a rewarded ad. Never a real-money balance and never transferable.
+_Avoid_: Credit, coin, point, generation
+
+**Spend**:
+The atomic, server-side decrement of Tokens — priced by the cost table — that a paid Generate requires before it proceeds. The client can never assert the cost; the server does.
+_Avoid_: Deduct, charge, use
+
+**Credit**:
+Adding a Token to a Device's balance, only ever from a verified, signed, deduplicated rewarded-ad callback. The sole way a balance goes up.
+_Avoid_: Grant, reward, top-up
+
+**Device**:
+The anonymous, account-less identity a Token balance belongs to — a UUID the browser holds, not a person or a login. A fresh Device starts at zero Tokens, so clearing it confers no advantage. Distinct from Maker (a public name on a Submission).
+_Avoid_: User, account, session
