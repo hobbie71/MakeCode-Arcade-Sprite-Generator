@@ -23,4 +23,6 @@ export const config = {
   ENVIRONMENT: process.env.ENVIRONMENT ?? "development",
   HOST: process.env.HOST ?? "0.0.0.0",
   PORT: Number(process.env.PORT) || 8000,
+  RATE_LIMIT_MAX: Number(process.env.RATE_LIMIT_MAX) || 20,
+  RATE_LIMIT_WINDOW_MS: Number(process.env.RATE_LIMIT_WINDOW_MS) || 60_000,
 };

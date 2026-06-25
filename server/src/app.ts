@@ -7,6 +7,7 @@ import {
 import { config } from "./config";
 import { generateOpenAISprite, moderatePrompt } from "./openai";
 import { applyModerationOverride } from "./moderation-logic";
+import { rateLimit } from "./rate-limit";
 
 export const app = new Hono();
 
@@ -27,6 +28,11 @@ app.use("*", async (c, next) => {
   console.log(`Request: ${c.req.method} ${c.req.url} Origin: ${c.req.header("origin") ?? "None"}`);
   await next();
 });
+
+// Per-IP rate limit on the paid endpoints (in-memory fixed window).
+const limiter = rateLimit({ max: config.RATE_LIMIT_MAX, windowMs: config.RATE_LIMIT_WINDOW_MS });
+app.use("/generate-image/*", limiter);
+app.use("/moderation/*", limiter);
 
 app.get("/", (c) =>
   c.json({ message: "MakeCode Arcade Sprite Generator API", version: "0.1.0" }),
