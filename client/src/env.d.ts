@@ -14,6 +14,8 @@ declare const process: {
     readonly VITE_API_URL?: string;
     readonly VITE_GOOGLE_AD_CLIENT_ID?: string;
     readonly VITE_SQUARE_AD_SLOT_ID?: string;
+    readonly VITE_AYET_PLACEMENT_ID?: string;
+    readonly VITE_AYET_ADSLOT?: string;
     readonly VITE_DEV?: string;
   };
 };
