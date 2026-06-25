@@ -1,9 +1,9 @@
 import type { BunPlugin } from "bun";
 
-// Marks absolute-path public assets (favicons, web manifest, AdSense recovery
-// scripts referenced as `/favicon.svg`, `/site.webmanifest`, `/adBlockingRecovery.js`,
-// etc.) as external, so Bun's HTML bundler leaves those URLs untouched instead of
-// trying to resolve+bundle them. They are served verbatim from the site root
+// Marks absolute-path public assets (favicons, web manifest, etc. — e.g.
+// `/favicon.svg`, `/site.webmanifest`) as external, so Bun's HTML bundler leaves
+// those URLs untouched instead of trying to resolve+bundle them. They are served
+// verbatim from the site root
 // (public/ is copied into dist/ by the build) — mirroring Vite's public/ directory.
 //
 // Shared by the production build (build.ts) and the dev server (bunfig.toml).
