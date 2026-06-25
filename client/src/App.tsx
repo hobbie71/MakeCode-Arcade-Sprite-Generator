@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import GlobalProviders from "./providers/GlobalProviders";
 import HeroPage from "./pages/HeroPage/HeroPage";
 import StudioPage from "./pages/StudioPage/StudioPage";
+import PrivacyPage from "./pages/PrivacyPage/PrivacyPage";
 import LoadingOverlay from "./components/LoadingOverlay";
 import Error from "./components/Error";
 import { initAyet } from "./ads/ayet";
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HeroPage />} />
         <Route path="/studio" element={<StudioPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
