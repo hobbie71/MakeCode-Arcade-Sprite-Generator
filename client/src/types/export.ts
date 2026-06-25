@@ -46,11 +46,6 @@ export enum AiModel {
   GPTImage = "gpt-image",
 }
 
-/** Display-only token cost per generation. Generation quality is forced to
- *  "low" server-side (Medium/High were removed), so every generation costs the
- *  same. There is no real token economy yet (ADR-0006). */
-export const GENERATION_TOKEN_COST = 1;
-
 // =============================================================================
 // GENERATION METHODS (UI-only)
 // =============================================================================

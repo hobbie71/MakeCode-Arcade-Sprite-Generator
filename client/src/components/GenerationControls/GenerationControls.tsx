@@ -12,7 +12,7 @@ import { useCanvasSize } from "../../context/CanvasSizeContext/useCanvasSize";
 import { useSprite } from "../../context/SpriteContext/useSprite";
 import { useOpenAISettings } from "../../context/OpenAISettingsContext/useOpenAISettings";
 import { useImageFileHandler } from "../../features/InputSection/hooks/useImageFileHandler";
-import { GenerationMethod, GENERATION_TOKEN_COST } from "../../types/export";
+import { GenerationMethod } from "../../types/export";
 import { MakeCodeColor } from "../../types/color";
 
 /** Small filled lightning bolt for the speed estimate (matches the solid ★). */
@@ -67,7 +67,7 @@ interface Props {
  * Shared generation UI used by BOTH the hero entry widget and the studio Generate
  * modal — identical experience on both, except the hero adds a Draw Blank tab.
  * Composes the existing primitives (OpenAISettingsSection, ImageUploadForm,
- * AssetTypeSelect) behind tabs, plus a token indicator and a context-aware
+ * AssetTypeSelect) behind tabs, plus a context-aware
  * primary button. Generate and Upload always STAGE a source image (the canvas is
  * untouched) and fire onStaged; the host decides where Resize & Process opens.
  */
@@ -95,10 +95,6 @@ export default function GenerationControls({
     setSourceImage,
     stageSource,
   } = useImageFileHandler();
-
-  // Display-only token cost per generation (no real economy — ADR-0006). Quality
-  // is forced to "low" server-side, so every generation costs the same.
-  const tokenCost = GENERATION_TOKEN_COST;
 
   // Only the hero has a Draw Blank tab. If the shared GenerationMethod context is
   // still on Blank (e.g. it was chosen on the hero before navigating in), fall
@@ -223,16 +219,9 @@ export default function GenerationControls({
 
       {renderPrimary()}
 
-      {/* Cost + speed indicator (AI only) — sits below the button, mirrors the mockup */}
+      {/* Speed indicator (AI only) — sits below the button */}
       {activeMethod === GenerationMethod.TextToSprite && (
         <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-ink-subtle">
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-            <span className="text-accent">★</span>
-            {`${tokenCost} token${tokenCost === 1 ? "" : "s"} per generation`}
-          </span>
-          <span aria-hidden="true" className="font-bold">
-            ·
-          </span>
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
             <BoltIcon />
             ~60s AI sprite generation
