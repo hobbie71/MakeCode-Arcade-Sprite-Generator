@@ -2,8 +2,8 @@
 //
 // ⚠️ Starter boilerplate, NOT legal advice — the pre-launch lawyer review must
 // vet this copy. It discloses third-party ad cookies (ayeT) because ad networks
-// require a published privacy policy. Replace CONTACT_EMAIL with the real support
-// address before launch (see the monetization plan's pre-launch checklist).
+// require a published privacy policy. The contact address below is the project's
+// support mailbox; swap it if the support address changes.
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 text-ink">
@@ -36,8 +36,11 @@ export default function PrivacyPage() {
       <h2 className="mt-6 text-h3 font-semibold">Contact</h2>
       <p className="mt-2">
         Questions:{" "}
-        <a className="text-accent underline" href="mailto:CONTACT_EMAIL">
-          CONTACT_EMAIL
+        <a
+          className="text-accent underline"
+          href="mailto:support@makespritecode.com"
+        >
+          support@makespritecode.com
         </a>
       </p>
     </main>

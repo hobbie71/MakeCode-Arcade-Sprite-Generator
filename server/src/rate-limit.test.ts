@@ -29,14 +29,28 @@ describe("rateLimit middleware", () => {
 });
 
 describe("app wiring", () => {
-  test("generate route is rate-limited (last request 429s)", async () => {
+  // Invalid body → the route returns 422 *after* passing the limiter, so the
+  // first RATE_LIMIT_MAX requests must be 422 (allowed through) and request
+  // MAX+1 must be 429 (limiter trips before the route runs). Asserting the 422s
+  // explicitly proves the limiter actually counts up rather than blocking from
+  // the first request — and that it never hits the paid OpenAI call.
+  const body = JSON.stringify({});
+
+  test("generate route allows up to max then 429s", async () => {
     __resetRateLimit();
     const headers = { "Content-Type": "application/json", "x-forwarded-for": "198.51.100.7" };
-    const body = JSON.stringify({}); // invalid body → 422 until the limiter trips first
-    let last = 0;
-    for (let i = 0; i < config.RATE_LIMIT_MAX + 1; i++) {
-      last = (await app.request("/generate-image/openai", { method: "POST", headers, body })).status;
+    for (let i = 0; i < config.RATE_LIMIT_MAX; i++) {
+      expect((await app.request("/generate-image/openai", { method: "POST", headers, body })).status).toBe(422);
     }
-    expect(last).toBe(429);
+    expect((await app.request("/generate-image/openai", { method: "POST", headers, body })).status).toBe(429);
+  });
+
+  test("moderation route allows up to max then 429s", async () => {
+    __resetRateLimit();
+    const headers = { "Content-Type": "application/json", "x-forwarded-for": "198.51.100.8" };
+    for (let i = 0; i < config.RATE_LIMIT_MAX; i++) {
+      expect((await app.request("/moderation/moderate", { method: "POST", headers, body })).status).toBe(422);
+    }
+    expect((await app.request("/moderation/moderate", { method: "POST", headers, body })).status).toBe(429);
   });
 });

@@ -21,8 +21,13 @@ describe("showRewardedAd", () => {
     delete (window as unknown as { AyetVideoSdk?: unknown }).AyetVideoSdk;
   });
 
-  test("resolves 'completed' on the reward/complete callback", async () => {
+  test("resolves 'completed' on the complete callback", async () => {
     fakeSdk((cb) => cb.onComplete?.());
+    expect(await showRewardedAd("slot")).toBe("completed");
+  });
+
+  test("resolves 'completed' on the reward callback", async () => {
+    fakeSdk((cb) => cb.onReward?.());
     expect(await showRewardedAd("slot")).toBe("completed");
   });
 
