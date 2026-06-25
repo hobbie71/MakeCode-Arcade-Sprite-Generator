@@ -21,6 +21,15 @@ export default function StudioNav({ onOpenExport }: Props) {
       </Link>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <Link
+          to="/privacy"
+          className="text-2xs text-ink-subtle hover:text-ink"
+        >
+          Privacy
+        </Link>
+        <Link to="/terms" className="text-2xs text-ink-subtle hover:text-ink">
+          Terms
+        </Link>
         <Button onClick={onOpenExport}>Export</Button>
       </div>
     </header>

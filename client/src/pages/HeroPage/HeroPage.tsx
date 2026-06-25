@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useHasVisited } from "../../hooks/useHasVisited";
 import Button from "../../components/Button";
+import Footer from "../../components/Footer/Footer";
 import HeroEntryWidget from "./components/HeroEntryWidget";
 import ExampleGallery from "./components/ExampleGallery";
 import HowItWorks from "./components/HowItWorks";
@@ -199,6 +200,8 @@ export default function HeroPage() {
           </nav>
         </div>
       </footer>
+
+      <Footer />
     </div>
   );
 }
