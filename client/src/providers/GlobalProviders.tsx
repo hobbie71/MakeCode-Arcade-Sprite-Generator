@@ -11,7 +11,6 @@ import { OpenAISettingsProvider } from "../context/OpenAISettingsContext/OpenAIS
 import { PostProcessingProvider } from "../context/PostProcessingContext/PostProcessingContext";
 import { ErrorProvider } from "../context/ErrorContext/ErrorContext";
 import { PreviewCanvasProvider } from "../context/PreviewCanvasContext/PreviewCanvasContext";
-import { TokenProvider } from "../context/TokenContext/TokenContext";
 import { StrokeSizeProvider } from "../features/SpriteEditor/contexts/StrokeSizeContext/StrokeSizeContext";
 // Global (not editor-local): undo/redo history wraps the global spriteData and is
 // also touched by usePasteData inside the Generate/Resize modals + hero widget.
@@ -28,11 +27,10 @@ import { HistoryProvider } from "../features/SpriteEditor/contexts/HistoryContex
  */
 const GlobalProviders = ({ children }: { children: React.ReactNode }) => {
   return (
-    <TokenProvider>
-      <AssetTypeProvider>
-        <GenerationMethodProvider>
-          <SpriteProvider>
-            <HistoryProvider>
+    <AssetTypeProvider>
+      <GenerationMethodProvider>
+        <SpriteProvider>
+          <HistoryProvider>
             <PaletteSelectedProvider>
               <CanvasProvider>
                 <CanvasSizeProvider>
@@ -54,11 +52,10 @@ const GlobalProviders = ({ children }: { children: React.ReactNode }) => {
                 </CanvasSizeProvider>
               </CanvasProvider>
             </PaletteSelectedProvider>
-            </HistoryProvider>
-          </SpriteProvider>
-        </GenerationMethodProvider>
-      </AssetTypeProvider>
-    </TokenProvider>
+          </HistoryProvider>
+        </SpriteProvider>
+      </GenerationMethodProvider>
+    </AssetTypeProvider>
   );
 };
 

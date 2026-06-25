@@ -5,7 +5,6 @@ import StudioNav from "./components/StudioNav";
 import GenerateModal from "./modals/GenerateModal";
 import ResizeProcessModal from "./modals/ResizeProcessModal";
 import ExportModal from "./modals/ExportModal";
-import TokenModal from "./modals/TokenModal";
 import { useModal } from "../../components/Modal/useModal";
 import { useHasVisited } from "../../hooks/useHasVisited";
 import { useLoading } from "../../context/LoadingContext/useLoading";
@@ -34,7 +33,6 @@ export default function StudioPage() {
   const generateModal = useModal();
   const resizeModal = useModal();
   const exportModal = useModal();
-  const tokenModal = useModal();
 
   useEffect(() => {
     // Reaching the studio makes you a returning visitor (skip the hero next time).
@@ -79,12 +77,11 @@ export default function StudioPage() {
       generateModal.close();
       resizeModal.close();
       exportModal.close();
-      tokenModal.close();
     } else if (finished) {
       if (pendingResize.current && !error) resizeModal.open();
       pendingResize.current = false;
     }
-  }, [isGenerating, error, generateModal, resizeModal, exportModal, tokenModal]);
+  }, [isGenerating, error, generateModal, resizeModal, exportModal]);
 
   // Opening a sprite-reading flow mid-move cancels the floating selection
   // (pixels snap home) so every modal sees the whole, unmoved sprite — see
@@ -113,7 +110,7 @@ export default function StudioPage() {
   return (
     <RightDockProvider>
       <div className="flex h-screen flex-col bg-surface">
-        <StudioNav onOpenExport={openExport} onOpenTokens={tokenModal.open} />
+        <StudioNav onOpenExport={openExport} />
 
         <div className="min-h-0 flex-1">
           <SpriteEditor
@@ -133,7 +130,6 @@ export default function StudioPage() {
           onClose={resizeModal.close}
         />
         <ExportModal isOpen={exportModal.isOpen} onClose={exportModal.close} />
-        <TokenModal isOpen={tokenModal.isOpen} onClose={tokenModal.close} />
       </div>
     </RightDockProvider>
   );

@@ -8,7 +8,6 @@ import AssetTypeSelect from "./AssetTypeSelect";
 import { useAssetType } from "../../context/AssetTypeContext/useAssetType";
 import { useGenerationMethod } from "../../context/GenerationMethodContext/useGenerationMethod";
 import { useLoading } from "../../context/LoadingContext/useLoading";
-import { useToken } from "../../context/TokenContext/useToken";
 import { useCanvasSize } from "../../context/CanvasSizeContext/useCanvasSize";
 import { useSprite } from "../../context/SpriteContext/useSprite";
 import { useOpenAISettings } from "../../context/OpenAISettingsContext/useOpenAISettings";
@@ -87,7 +86,6 @@ export default function GenerationControls({
   // once. 0 = no failed attempt yet.
   const [assetErrorNonce, setAssetErrorNonce] = useState(0);
   const [promptErrorNonce, setPromptErrorNonce] = useState(0);
-  const { canGenerate, watchAdToEarnToken } = useToken();
   const { settings } = useOpenAISettings();
   const { width, height } = useCanvasSize();
   const { setSpriteData } = useSprite();
@@ -152,7 +150,7 @@ export default function GenerationControls({
 
   const renderPrimary = () => {
     if (activeMethod === GenerationMethod.TextToSprite) {
-      return canGenerate ? (
+      return (
         <Button
           variant="primary"
           className="w-full"
@@ -160,15 +158,6 @@ export default function GenerationControls({
           onClick={handleGenerate}
         >
           ✦ Generate sprite
-        </Button>
-      ) : (
-        // Display-only placeholder for the future rewarded-ad flow (ADR-0006).
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={watchAdToEarnToken}
-        >
-          Watch ad to earn a token
         </Button>
       );
     }
