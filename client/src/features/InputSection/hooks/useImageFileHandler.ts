@@ -30,6 +30,10 @@ import { validatePrompt } from "../utils/promptModeration";
 // API imports
 import { generateOpenAiImage } from "../../../api/generateImageApi";
 
+// Ad gate imports
+import { runWithAdGate } from "../../../ads/runWithAdGate";
+import { showRewardedAd } from "../../../ads/ayet";
+
 // Type imports
 import { AiModel, Crop } from "../../../types/export";
 import type { PostProcessingSettings } from "../../../types/export";
@@ -204,10 +208,9 @@ export const useImageFileHandler = () => {
 
         setGenerationMessage("Generating AI Image");
 
-        response = await generateOpenAiImage(
-          openAISettings,
-          { width, height },
-          palette
+        response = await runWithAdGate(
+          generateOpenAiImage(openAISettings, { width, height }, palette),
+          () => showRewardedAd()
         );
       } else {
         throw new Error(`Unsupported AI model: ${selectedModel}`);

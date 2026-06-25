@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import GlobalProviders from "./providers/GlobalProviders";
 import HeroPage from "./pages/HeroPage/HeroPage";
 import StudioPage from "./pages/StudioPage/StudioPage";
 import LoadingOverlay from "./components/LoadingOverlay";
 import Error from "./components/Error";
+import { initAyet } from "./ads/ayet";
 
 /**
  * Thin route shell. GlobalProviders holds state that must survive hero ↔ studio
@@ -11,6 +13,12 @@ import Error from "./components/Error";
  * or error toast persists across navigation.
  */
 function App() {
+  // Warm up the ayeT SDK once so the first generation's ad has the best chance
+  // of being ready (no-ops if the async SDK script hasn't loaded yet).
+  useEffect(() => {
+    initAyet();
+  }, []);
+
   return (
     <GlobalProviders>
       <Routes>

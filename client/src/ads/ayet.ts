@@ -25,7 +25,6 @@ function getSdk(): AyetSdk | undefined {
 let initialized = false;
 
 /** Idempotent; safe to call before the async SDK script has loaded (no-ops). */
-// fallow-ignore-next-line unused-export
 export function initAyet(): void {
   if (initialized) return;
   const sdk = getSdk();

@@ -1,6 +1,5 @@
 import React from "react";
 import { useLoading } from "../context/LoadingContext/useLoading";
-import SquareResponiveAd from "./AdComponents/SquareResponiveAd";
 
 /**
  * Small filled lightning bolt for the speed estimate — mirrors the bolt on the
@@ -72,17 +71,6 @@ const LoadingOverlay: React.FC = () => {
             ~60s AI sprite generation
           </span>
         </p>
-
-        {/* Ad slot — labeled + framed so the empty/loading state reads as
-            intentional rather than a void while the network ad fills in. */}
-        <div className="mt-6">
-          <p className="mb-1.5 text-2xs font-semibold uppercase tracking-wide text-ink-subtle">
-            Advertisement
-          </p>
-          <div className="flex min-h-[250px] items-center justify-center overflow-hidden rounded-card border border-line bg-surface-sunken">
-            <SquareResponiveAd />
-          </div>
-        </div>
       </div>
     </div>
   );
