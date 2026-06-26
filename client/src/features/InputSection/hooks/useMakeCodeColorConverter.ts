@@ -4,59 +4,24 @@ import { useMemo, useCallback } from "react";
 // Context imports
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
 
-// Lib imports
+// Lib imports — OKLab perceptual nearest-colour matcher (the production matcher).
 import {
-  hslToMakeCodeColor,
-  rgbToMakeCodeColor,
-  hexToMakeCodeColor,
+  buildPaletteLab,
   rgbaToMakeCodeColor,
-} from "../../../utils/colors/getMakeCodeColor";
+} from "../../../utils/colors/oklab";
 
 // Util imports
-import { calculateHueZones } from "../utils/hueZoneUtils";
 import { getRgbaDataFromCanvas } from "../../../utils/getDataFromCanvas";
 
 // Type imports
 import { MakeCodeColor } from "../../../types/color";
 import { drawSpriteDataOnCanvasTransparent } from "../../SpriteEditor/libs/drawPixelOnCanvas";
-import type { HSL, RGB, RGBA } from "../../../utils/colors/colorConversion";
 import { PIXEL_SIZE } from "../../SpriteEditor/constants/canvas";
 
 export const useMakeCodeColorConverter = () => {
   const { palette } = usePaletteSelected();
-  const hueZones = useMemo(() => calculateHueZones(palette), [palette]);
-
-  // Memoized conversion functions
-  const getMakeCodeColorFromHsl = useCallback(
-    (hsl: HSL): MakeCodeColor => {
-      const { h, l } = hsl;
-      return hslToMakeCodeColor(h, l, hueZones);
-    },
-    [hueZones]
-  );
-
-  const getMakeCodeColorFromRgb = useCallback(
-    (rgb: RGB): MakeCodeColor => {
-      const { r, g, b } = rgb;
-      return rgbToMakeCodeColor(r, g, b, hueZones);
-    },
-    [hueZones]
-  );
-
-  const getMakeCodeColorFromHex = useCallback(
-    (hex: string): MakeCodeColor => {
-      return hexToMakeCodeColor(hex, hueZones);
-    },
-    [hueZones]
-  );
-
-  const getMakeCodeColorFromRgba = useCallback(
-    (rgba: RGBA, alphaThreshold?: number): MakeCodeColor => {
-      const { r, g, b, a } = rgba;
-      return rgbaToMakeCodeColor(r, g, b, a, hueZones, alphaThreshold);
-    },
-    [hueZones]
-  );
+  // Pre-convert the active palette to OKLab once; reused for every pixel match.
+  const paletteLab = useMemo(() => buildPaletteLab(palette), [palette]);
 
   const getSpriteDataFromCanvas = useCallback(
     (canvas: HTMLCanvasElement): MakeCodeColor[][] => {
@@ -67,16 +32,14 @@ export const useMakeCodeColorConverter = () => {
         const row: MakeCodeColor[] = [];
         for (let x = 0; x < canvas.width; x++) {
           const { r, g, b, a } = rgbaData[y][x];
-          const color = rgbaToMakeCodeColor(r, g, b, a, hueZones);
-
-          row.push(color);
+          row.push(rgbaToMakeCodeColor(r, g, b, a, paletteLab));
         }
         spriteData.push(row);
       }
 
       return spriteData;
     },
-    [hueZones]
+    [paletteLab]
   );
 
   const mapCanvasToMakeCodeColors = useCallback(
@@ -106,11 +69,6 @@ export const useMakeCodeColorConverter = () => {
   );
 
   return {
-    hueZones,
-    getMakeCodeColorFromHsl,
-    getMakeCodeColorFromRgb,
-    getMakeCodeColorFromHex,
-    getMakeCodeColorFromRgba,
     getSpriteDataFromCanvas,
     mapCanvasToMakeCodeColors,
   };
