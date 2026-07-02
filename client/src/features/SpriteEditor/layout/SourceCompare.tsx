@@ -4,6 +4,9 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { useSprite } from "../../../context/SpriteContext/useSprite";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+import { useImageImports } from "../../../context/ImageImportContext/useImageImports";
+import { usePostProcessing } from "../../../context/PostProcessingContext/usePostProcessing";
+import { useImageFileHandler } from "../../InputSection/hooks/useImageFileHandler";
 
 interface Props {
   sourceUrl: string;
@@ -11,20 +14,73 @@ interface Props {
 
 /**
  * Drag-to-compare viewer: the source image and the live sprite share one box
- * (the sprite's aspect — the same mapping the ghost uses on the canvas),
- * split by a draggable divider: original to the left, sprite to the right.
+ * (the sprite's aspect), split by a draggable divider: original to the left,
+ * sprite to the right.
+ *
  * The sprite side is copied 1:1 from the editor's canvas element after each
- * committed repaint, so it always shows exactly what the editor shows.
+ * committed repaint, so it always shows exactly what the editor shows. The
+ * original side is re-processed through the sprite's exact geometry
+ * (background removal → crop → scale) minus the palette snap, so a cropped or
+ * filled sprite lines up with its source instead of drifting as the divider
+ * is dragged.
  */
 export default function SourceCompare({ sourceUrl }: Props) {
   const { canvasRef } = useCanvas();
   const { width, height } = useCanvasSize();
   const { spriteData } = useSprite();
   const { palette } = usePaletteSelected();
+  const { sourceImage } = useImageImports();
+  const { settings } = usePostProcessing();
+  const { crop, removeBackground, tolerance } = settings;
+  const { processSourceToCanvas } = useImageFileHandler();
   const boxRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLCanvasElement>(null);
   const draggingRef = useRef(false);
+  const frameToken = useRef(0);
   const [pos, setPos] = useState(50);
+  // The source, re-framed with the sprite's geometry (see below). Falls back to
+  // the raw source URL until it's ready / if re-framing fails.
+  const [framedUrl, setFramedUrl] = useState<string | null>(null);
+
+  // Re-frame the source the same way the sprite was produced — background
+  // removal, then the current crop mode, then scale to the sprite size — but
+  // WITHOUT the palette snap, so the original colours show under the sprite's
+  // exact framing. Without this the raw source is stretched edge-to-edge and a
+  // cropped/filled sprite drifts badly against it as the divider moves. Runs
+  // only when the source, size or crop/background settings change; a token
+  // guards against a slow run overwriting a newer one.
+  useEffect(() => {
+    if (!sourceImage) {
+      setFramedUrl(null);
+      return;
+    }
+    // A monotonic token guards against a slow run overwriting a newer one; a
+    // late resolve after unmount is a harmless no-op setState.
+    const token = ++frameToken.current;
+    const fresh = () => token === frameToken.current;
+    processSourceToCanvas(
+      sourceImage,
+      width,
+      height,
+      { crop, removeBackground, tolerance },
+      { skipColorSnap: true }
+    )
+      .then((canvas) => {
+        if (fresh()) setFramedUrl(canvas.toDataURL("image/png"));
+      })
+      // Fall back to the raw source URL (rendered below) on any failure.
+      .catch(() => {
+        if (fresh()) setFramedUrl(null);
+      });
+  }, [
+    sourceImage,
+    width,
+    height,
+    crop,
+    removeBackground,
+    tolerance,
+    processSourceToCanvas,
+  ]);
 
   // Copy the editor canvas one frame after it repaints. Canvas.tsx redraws in
   // a passive effect on the same triggers (committed edits, undo/redo, palette
@@ -83,14 +139,17 @@ export default function SourceCompare({ sourceUrl }: Props) {
           style={{ imageRendering: "pixelated" }}
           aria-hidden="true"
         />
-        {/* Original, stretched to the sprite's box (the ghost's mapping),
-            clipped to the left of the divider. */}
+        {/* Original, re-framed to the sprite's exact geometry so it lines up
+            with the sprite side; clipped to the left of the divider. */}
         <img
-          src={sourceUrl}
+          src={framedUrl ?? sourceUrl}
           alt="Source image"
           draggable={false}
           className="absolute inset-0 h-full w-full"
-          style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
+          style={{
+            clipPath: `inset(0 ${100 - pos}% 0 0)`,
+            imageRendering: "pixelated",
+          }}
         />
         {/* Divider */}
         <div
