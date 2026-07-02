@@ -4,9 +4,7 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { useSprite } from "../../../context/SpriteContext/useSprite";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
-import { useImageImports } from "../../../context/ImageImportContext/useImageImports";
-import { usePostProcessing } from "../../../context/PostProcessingContext/usePostProcessing";
-import { useImageFileHandler } from "../../InputSection/hooks/useImageFileHandler";
+import { useFramedSource } from "../hooks/useFramedSource";
 
 interface Props {
   sourceUrl: string;
@@ -29,58 +27,14 @@ export default function SourceCompare({ sourceUrl }: Props) {
   const { width, height } = useCanvasSize();
   const { spriteData } = useSprite();
   const { palette } = usePaletteSelected();
-  const { sourceImage } = useImageImports();
-  const { settings } = usePostProcessing();
-  const { crop, removeBackground, tolerance } = settings;
-  const { processSourceToCanvas } = useImageFileHandler();
   const boxRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLCanvasElement>(null);
   const draggingRef = useRef(false);
-  const frameToken = useRef(0);
   const [pos, setPos] = useState(50);
-  // The source, re-framed with the sprite's geometry (see below). Falls back to
-  // the raw source URL until it's ready / if re-framing fails.
-  const [framedUrl, setFramedUrl] = useState<string | null>(null);
-
-  // Re-frame the source the same way the sprite was produced — background
-  // removal, then the current crop mode, then scale to the sprite size — but
-  // WITHOUT the palette snap, so the original colours show under the sprite's
-  // exact framing. Without this the raw source is stretched edge-to-edge and a
-  // cropped/filled sprite drifts badly against it as the divider moves. Runs
-  // only when the source, size or crop/background settings change; a token
-  // guards against a slow run overwriting a newer one.
-  useEffect(() => {
-    if (!sourceImage) {
-      setFramedUrl(null);
-      return;
-    }
-    // A monotonic token guards against a slow run overwriting a newer one; a
-    // late resolve after unmount is a harmless no-op setState.
-    const token = ++frameToken.current;
-    const fresh = () => token === frameToken.current;
-    processSourceToCanvas(
-      sourceImage,
-      width,
-      height,
-      { crop, removeBackground, tolerance },
-      { skipColorSnap: true }
-    )
-      .then((canvas) => {
-        if (fresh()) setFramedUrl(canvas.toDataURL("image/png"));
-      })
-      // Fall back to the raw source URL (rendered below) on any failure.
-      .catch(() => {
-        if (fresh()) setFramedUrl(null);
-      });
-  }, [
-    sourceImage,
-    width,
-    height,
-    crop,
-    removeBackground,
-    tolerance,
-    processSourceToCanvas,
-  ]);
+  // The source re-framed with the sprite's exact geometry (background removal →
+  // crop → scale, minus the palette snap) so the "Original" side lines up with
+  // the sprite. Null until ready / on failure → falls back to the raw source.
+  const framedUrl = useFramedSource(width, height);
 
   // Copy the editor canvas one frame after it repaints. Canvas.tsx redraws in
   // a passive effect on the same triggers (committed edits, undo/redo, palette
