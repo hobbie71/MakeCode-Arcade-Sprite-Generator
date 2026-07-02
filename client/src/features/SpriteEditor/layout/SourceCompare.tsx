@@ -4,6 +4,7 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { useSprite } from "../../../context/SpriteContext/useSprite";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
+import { useFramedSource } from "../hooks/useFramedSource";
 
 interface Props {
   sourceUrl: string;
@@ -11,10 +12,15 @@ interface Props {
 
 /**
  * Drag-to-compare viewer: the source image and the live sprite share one box
- * (the sprite's aspect — the same mapping the ghost uses on the canvas),
- * split by a draggable divider: original to the left, sprite to the right.
+ * (the sprite's aspect), split by a draggable divider: original to the left,
+ * sprite to the right.
+ *
  * The sprite side is copied 1:1 from the editor's canvas element after each
- * committed repaint, so it always shows exactly what the editor shows.
+ * committed repaint, so it always shows exactly what the editor shows. The
+ * original side is re-processed through the sprite's exact geometry
+ * (background removal → crop → scale) minus the palette snap, so a cropped or
+ * filled sprite lines up with its source instead of drifting as the divider
+ * is dragged.
  */
 export default function SourceCompare({ sourceUrl }: Props) {
   const { canvasRef } = useCanvas();
@@ -25,6 +31,10 @@ export default function SourceCompare({ sourceUrl }: Props) {
   const copyRef = useRef<HTMLCanvasElement>(null);
   const draggingRef = useRef(false);
   const [pos, setPos] = useState(50);
+  // The source re-framed with the sprite's exact geometry (background removal →
+  // crop → scale, minus the palette snap) so the "Original" side lines up with
+  // the sprite. Null until ready / on failure → falls back to the raw source.
+  const framedUrl = useFramedSource(width, height);
 
   // Copy the editor canvas one frame after it repaints. Canvas.tsx redraws in
   // a passive effect on the same triggers (committed edits, undo/redo, palette
@@ -52,11 +62,13 @@ export default function SourceCompare({ sourceUrl }: Props) {
   }, []);
 
   return (
-    <div className="transparent flex aspect-square w-full items-center justify-center overflow-hidden rounded-md border border-line">
-      {/* Sprite-aspect content box, letterboxed inside the square viewer. */}
+    // Stable square stage; the bordered frame below takes the sprite's true
+    // aspect ratio, so a non-square sprite (e.g. a 160×120 background) reads as
+    // its real shape instead of being letterboxed inside a square viewer.
+    <div className="flex aspect-square w-full items-center justify-center">
       <div
         ref={boxRef}
-        className="relative max-h-full max-w-full touch-none select-none"
+        className="transparent relative max-h-full max-w-full touch-none select-none overflow-hidden rounded-md border border-line"
         style={{
           aspectRatio: `${width} / ${height}`,
           ...(width >= height ? { width: "100%" } : { height: "100%" }),
@@ -83,14 +95,17 @@ export default function SourceCompare({ sourceUrl }: Props) {
           style={{ imageRendering: "pixelated" }}
           aria-hidden="true"
         />
-        {/* Original, stretched to the sprite's box (the ghost's mapping),
-            clipped to the left of the divider. */}
+        {/* Original, re-framed to the sprite's exact geometry so it lines up
+            with the sprite side; clipped to the left of the divider. */}
         <img
-          src={sourceUrl}
+          src={framedUrl ?? sourceUrl}
           alt="Source image"
           draggable={false}
           className="absolute inset-0 h-full w-full"
-          style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
+          style={{
+            clipPath: `inset(0 ${100 - pos}% 0 0)`,
+            imageRendering: "pixelated",
+          }}
         />
         {/* Divider */}
         <div

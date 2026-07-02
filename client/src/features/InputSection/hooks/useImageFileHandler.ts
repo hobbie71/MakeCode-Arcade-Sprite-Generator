@@ -89,13 +89,19 @@ export const useImageFileHandler = () => {
    * URL). Pipeline:
    *   1. Remove background  2. Snap to MakeCode palette
    *   3. Trim / fill        4. Scale to the target size
+   *
+   * `skipColorSnap` omits step 2 so the caller keeps the source's original
+   * colours under the sprite's exact framing — the Source panel's compare
+   * slider uses this so the "Original" side lines up pixel-for-pixel with the
+   * palette-snapped sprite it's dragged against.
    */
   const processSourceToCanvas = useCallback(
     async (
       file: File,
       targetWidth: number,
       targetHeight: number,
-      settings: PostProcessingSettings
+      settings: PostProcessingSettings,
+      options?: { skipColorSnap?: boolean }
     ): Promise<HTMLCanvasElement> => {
       const imgElement = await fileToImageElement(file);
       let canvas = createCanvasFromImage(imgElement);
@@ -105,8 +111,11 @@ export const useImageFileHandler = () => {
         canvas = removeBackground(canvas, settings.tolerance);
       }
 
-      // 2. Convert colors to MakeCode palette (required)
-      canvas = mapCanvasToMakeCodeColors(canvas, 1);
+      // 2. Convert colors to MakeCode palette (required for the sprite; skipped
+      //    for the compare view, which shows the source's original colours).
+      if (!options?.skipColorSnap) {
+        canvas = mapCanvasToMakeCodeColors(canvas, 1);
+      }
 
       // 3. Trim or fill
       if (settings.crop === Crop.Edges) {

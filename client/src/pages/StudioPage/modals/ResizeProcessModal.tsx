@@ -478,41 +478,55 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
         <div>
           <h4 className="mb-2 text-sm font-semibold text-ink">Live preview</h4>
           <div className="rounded-card border border-line bg-surface p-4">
-            <div className="transparent relative mx-auto flex aspect-square w-full items-center justify-center overflow-hidden rounded-md border border-line">
-              {previewUrl && (
-                <img
-                  src={previewUrl}
-                  alt="Processed sprite preview"
-                  className={`h-full w-full object-contain transition duration-200 ${
-                    isStale || isProcessing
-                      ? "scale-105 opacity-50 blur-[6px]"
-                      : ""
-                  }`}
-                  style={{ imageRendering: "pixelated" }}
-                />
-              )}
+            {/* Aspect-correct preview: the bordered frame takes the target
+                dimensions' aspect ratio, so a non-square sprite (e.g. 160×120)
+                reads as its true shape instead of a letterboxed square. A stable
+                square stage bounds it so the modal doesn't resize as the aspect
+                changes. */}
+            <div className="mx-auto flex aspect-square w-full items-center justify-center">
+              <div
+                className="transparent relative flex max-h-full max-w-full items-center justify-center overflow-hidden rounded-md border border-line"
+                style={{
+                  aspectRatio: `${stagedW} / ${stagedH}`,
+                  ...(stagedW >= stagedH
+                    ? { width: "100%" }
+                    : { height: "100%" }),
+                }}>
+                {previewUrl && (
+                  <img
+                    src={previewUrl}
+                    alt="Processed sprite preview"
+                    className={`h-full w-full object-contain transition duration-200 ${
+                      isStale || isProcessing
+                        ? "scale-105 opacity-50 blur-[6px]"
+                        : ""
+                    }`}
+                    style={{ imageRendering: "pixelated" }}
+                  />
+                )}
 
-              {/* Processing: a centered spinner over the blurred preview. */}
-              {isProcessing && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                  <Spinner size="md" />
-                  <span className="text-xs font-medium text-ink-muted">
-                    Processing…
-                  </span>
-                </div>
-              )}
+                {/* Processing: a centered spinner over the blurred preview. */}
+                {isProcessing && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                    <Spinner size="md" />
+                    <span className="text-xs font-medium text-ink-muted">
+                      Processing…
+                    </span>
+                  </div>
+                )}
 
-              {/* Stale (typing a custom size / dragging Tolerance is expensive):
-                  a centered call-to-action recomputes the preview on demand. */}
-              {isStale && !isProcessing && (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={refreshPreview}
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 gap-1.5 whitespace-nowrap shadow-lg">
-                  <span aria-hidden>⟲</span> Update preview
-                </Button>
-              )}
+                {/* Stale (typing a custom size / dragging Tolerance is expensive):
+                    a centered call-to-action recomputes the preview on demand. */}
+                {isStale && !isProcessing && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={refreshPreview}
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 gap-1.5 whitespace-nowrap shadow-lg">
+                    <span aria-hidden>⟲</span> Update preview
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
