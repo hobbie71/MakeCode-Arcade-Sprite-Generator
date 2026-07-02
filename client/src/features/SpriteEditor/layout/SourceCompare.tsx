@@ -108,11 +108,13 @@ export default function SourceCompare({ sourceUrl }: Props) {
   }, []);
 
   return (
-    <div className="transparent flex aspect-square w-full items-center justify-center overflow-hidden rounded-md border border-line">
-      {/* Sprite-aspect content box, letterboxed inside the square viewer. */}
+    // Stable square stage; the bordered frame below takes the sprite's true
+    // aspect ratio, so a non-square sprite (e.g. a 160×120 background) reads as
+    // its real shape instead of being letterboxed inside a square viewer.
+    <div className="flex aspect-square w-full items-center justify-center">
       <div
         ref={boxRef}
-        className="relative max-h-full max-w-full touch-none select-none"
+        className="transparent relative max-h-full max-w-full touch-none select-none overflow-hidden rounded-md border border-line"
         style={{
           aspectRatio: `${width} / ${height}`,
           ...(width >= height ? { width: "100%" } : { height: "100%" }),
