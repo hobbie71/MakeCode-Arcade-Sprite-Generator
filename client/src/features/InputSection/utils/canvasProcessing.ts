@@ -3,6 +3,7 @@ import {
   getImageDataFromCanvas,
   getPixel,
 } from "../../../utils/getDataFromCanvas";
+import { createCanvas2D } from "../../../utils/image/canvas";
 
 interface ContentBounds {
   minX: number;
@@ -451,16 +452,7 @@ export const scaleCanvasToTarget = (
   }
 
   // Create target canvas
-  const targetCanvas = document.createElement("canvas");
-  targetCanvas.width = targetWidth;
-  targetCanvas.height = targetHeight;
-
-  const ctx = targetCanvas.getContext("2d", {
-    willReadFrequently: true,
-    alpha: true,
-  });
-
-  if (!ctx) throw new Error("Failed to get CTX");
+  const { canvas: targetCanvas, ctx } = createCanvas2D(targetWidth, targetHeight);
 
   // Configure for pixel art (no smoothing)
   ctx.imageSmoothingEnabled = false;

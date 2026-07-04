@@ -22,12 +22,23 @@ const PORT = Number(process.env.PORT) || 3000;
 // wildcard by specificity, so `/favicon.svg` serves the real file while `/studio`
 // (and any other client route) still falls through to the bundled SPA. New files
 // added to public/ require a dev-server restart — same as production's copy step.
+//
+// Walked recursively so nested public/ assets (e.g. public/compare-samples/*.png)
+// resolve in dev the same way production's recursive `cp -R public/* dist/` makes
+// them resolve at the site root.
 const publicRoutes: Record<string, Response> = {};
-for (const entry of readdirSync(PUBLIC, { withFileTypes: true })) {
-  if (entry.isFile()) {
-    publicRoutes[`/${entry.name}`] = new Response(Bun.file(join(PUBLIC, entry.name)));
+const registerPublic = (dir: string, prefix: string) => {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const abs = join(dir, entry.name);
+    const route = `${prefix}/${entry.name}`;
+    if (entry.isFile()) {
+      publicRoutes[route] = new Response(Bun.file(abs));
+    } else if (entry.isDirectory()) {
+      registerPublic(abs, route);
+    }
   }
-}
+};
+registerPublic(PUBLIC, "");
 
 const server = Bun.serve({
   port: PORT,
