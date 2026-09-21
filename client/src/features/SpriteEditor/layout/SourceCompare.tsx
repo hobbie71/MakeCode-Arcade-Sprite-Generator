@@ -4,11 +4,10 @@ import { useCanvas } from "../../../context/CanvasContext/useCanvas";
 import { useCanvasSize } from "../../../context/CanvasSizeContext/useCanvasSize";
 import { useSprite } from "../../../context/SpriteContext/useSprite";
 import { usePaletteSelected } from "../../../context/PaletteSelectedContext/usePaletteSelected";
-import { useFramedSource } from "../hooks/useFramedSource";
+import { useFramedSourceCanvas } from "../hooks/useFramedSourceCanvas";
 
-interface Props {
-  sourceUrl: string;
-}
+// Backing-store cap for the original side; the viewer is a few hundred CSS px.
+const MAX_BACKING_EDGE = 1024;
 
 /**
  * Drag-to-compare viewer: the source image and the live sprite share one box
@@ -17,12 +16,11 @@ interface Props {
  *
  * The sprite side is copied 1:1 from the editor's canvas element after each
  * committed repaint, so it always shows exactly what the editor shows. The
- * original side is re-processed through the sprite's exact geometry
- * (background removal → crop → scale) minus the palette snap, so a cropped or
- * filled sprite lines up with its source instead of drifting as the divider
- * is dragged.
+ * original side is the full-res source cropped to the frame the processing
+ * pipeline mapped onto the canvas, so a trimmed or filled sprite lines up with
+ * its source without re-running the pipeline.
  */
-export default function SourceCompare({ sourceUrl }: Props) {
+export default function SourceCompare() {
   const { canvasRef } = useCanvas();
   const { width, height } = useCanvasSize();
   const { spriteData } = useSprite();
@@ -31,10 +29,11 @@ export default function SourceCompare({ sourceUrl }: Props) {
   const copyRef = useRef<HTMLCanvasElement>(null);
   const draggingRef = useRef(false);
   const [pos, setPos] = useState(50);
-  // The source re-framed with the sprite's exact geometry (background removal →
-  // crop → scale, minus the palette snap) so the "Original" side lines up with
-  // the sprite. Null until ready / on failure → falls back to the raw source.
-  const framedUrl = useFramedSource(width, height);
+  const {
+    canvasRef: originalRef,
+    backingWidth,
+    backingHeight,
+  } = useFramedSourceCanvas(width, height, MAX_BACKING_EDGE);
 
   // Copy the editor canvas one frame after it repaints. Canvas.tsx redraws in
   // a passive effect on the same triggers (committed edits, undo/redo, palette
@@ -95,16 +94,18 @@ export default function SourceCompare({ sourceUrl }: Props) {
           style={{ imageRendering: "pixelated" }}
           aria-hidden="true"
         />
-        {/* Original, re-framed to the sprite's exact geometry so it lines up
-            with the sprite side; clipped to the left of the divider. */}
-        <img
-          src={framedUrl ?? sourceUrl}
-          alt="Source image"
-          draggable={false}
+        {/* Original, cropped to the sprite's frame so it lines up with the
+            sprite side; clipped to the left of the divider. */}
+        <canvas
+          ref={originalRef}
+          width={backingWidth}
+          height={backingHeight}
+          role="img"
+          aria-label="Source image"
           className="absolute inset-0 h-full w-full"
           style={{
             clipPath: `inset(0 ${100 - pos}% 0 0)`,
-            imageRendering: "pixelated",
+            imageRendering: "auto",
           }}
         />
         {/* Divider */}

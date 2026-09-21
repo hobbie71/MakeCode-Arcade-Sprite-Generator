@@ -1,3 +1,4 @@
+// fallow-ignore-file code-duplication -- semantic dupes match this hook's run of context reads against other components
 import { useCallback } from "react";
 
 // Context imports
@@ -12,26 +13,16 @@ import { useError } from "../../../context/ErrorContext/useError";
 
 // Hook imports
 import { usePasteData } from "../../../features/SpriteEditor/hooks/usePasteData";
-import { useMakeCodeColorConverter } from "./useMakeCodeColorConverter";
+import { useProcessSourceToCanvas } from "./useProcessSourceToCanvas";
 
 // Utils imports
-import {
-  createCanvasFromImage,
-  fileToImageElement,
-} from "../utils/imageProcessers";
-import {
-  removeBackground,
-  cropToVisibleContent,
-  fillToEdges,
-  scaleCanvasToTarget,
-} from "../utils/canvasProcessing";
 import { validatePrompt } from "../utils/promptModeration";
 
 // API imports
 import { generateOpenAiImage } from "../../../api/generateImageApi";
 
 // Type imports
-import { AiModel, Crop } from "../../../types/export";
+import { AiModel } from "../../../types/export";
 import type { PostProcessingSettings } from "../../../types/export";
 
 /**
@@ -53,12 +44,16 @@ const dataUrlToFile = (dataUrl: string, filename: string): File => {
 
 export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();
-  const { setImportedImage, importedImage, sourceImage, setSourceImage } =
-    useImageImports();
+  const {
+    setImportedImage,
+    importedImage,
+    sourceImage,
+    setSourceImage,
+    setSourceFrame,
+  } = useImageImports();
   const { startGeneration, stopGeneration, setGenerationMessage } =
     useLoading();
   const { pasteCanvas } = usePasteData();
-  const { mapCanvasToMakeCodeColors } = useMakeCodeColorConverter();
   const { selectedModel } = useAiModel();
   const { settings: openAISettings } = useOpenAISettings();
   const { settings: postProcessingSettings } = usePostProcessing();
@@ -78,57 +73,7 @@ export const useImageFileHandler = () => {
     [setImportedImage, setSourceImage]
   );
 
-  /**
-   * Runs the image → sprite processing pipeline on a source file and returns the
-   * resulting canvas WITHOUT committing it to the editor. All inputs are passed
-   * explicitly (no editor-state coupling) so callers can render a preview of
-   * *pending* settings before applying them.
-   *
-   * Shared by `processImageToSprite` (which pastes the canvas into the editor)
-   * and the Resize & Process modal's live preview (which renders it to a data
-   * URL). Pipeline:
-   *   1. Remove background  2. Snap to MakeCode palette
-   *   3. Trim / fill        4. Scale to the target size
-   *
-   * `skipColorSnap` omits step 2 so the caller keeps the source's original
-   * colours under the sprite's exact framing — the Source panel's compare
-   * slider uses this so the "Original" side lines up pixel-for-pixel with the
-   * palette-snapped sprite it's dragged against.
-   */
-  const processSourceToCanvas = useCallback(
-    async (
-      file: File,
-      targetWidth: number,
-      targetHeight: number,
-      settings: PostProcessingSettings,
-      options?: { skipColorSnap?: boolean }
-    ): Promise<HTMLCanvasElement> => {
-      const imgElement = await fileToImageElement(file);
-      let canvas = createCanvasFromImage(imgElement);
-
-      // 1. Remove background
-      if (settings.removeBackground) {
-        canvas = removeBackground(canvas, settings.tolerance);
-      }
-
-      // 2. Convert colors to MakeCode palette (required for the sprite; skipped
-      //    for the compare view, which shows the source's original colours).
-      if (!options?.skipColorSnap) {
-        canvas = mapCanvasToMakeCodeColors(canvas, 1);
-      }
-
-      // 3. Trim or fill
-      if (settings.crop === Crop.Edges) {
-        canvas = cropToVisibleContent(canvas);
-      } else if (settings.crop === Crop.Fill) {
-        canvas = fillToEdges(canvas, targetWidth, targetHeight);
-      }
-
-      // 4. Scale to target
-      return scaleCanvasToTarget(canvas, targetWidth, targetHeight);
-    },
-    [mapCanvasToMakeCodeColors]
-  );
+  const processSourceToCanvas = useProcessSourceToCanvas();
 
   /**
    * Converts an image file to sprite data with post-processing settings applied,
@@ -159,7 +104,7 @@ export const useImageFileHandler = () => {
       try {
         startGeneration("Processing Image to Sprite");
 
-        const canvas = await processSourceToCanvas(
+        const { canvas, frame } = await processSourceToCanvas(
           imageFile,
           overrides?.width ?? width,
           overrides?.height ?? height,
@@ -168,6 +113,7 @@ export const useImageFileHandler = () => {
 
         // Upload Canvas to UI Sprite Editor
         pasteCanvas(canvas);
+        setSourceFrame(frame);
         stopGeneration();
       } catch (error) {
         setError(String(error));
@@ -184,6 +130,7 @@ export const useImageFileHandler = () => {
       width,
       height,
       pasteCanvas,
+      setSourceFrame,
     ]
   );
 

@@ -45,7 +45,7 @@ jobs:
           fetch-depth: 0
 
       - name: Fallow audit
-        uses: fallow-rs/fallow@v2
+        uses: fallow-rs/fallow@v3
         with:
           command: audit
           gate: new-only # fail only on findings this PR introduces
@@ -65,7 +65,7 @@ jobs:
           fetch-depth: 0
 
       - name: Fallow security gate
-        uses: fallow-rs/fallow@v2
+        uses: fallow-rs/fallow@v3
         with:
           command: security
           security-gate: new # fail only on candidates introduced by this PR

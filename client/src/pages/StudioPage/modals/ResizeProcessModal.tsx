@@ -203,7 +203,7 @@ export default function ResizeProcessModal({ isOpen, onClose }: Props) {
       try {
         let url: string;
         if (sourceImage) {
-          const canvas = await processSourceToCanvas(sourceImage, w, h, s);
+          const { canvas } = await processSourceToCanvas(sourceImage, w, h, s);
           if (token !== previewToken.current) return; // superseded
           url = canvas.toDataURL("image/png");
         } else {
