@@ -26,6 +26,12 @@ import {
   scaleCanvasToTarget,
 } from "../utils/canvasProcessing";
 import { validatePrompt } from "../utils/promptModeration";
+import {
+  fullFrame,
+  letterboxFrame,
+  subFrame,
+  type SourceFrame,
+} from "../utils/sourceFrame";
 
 // API imports
 import { generateOpenAiImage } from "../../../api/generateImageApi";
@@ -53,8 +59,13 @@ const dataUrlToFile = (dataUrl: string, filename: string): File => {
 
 export const useImageFileHandler = () => {
   const { width, height } = useCanvasSize();
-  const { setImportedImage, importedImage, sourceImage, setSourceImage } =
-    useImageImports();
+  const {
+    setImportedImage,
+    importedImage,
+    sourceImage,
+    setSourceImage,
+    setSourceFrame,
+  } = useImageImports();
   const { startGeneration, stopGeneration, setGenerationMessage } =
     useLoading();
   const { pasteCanvas } = usePasteData();
@@ -90,42 +101,50 @@ export const useImageFileHandler = () => {
    *   1. Remove background  2. Snap to MakeCode palette
    *   3. Trim / fill        4. Scale to the target size
    *
-   * `skipColorSnap` omits step 2 so the caller keeps the source's original
-   * colours under the sprite's exact framing — the Source panel's compare
-   * slider uses this so the "Original" side lines up pixel-for-pixel with the
-   * palette-snapped sprite it's dragged against.
+   * `frame` is the region of the original the canvas ends up showing, so the
+   * Source panel can crop the full-res original identically for free.
    */
   const processSourceToCanvas = useCallback(
     async (
       file: File,
       targetWidth: number,
       targetHeight: number,
-      settings: PostProcessingSettings,
-      options?: { skipColorSnap?: boolean }
-    ): Promise<HTMLCanvasElement> => {
+      settings: PostProcessingSettings
+    ): Promise<{ canvas: HTMLCanvasElement; frame: SourceFrame }> => {
       const imgElement = await fileToImageElement(file);
       let canvas = createCanvasFromImage(imgElement);
+      let frame = fullFrame(canvas.width, canvas.height);
 
       // 1. Remove background
       if (settings.removeBackground) {
         canvas = removeBackground(canvas, settings.tolerance);
       }
 
-      // 2. Convert colors to MakeCode palette (required for the sprite; skipped
-      //    for the compare view, which shows the source's original colours).
-      if (!options?.skipColorSnap) {
-        canvas = mapCanvasToMakeCodeColors(canvas, 1);
-      }
+      // 2. Convert colors to MakeCode palette (required)
+      canvas = mapCanvasToMakeCodeColors(canvas, 1);
 
       // 3. Trim or fill
       if (settings.crop === Crop.Edges) {
-        canvas = cropToVisibleContent(canvas);
+        const trimmed = cropToVisibleContent(canvas);
+        frame = subFrame(frame, canvas.width, canvas.height, trimmed.rect);
+        canvas = trimmed.canvas;
       } else if (settings.crop === Crop.Fill) {
-        canvas = fillToEdges(canvas, targetWidth, targetHeight);
+        const filled = fillToEdges(canvas, targetWidth, targetHeight);
+        frame = subFrame(frame, canvas.width, canvas.height, filled.rect);
+        canvas = filled.canvas;
       }
 
       // 4. Scale to target
-      return scaleCanvasToTarget(canvas, targetWidth, targetHeight);
+      const scaled = scaleCanvasToTarget(canvas, targetWidth, targetHeight);
+      frame = letterboxFrame(
+        frame,
+        canvas.width,
+        canvas.height,
+        targetWidth,
+        targetHeight,
+        scaled.placement
+      );
+      return { canvas: scaled.canvas, frame };
     },
     [mapCanvasToMakeCodeColors]
   );
@@ -159,7 +178,7 @@ export const useImageFileHandler = () => {
       try {
         startGeneration("Processing Image to Sprite");
 
-        const canvas = await processSourceToCanvas(
+        const { canvas, frame } = await processSourceToCanvas(
           imageFile,
           overrides?.width ?? width,
           overrides?.height ?? height,
@@ -168,6 +187,7 @@ export const useImageFileHandler = () => {
 
         // Upload Canvas to UI Sprite Editor
         pasteCanvas(canvas);
+        setSourceFrame(frame);
         stopGeneration();
       } catch (error) {
         setError(String(error));
@@ -184,6 +204,7 @@ export const useImageFileHandler = () => {
       width,
       height,
       pasteCanvas,
+      setSourceFrame,
     ]
   );
 

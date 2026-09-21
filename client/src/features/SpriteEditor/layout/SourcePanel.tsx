@@ -56,7 +56,7 @@ export default function SourcePanel({ onOpenGenerate, onOpenResize }: Props) {
   return (
     <div className="space-y-3">
       {/* Drag-to-compare: original vs the live sprite */}
-      <SourceCompare sourceUrl={sourceUrl} />
+      <SourceCompare />
 
       {/* Ghost overlay controls */}
       <div className="rounded-md border border-line p-2">

@@ -3,6 +3,7 @@ import {
   getImageDataFromCanvas,
   getPixel,
 } from "../../../utils/getDataFromCanvas";
+import { computeContainPlacement, type Rect } from "./sourceFrame";
 
 interface ContentBounds {
   minX: number;
@@ -203,10 +204,11 @@ export const removeBackground = (
 /**
  * Crops canvas to visible content bounds (non-transparent pixels only)
  * Tight crop: for each side (top, right, bottom, left), move inward until a colored (non-transparent) pixel is found.
+ * `rect` is the kept region in source-canvas coordinates.
  */
 export const cropToVisibleContent = (
   sourceCanvas: HTMLCanvasElement
-): HTMLCanvasElement => {
+): { canvas: HTMLCanvasElement; rect: Rect } => {
   const ctx = sourceCanvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) {
     throw new Error("Could not get canvas context");
@@ -225,7 +227,7 @@ export const cropToVisibleContent = (
     if (newCtx) {
       newCtx.drawImage(sourceCanvas, 0, 0);
     }
-    return newCanvas;
+    return { canvas: newCanvas, rect: { x: 0, y: 0, width, height } };
   }
 
   // Tight bounding box crop on all sides
@@ -260,7 +262,10 @@ export const cropToVisibleContent = (
     srcH // dest height
   );
 
-  return croppedCanvas;
+  return {
+    canvas: croppedCanvas,
+    rect: { x: srcX, y: srcY, width: srcW, height: srcH },
+  };
 };
 
 /**
@@ -272,7 +277,7 @@ const computeAspectCrop = (
   sourceWidth: number,
   sourceHeight: number,
   targetAspect: number
-): { x: number; y: number; width: number; height: number } => {
+): Rect => {
   // Calculate content dimensions and center
   const contentWidth = bounds.maxX - bounds.minX + 1;
   const contentHeight = bounds.maxY - bounds.minY + 1;
@@ -316,12 +321,13 @@ const computeAspectCrop = (
 /**
  * Crops canvas until content touches all 4 edges, maintaining target aspect ratio
  * Removes parts that don't fit to make content fill the entire canvas
+ * `rect` is the cropped region in source-canvas coordinates.
  */
 export const fillToEdges = (
   sourceCanvas: HTMLCanvasElement,
   targetWidth: number,
   targetHeight: number
-): HTMLCanvasElement => {
+): { canvas: HTMLCanvasElement; rect: Rect } => {
   const { width: sourceWidth, height: sourceHeight } = sourceCanvas;
 
   // Validate input dimensions
@@ -342,9 +348,17 @@ export const fillToEdges = (
   filledCanvas.width = targetWidth;
   filledCanvas.height = targetHeight;
 
+  const targetAspect = targetWidth / targetHeight;
+
   // If no content found, return empty canvas with target aspect ratio
   if (!bounds) {
-    return filledCanvas;
+    const rect = computeAspectCrop(
+      { minX: 0, minY: 0, maxX: sourceWidth - 1, maxY: sourceHeight - 1 },
+      sourceWidth,
+      sourceHeight,
+      targetAspect
+    );
+    return { canvas: filledCanvas, rect };
   }
 
   const filledCtx = filledCanvas.getContext("2d", {
@@ -356,12 +370,7 @@ export const fillToEdges = (
     throw new Error("Could not get filled canvas context");
   }
 
-  const crop = computeAspectCrop(
-    bounds,
-    sourceWidth,
-    sourceHeight,
-    targetWidth / targetHeight
-  );
+  const crop = computeAspectCrop(bounds, sourceWidth, sourceHeight, targetAspect);
 
   // Draw the cropped content to fill the entire target canvas
   filledCtx.drawImage(
@@ -376,7 +385,7 @@ export const fillToEdges = (
     targetHeight // dest height (fill target)
   );
 
-  return filledCanvas;
+  return { canvas: filledCanvas, rect: crop };
 };
 
 /**
@@ -429,28 +438,22 @@ const isColorSimilar = (
   );
 };
 
+/**
+ * Contains the canvas (aspect preserved, centered) inside a target-size canvas.
+ * `placement` is where the source landed, in target coordinates.
+ */
 export const scaleCanvasToTarget = (
   sourceCanvas: HTMLCanvasElement,
   targetWidth: number,
   targetHeight: number
-): HTMLCanvasElement => {
-  // Calculate dimensions to maintain aspect ratio
-  const sourceAspectRatio = sourceCanvas.width / sourceCanvas.height;
-  const targetAspectRatio = targetWidth / targetHeight;
+): { canvas: HTMLCanvasElement; placement: Rect } => {
+  const placement = computeContainPlacement(
+    sourceCanvas.width,
+    sourceCanvas.height,
+    targetWidth,
+    targetHeight
+  );
 
-  let drawWidth: number, drawHeight: number;
-
-  if (sourceAspectRatio > targetAspectRatio) {
-    // Source is wider, fit to width
-    drawWidth = targetWidth;
-    drawHeight = Math.round(targetWidth / sourceAspectRatio);
-  } else {
-    // Source is taller, fit to height
-    drawHeight = targetHeight;
-    drawWidth = Math.round(targetHeight * sourceAspectRatio);
-  }
-
-  // Create target canvas
   const targetCanvas = document.createElement("canvas");
   targetCanvas.width = targetWidth;
   targetCanvas.height = targetHeight;
@@ -465,21 +468,17 @@ export const scaleCanvasToTarget = (
   // Configure for pixel art (no smoothing)
   ctx.imageSmoothingEnabled = false;
 
-  // Center the image within the target canvas
-  const offsetX = Math.floor((targetWidth - drawWidth) / 2);
-  const offsetY = Math.floor((targetHeight - drawHeight) / 2);
-
   ctx.drawImage(
     sourceCanvas,
     0,
     0,
     sourceCanvas.width,
     sourceCanvas.height,
-    offsetX,
-    offsetY,
-    drawWidth,
-    drawHeight
+    placement.x,
+    placement.y,
+    placement.width,
+    placement.height
   );
 
-  return targetCanvas;
+  return { canvas: targetCanvas, placement };
 };
